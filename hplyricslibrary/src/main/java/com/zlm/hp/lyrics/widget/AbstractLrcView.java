@@ -1059,6 +1059,10 @@ public abstract class AbstractLrcView extends View {
         }
     }
 
+    public LyricsReader getLyricsReader() {
+        return mLyricsReader;
+    }
+
     public void setTranslateDrawType(int mTranslateDrawType) {
         this.mTranslateDrawType = mTranslateDrawType;
     }
