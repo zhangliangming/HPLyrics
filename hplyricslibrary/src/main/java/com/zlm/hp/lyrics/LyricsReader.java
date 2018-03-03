@@ -58,6 +58,8 @@ public class LyricsReader {
      */
     private List<LyricsLineInfo> mTransliterationLrcLineInfos;
 
+    private LyricsInfo mLyricsInfo;
+
     public LyricsReader() {
 
     }
@@ -112,6 +114,7 @@ public class LyricsReader {
      * @param lyricsInfo
      */
     private void parser(LyricsInfo lyricsInfo) {
+        mLyricsInfo = lyricsInfo;
         mLyricsType = lyricsInfo.getLyricsType();
         Map<String, Object> tags = lyricsInfo.getLyricsTags();
         if (tags.containsKey(LyricsTag.TAG_OFFSET)) {
@@ -177,6 +180,10 @@ public class LyricsReader {
 
     public void setOffset(int offset) {
         this.mOffset = offset;
+    }
+
+    public LyricsInfo getLyricsInfo() {
+        return mLyricsInfo;
     }
 
     ////////////////////////////////////////////////////////////////////////////////
