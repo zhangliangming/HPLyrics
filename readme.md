@@ -2,6 +2,9 @@
 该开源依赖库是乐乐音乐播放器里的一个歌词模块功能，现在把该功能模块独立出来进行优化，并弄成了一个开源依赖库，其它音乐播放器项目只要引用该库并调用接口，便可轻松实现与乐乐音乐播放器一样的动感歌词显示效果，其项目地址如下：[乐乐音乐播放器](https://github.com/zhangliangming/HappyPlayer5.git)。
 
 # 日志 #
+## v1.1##
+
+- 添加歌词读取器获取歌词实体类方法
 ## v1.0##
 
 - 实现lrc、ksc、krc和hrc歌词格式的显示
@@ -64,7 +67,7 @@
 2.app build.gradle
 
 `dependencies {
-	         compile 'com.github.zhangliangming:HPLyrics:v1.0'
+	         compile 'com.github.zhangliangming:HPLyrics:v1.1'
 	}`
 
 # 调用Demo #
