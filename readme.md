@@ -76,7 +76,7 @@
 2.app build.gradle
 
 `dependencies {
-	         compile 'com.github.zhangliangming:HPLyrics:v1.4'
+	         compile 'com.github.zhangliangming:HPLyrics:v1.5'
 	}`
 
 # 调用Demo #

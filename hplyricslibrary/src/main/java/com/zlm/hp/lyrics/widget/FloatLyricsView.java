@@ -7,6 +7,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 
 import com.zlm.hp.lyrics.LyricsReader;
+import com.zlm.hp.lyrics.interfaces.ILrcView;
 import com.zlm.hp.lyrics.model.LyricsInfo;
 import com.zlm.hp.lyrics.model.LyricsLineInfo;
 import com.zlm.hp.lyrics.utils.LyricsUtils;
@@ -18,7 +19,7 @@ import java.util.List;
  * Created by zhangliangming on 2018-02-24.
  */
 
-public class FloatLyricsView extends AbstractLrcView {
+public class FloatLyricsView extends BaseLrcView implements ILrcView {
 
 
     public FloatLyricsView(Context context) {
@@ -31,12 +32,12 @@ public class FloatLyricsView extends AbstractLrcView {
 
 
     @Override
-    protected void viewInit(Context context) {
+    public void viewInit(Context context) {
 
     }
 
     @Override
-    protected void viewLoadFinish() {
+    public void viewLoadFinish() {
         //设置歌词的最大宽度
         mTextMaxWidth = getWidth() / 3 * 2;
         //字体大小
@@ -53,7 +54,7 @@ public class FloatLyricsView extends AbstractLrcView {
     }
 
     @Override
-    protected void onViewDrawLrc(Canvas canvas) {
+    public void onViewDrawLrc(Canvas canvas) {
 
         //绘画歌词
         if (mExtraLrcStatus == EXTRALRCSTATUS_NOSHOWEXTRALRC) {
@@ -77,7 +78,7 @@ public class FloatLyricsView extends AbstractLrcView {
         List<LyricsLineInfo> splitLyricsLineInfos = mLrcLineInfos.get(mLyricsLineNum).getSplitLyricsLineInfos();
         LyricsLineInfo lyricsLineInfo = splitLyricsLineInfos.get(mSplitLyricsLineNum);
         //获取行歌词高亮宽度
-        mLineLyricsHLWidth = getLineLyricsHLWidth(mLyricsReader.getLyricsType(),mPaint, lyricsLineInfo, mSplitLyricsWordIndex, mLyricsWordHLTime);
+        mLineLyricsHLWidth = getLineLyricsHLWidth(mLyricsReader.getLyricsType(), mPaint, lyricsLineInfo, mSplitLyricsWordIndex, mLyricsWordHLTime);
         // 当行歌词
         String curLyrics = lyricsLineInfo.getLineLyrics();
         float curLrcTextWidth = getTextWidth(mPaint, curLyrics);
@@ -231,7 +232,7 @@ public class FloatLyricsView extends AbstractLrcView {
     }
 
     @Override
-    protected boolean onViewTouchEvent(MotionEvent event) {
+    public boolean onViewTouchEvent(MotionEvent event) {
         return true;
     }
 
@@ -250,7 +251,7 @@ public class FloatLyricsView extends AbstractLrcView {
     }
 
     @Override
-    protected void updateView(int playProgress) {
+    public void updateView(int playProgress) {
         //不在转换中，则进行歌词的绘画
         mLyricsLineNum = LyricsUtils.getLineNumber(mLyricsReader.getLyricsType(), mLrcLineInfos, playProgress, mLyricsReader.getPlayOffset());
         updateSplitData(playProgress);

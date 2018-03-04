@@ -19,6 +19,7 @@ import android.view.animation.LinearInterpolator;
 import android.widget.Scroller;
 
 import com.zlm.hp.lyrics.LyricsReader;
+import com.zlm.hp.lyrics.interfaces.ILrcView;
 import com.zlm.hp.lyrics.model.LyricsInfo;
 import com.zlm.hp.lyrics.model.LyricsLineInfo;
 import com.zlm.hp.lyrics.utils.ColorUtils;
@@ -32,7 +33,7 @@ import java.util.List;
  * Created by zhangliangming on 2018-02-24.
  */
 
-public class ManyLyricsView extends AbstractLrcView {
+public class ManyLyricsView extends BaseLrcView implements ILrcView {
     /**
      * 初始
      */
@@ -184,7 +185,7 @@ public class ManyLyricsView extends AbstractLrcView {
     }
 
     @Override
-    protected void viewInit(Context context) {
+    public void viewInit(Context context) {
         //
         mScroller = new Scroller(context, new LinearInterpolator());
         mTouchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
@@ -217,7 +218,7 @@ public class ManyLyricsView extends AbstractLrcView {
     }
 
     @Override
-    protected void viewLoadFinish() {
+    public void viewLoadFinish() {
 
         //设置画笔大小
         mPaintIndicator.setTextSize(mPlayRectSize);
@@ -230,7 +231,7 @@ public class ManyLyricsView extends AbstractLrcView {
     }
 
     @Override
-    protected void onViewDrawLrc(Canvas canvas) {
+    public void onViewDrawLrc(Canvas canvas) {
         //获取中间位置
         mCentreY = (getHeight() + getTextHeight(mPaintHL)) * 0.5f + getLineAtHeightY(mLyricsLineNum) - mOffsetY;
 
@@ -597,7 +598,7 @@ public class ManyLyricsView extends AbstractLrcView {
     }
 
     @Override
-    protected boolean onViewTouchEvent(MotionEvent event) {
+    public boolean onViewTouchEvent(MotionEvent event) {
         if (!mTouchAble || mLrcStatus != LRCSTATUS_LRC)
             return true;
         obtainVelocityTracker(event);
@@ -840,7 +841,7 @@ public class ManyLyricsView extends AbstractLrcView {
     }
 
     @Override
-    protected void updateView(int playProgress) {
+    public void updateView(int playProgress) {
         int newLyricsLineNum = LyricsUtils.getLineNumber(mLyricsReader.getLyricsType(), mLrcLineInfos, playProgress, mLyricsReader.getPlayOffset());
         if (newLyricsLineNum != mLyricsLineNum) {
             if (mTouchEventStatus == TOUCHEVENTSTATUS_INIT && !isChangeScrollerFinalY && !mTouchIntercept) {
