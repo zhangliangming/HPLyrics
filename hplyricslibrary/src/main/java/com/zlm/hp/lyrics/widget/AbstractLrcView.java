@@ -1060,7 +1060,7 @@ public abstract class AbstractLrcView extends View {
      *
      * @param lyricsReader 歌词读取器
      */
-    public void setAbstracLyricsReader(LyricsReader lyricsReader) {
+    public void setLyricsReader(LyricsReader lyricsReader) {
         synchronized (lock) {
             this.mLyricsReader = lyricsReader;
             resetData();

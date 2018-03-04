@@ -3,6 +3,9 @@
 
 # 日志 #
 
+## v1.7##
+
+- 修复设置歌词读取器的问题
 ## v1.6##
 
 - 还原
@@ -79,7 +82,7 @@
 2.app build.gradle
 
 `dependencies {
-	         compile 'com.github.zhangliangming:HPLyrics:v1.6'
+	         compile 'com.github.zhangliangming:HPLyrics:v1.7'
 	}`
 
 # 调用Demo #

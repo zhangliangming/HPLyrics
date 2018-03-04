@@ -248,15 +248,15 @@ public class FloatLyricsView extends AbstractLrcView {
      *
      * @param lyricsReader
      */
+    @Override
     public synchronized void setLyricsReader(LyricsReader lyricsReader) {
-        if (lyricsReader == null || lyricsReader.getLyricsType() == LyricsInfo.DYNAMIC) {
-           setAbstracLyricsReader(lyricsReader);
-
+        super.setLyricsReader(lyricsReader);
+        if (lyricsReader != null && lyricsReader.getLyricsType() == LyricsInfo.DYNAMIC) {
             //翻译歌词以动感歌词形式显示
             if (mExtraLrcType == EXTRALRCTYPE_BOTH || mExtraLrcType == EXTRALRCTYPE_TRANSLATELRC) {
                 setTranslateDrawType(TRANSLATE_DRAW_TYPE_DYNAMIC);
             }
-        } else {
+        }else {
             setLrcStatus(LRCSTATUS_NONSUPPORT);
         }
     }
