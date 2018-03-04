@@ -3,6 +3,9 @@
 
 # 日志 #
 
+## v1.6##
+
+- 还原
 ## v1.3##
 
 - 2018-03-04
@@ -76,7 +79,7 @@
 2.app build.gradle
 
 `dependencies {
-	         compile 'com.github.zhangliangming:HPLyrics:v1.5'
+	         compile 'com.github.zhangliangming:HPLyrics:v1.6'
 	}`
 
 # 调用Demo #

@@ -7,7 +7,6 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 
 import com.zlm.hp.lyrics.LyricsReader;
-import com.zlm.hp.lyrics.interfaces.ILrcView;
 import com.zlm.hp.lyrics.model.LyricsInfo;
 import com.zlm.hp.lyrics.model.LyricsLineInfo;
 import com.zlm.hp.lyrics.utils.LyricsUtils;
@@ -19,7 +18,7 @@ import java.util.List;
  * Created by zhangliangming on 2018-02-24.
  */
 
-public class FloatLyricsView extends BaseLrcView implements ILrcView {
+public class FloatLyricsView extends AbstractLrcView {
 
 
     public FloatLyricsView(Context context) {
@@ -32,12 +31,12 @@ public class FloatLyricsView extends BaseLrcView implements ILrcView {
 
 
     @Override
-    public void viewInit(Context context) {
+    protected void viewInit(Context context) {
 
     }
 
     @Override
-    public void viewLoadFinish() {
+    protected void viewLoadFinish() {
         //设置歌词的最大宽度
         mTextMaxWidth = getWidth() / 3 * 2;
         //字体大小
@@ -54,7 +53,7 @@ public class FloatLyricsView extends BaseLrcView implements ILrcView {
     }
 
     @Override
-    public void onViewDrawLrc(Canvas canvas) {
+    protected void onViewDrawLrc(Canvas canvas) {
 
         //绘画歌词
         if (mExtraLrcStatus == EXTRALRCSTATUS_NOSHOWEXTRALRC) {
@@ -232,14 +231,26 @@ public class FloatLyricsView extends BaseLrcView implements ILrcView {
     }
 
     @Override
-    public boolean onViewTouchEvent(MotionEvent event) {
+    protected boolean onViewTouchEvent(MotionEvent event) {
         return true;
     }
 
+
     @Override
+    protected void updateView(int playProgress) {
+        //不在转换中，则进行歌词的绘画
+        mLyricsLineNum = LyricsUtils.getLineNumber(mLyricsReader.getLyricsType(), mLrcLineInfos, playProgress, mLyricsReader.getPlayOffset());
+        updateSplitData(playProgress);
+    }
+
+    /**
+     * 设置歌词读取器
+     *
+     * @param lyricsReader
+     */
     public synchronized void setLyricsReader(LyricsReader lyricsReader) {
         if (lyricsReader == null || lyricsReader.getLyricsType() == LyricsInfo.DYNAMIC) {
-            super.setLyricsReader(lyricsReader);
+           setAbstracLyricsReader(lyricsReader);
 
             //翻译歌词以动感歌词形式显示
             if (mExtraLrcType == EXTRALRCTYPE_BOTH || mExtraLrcType == EXTRALRCTYPE_TRANSLATELRC) {
@@ -248,12 +259,5 @@ public class FloatLyricsView extends BaseLrcView implements ILrcView {
         } else {
             setLrcStatus(LRCSTATUS_NONSUPPORT);
         }
-    }
-
-    @Override
-    public void updateView(int playProgress) {
-        //不在转换中，则进行歌词的绘画
-        mLyricsLineNum = LyricsUtils.getLineNumber(mLyricsReader.getLyricsType(), mLrcLineInfos, playProgress, mLyricsReader.getPlayOffset());
-        updateSplitData(playProgress);
     }
 }

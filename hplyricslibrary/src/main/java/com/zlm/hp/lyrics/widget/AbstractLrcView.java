@@ -16,7 +16,6 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 
 import com.zlm.hp.lyrics.LyricsReader;
-import com.zlm.hp.lyrics.interfaces.ILrcView;
 import com.zlm.hp.lyrics.model.LyricsInfo;
 import com.zlm.hp.lyrics.model.LyricsLineInfo;
 import com.zlm.hp.lyrics.utils.ColorUtils;
@@ -31,7 +30,7 @@ import java.util.TreeMap;
  * Created by zhangliangming on 2018-02-25.
  */
 
-public  class BaseLrcView extends View implements ILrcView {
+public abstract class AbstractLrcView extends View {
     /**
      * 初始
      */
@@ -369,12 +368,12 @@ public  class BaseLrcView extends View implements ILrcView {
         }
     };
 
-    public BaseLrcView(Context context) {
+    public AbstractLrcView(Context context) {
         super(context);
         init(context);
     }
 
-    public BaseLrcView(Context context, AttributeSet attrs) {
+    public AbstractLrcView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context);
     }
@@ -842,7 +841,6 @@ public  class BaseLrcView extends View implements ILrcView {
     }
 
 
-
     /**
      * 更新分隔后的行号，字索引，高亮时间
      *
@@ -1062,7 +1060,7 @@ public  class BaseLrcView extends View implements ILrcView {
      *
      * @param lyricsReader 歌词读取器
      */
-    public void setLyricsReader(LyricsReader lyricsReader) {
+    public void setAbstracLyricsReader(LyricsReader lyricsReader) {
         synchronized (lock) {
             this.mLyricsReader = lyricsReader;
             resetData();
@@ -1350,30 +1348,40 @@ public  class BaseLrcView extends View implements ILrcView {
         }
     }
 
-    @Override
-    public void viewInit(Context context) {
+    /**
+     * 初始化
+     *
+     * @param context
+     */
+    protected abstract void viewInit(Context context);
 
-    }
+    /**
+     * view视图加载完成
+     */
+    protected abstract void viewLoadFinish();
 
-    @Override
-    public void viewLoadFinish() {
+    /**
+     * view的draw歌词调用方法
+     *
+     * @param canvas
+     * @return
+     */
+    protected abstract void onViewDrawLrc(Canvas canvas);
 
-    }
+    /**
+     * view的onTouchEvent调用方法
+     *
+     * @param event
+     * @return
+     */
+    protected abstract boolean onViewTouchEvent(MotionEvent event);
 
-    @Override
-    public void onViewDrawLrc(Canvas canvas) {
-
-    }
-
-    @Override
-    public boolean onViewTouchEvent(MotionEvent event) {
-        return false;
-    }
-
-    @Override
-    public void updateView(int playProgress) {
-
-    }
+    /**
+     * 更新视图
+     *
+     * @param playProgress
+     */
+    protected abstract void updateView(int playProgress);
 
     /**
      * 搜索歌词接口

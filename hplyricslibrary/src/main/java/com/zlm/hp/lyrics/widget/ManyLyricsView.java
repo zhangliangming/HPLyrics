@@ -19,7 +19,6 @@ import android.view.animation.LinearInterpolator;
 import android.widget.Scroller;
 
 import com.zlm.hp.lyrics.LyricsReader;
-import com.zlm.hp.lyrics.interfaces.ILrcView;
 import com.zlm.hp.lyrics.model.LyricsInfo;
 import com.zlm.hp.lyrics.model.LyricsLineInfo;
 import com.zlm.hp.lyrics.utils.ColorUtils;
@@ -33,7 +32,7 @@ import java.util.List;
  * Created by zhangliangming on 2018-02-24.
  */
 
-public class ManyLyricsView extends BaseLrcView implements ILrcView {
+public class ManyLyricsView extends AbstractLrcView {
     /**
      * 初始
      */
@@ -185,7 +184,7 @@ public class ManyLyricsView extends BaseLrcView implements ILrcView {
     }
 
     @Override
-    public void viewInit(Context context) {
+    protected void viewInit(Context context) {
         //
         mScroller = new Scroller(context, new LinearInterpolator());
         mTouchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
@@ -218,7 +217,7 @@ public class ManyLyricsView extends BaseLrcView implements ILrcView {
     }
 
     @Override
-    public void viewLoadFinish() {
+    protected void viewLoadFinish() {
 
         //设置画笔大小
         mPaintIndicator.setTextSize(mPlayRectSize);
@@ -231,7 +230,7 @@ public class ManyLyricsView extends BaseLrcView implements ILrcView {
     }
 
     @Override
-    public void onViewDrawLrc(Canvas canvas) {
+    protected void onViewDrawLrc(Canvas canvas) {
         //获取中间位置
         mCentreY = (getHeight() + getTextHeight(mPaintHL)) * 0.5f + getLineAtHeightY(mLyricsLineNum) - mOffsetY;
 
@@ -598,7 +597,7 @@ public class ManyLyricsView extends BaseLrcView implements ILrcView {
     }
 
     @Override
-    public boolean onViewTouchEvent(MotionEvent event) {
+    protected boolean onViewTouchEvent(MotionEvent event) {
         if (!mTouchAble || mLrcStatus != LRCSTATUS_LRC)
             return true;
         obtainVelocityTracker(event);
@@ -805,17 +804,21 @@ public class ManyLyricsView extends BaseLrcView implements ILrcView {
 
     }
 
-    @Override
+    /**
+     * 设置歌词读取器
+     *
+     * @param lyricsReader
+     */
     public synchronized void setLyricsReader(LyricsReader lyricsReader) {
         if (lyricsReader == null || lyricsReader.getLyricsType() == LyricsInfo.DYNAMIC) {
-            super.setLyricsReader(lyricsReader);
+            setAbstracLyricsReader(lyricsReader);
 
             //翻译歌词以动感歌词形式显示
             if (mExtraLrcType == EXTRALRCTYPE_BOTH || mExtraLrcType == EXTRALRCTYPE_TRANSLATELRC) {
                 setTranslateDrawType(TRANSLATE_DRAW_TYPE_DYNAMIC);
             }
         } else {
-            super.setLyricsReader(lyricsReader);
+            setAbstracLyricsReader(lyricsReader);
         }
     }
 
@@ -841,7 +844,7 @@ public class ManyLyricsView extends BaseLrcView implements ILrcView {
     }
 
     @Override
-    public void updateView(int playProgress) {
+    protected void updateView(int playProgress) {
         int newLyricsLineNum = LyricsUtils.getLineNumber(mLyricsReader.getLyricsType(), mLrcLineInfos, playProgress, mLyricsReader.getPlayOffset());
         if (newLyricsLineNum != mLyricsLineNum) {
             if (mTouchEventStatus == TOUCHEVENTSTATUS_INIT && !isChangeScrollerFinalY && !mTouchIntercept) {
