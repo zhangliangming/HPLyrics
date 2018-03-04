@@ -797,16 +797,23 @@ public class LyricsUtils {
         //添加歌词增量
         int curPlayingTime = oldPlayingTime + playOffset;
         LyricsLineInfo lyrLine = lyricsLineTreeMap.get(lyricsLineNum);
-        int elapseTime = lyrLine.getStartTime();
+
         List<LyricsLineInfo> lyricsLineInfos = lyrLine.getSplitLyricsLineInfos();
         for (int i = 0; i < lyricsLineInfos.size(); i++) {
             LyricsLineInfo temp = lyricsLineInfos.get(i);
+            int elapseTime = temp.getStartTime();
+            if (curPlayingTime < elapseTime) return -1;
             for (int j = 0; j < temp.getLyricsWords().length; j++) {
                 elapseTime += temp.getWordsDisInterval()[j];
                 if (curPlayingTime <= elapseTime) {
                     return j;
                 }
             }
+            int endTime = temp.getEndTime();
+            if (elapseTime < curPlayingTime && curPlayingTime <= endTime) {
+                return temp.getLyricsWords().length - 1;
+            }
+
         }
         return -1;
     }
@@ -827,11 +834,17 @@ public class LyricsUtils {
         int curPlayingTime = oldPlayingTime + playOffset;
         LyricsLineInfo lyrLine = lyricsLineTreeMap.get(lyricsLineNum);
         int elapseTime = lyrLine.getStartTime();
+        if (curPlayingTime < elapseTime) return -1;
+
         for (int j = 0; j < lyrLine.getLyricsWords().length; j++) {
             elapseTime += lyrLine.getWordsDisInterval()[j];
             if (curPlayingTime <= elapseTime) {
                 return j;
             }
+        }
+        int endTime = lyrLine.getEndTime();
+        if (elapseTime < curPlayingTime && curPlayingTime <= endTime) {
+            return lyrLine.getLyricsWords().length - 1;
         }
 
         return -1;
@@ -852,16 +865,22 @@ public class LyricsUtils {
         //添加歌词增量
         int curPlayingTime = oldPlayingTime + playOffset;
         LyricsLineInfo lyrLine = lyricsLineInfos.get(lyricsLineNum);
-        int elapseTime = lyrLine.getStartTime();
         List<LyricsLineInfo> newLyricsLineInfos = lyrLine.getSplitLyricsLineInfos();
         for (int i = 0; i < newLyricsLineInfos.size(); i++) {
             LyricsLineInfo temp = newLyricsLineInfos.get(i);
+            int elapseTime = temp.getStartTime();
+            if (curPlayingTime < elapseTime) return -1;
             for (int j = 0; j < temp.getLyricsWords().length; j++) {
                 elapseTime += temp.getWordsDisInterval()[j];
                 if (curPlayingTime <= elapseTime) {
                     return j;
                 }
             }
+            int endTime = temp.getEndTime();
+            if (elapseTime < curPlayingTime && curPlayingTime <= endTime) {
+                return temp.getLyricsWords().length - 1;
+            }
+
         }
         return -1;
     }
@@ -882,11 +901,16 @@ public class LyricsUtils {
         int curPlayingTime = oldPlayingTime + playOffset;
         LyricsLineInfo lyrLine = lyricsLineInfos.get(lyricsLineNum);
         int elapseTime = lyrLine.getStartTime();
+        if (curPlayingTime < elapseTime) return -1;
         for (int j = 0; j < lyrLine.getLyricsWords().length; j++) {
             elapseTime += lyrLine.getWordsDisInterval()[j];
             if (curPlayingTime <= elapseTime) {
                 return j;
             }
+        }
+        int endTime = lyrLine.getEndTime();
+        if (elapseTime < curPlayingTime && curPlayingTime <= endTime) {
+            return lyrLine.getLyricsWords().length - 1;
         }
 
         return -1;
@@ -906,12 +930,19 @@ public class LyricsUtils {
         int curPlayingTime = oldPlayingTime + playOffset;
         LyricsLineInfo lyrLine = lyricsLineTreeMap.get(lyricsLineNum);
         int elapseTime = lyrLine.getStartTime();
+        if (curPlayingTime < elapseTime) return 0;
         for (int i = 0; i < lyrLine.getLyricsWords().length; i++) {
             elapseTime += lyrLine.getWordsDisInterval()[i];
             if (curPlayingTime <= elapseTime) {
                 return lyrLine.getWordsDisInterval()[i] - (elapseTime - curPlayingTime);
             }
         }
+
+        int endTime = lyrLine.getEndTime();
+        if (elapseTime < curPlayingTime && curPlayingTime <= endTime) {
+            return lyrLine.getWordsDisInterval()[lyrLine.getLyricsWords().length - 1];
+        }
+
         return 0;
     }
 
@@ -931,11 +962,16 @@ public class LyricsUtils {
         int curPlayingTime = oldPlayingTime + playOffset;
         LyricsLineInfo lyrLine = lyricsLineInfos.get(lyricsLineNum);
         int elapseTime = lyrLine.getStartTime();
+        if (curPlayingTime < elapseTime) return 0;
         for (int i = 0; i < lyrLine.getLyricsWords().length; i++) {
             elapseTime += lyrLine.getWordsDisInterval()[i];
             if (curPlayingTime <= elapseTime) {
                 return lyrLine.getWordsDisInterval()[i] - (elapseTime - curPlayingTime);
             }
+        }
+        int endTime = lyrLine.getEndTime();
+        if (elapseTime < curPlayingTime && curPlayingTime <= endTime) {
+            return lyrLine.getWordsDisInterval()[lyrLine.getLyricsWords().length - 1];
         }
         return 0;
     }

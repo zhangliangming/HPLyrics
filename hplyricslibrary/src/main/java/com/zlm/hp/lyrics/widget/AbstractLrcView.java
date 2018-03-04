@@ -329,10 +329,7 @@ public abstract class AbstractLrcView extends View {
      * 播放器类型
      */
     private int mLrcPlayerStatus = LRCPLAYERSTATUS_INIT;
-    /**
-     * 歌词刷新
-     */
-    private Handler mLrcPlayerHandler = new Handler();
+
     /**
      * 播放器开始时间，用于计算歌曲播放的时长
      */
@@ -346,6 +343,11 @@ public abstract class AbstractLrcView extends View {
      * 当前播放进度
      */
     private int mCurPlayingTime = 0;
+
+    /**
+     * 歌词刷新
+     */
+    private Handler mLrcPlayerHandler = new Handler();
     /**
      * 歌词刷新线程
      */
@@ -573,37 +575,41 @@ public abstract class AbstractLrcView extends View {
      * @param lyricsWordHLTime
      * @return
      */
-    public float getLineLyricsHLWidth(Paint paint, LyricsLineInfo lyricsLineInfo, int lyricsWordIndex, float lyricsWordHLTime) {
+    public float getLineLyricsHLWidth(int lyricsType, Paint paint, LyricsLineInfo lyricsLineInfo, int lyricsWordIndex, float lyricsWordHLTime) {
         float lineLyricsHLWidth = 0;
+
         // 当行歌词
         String curLyrics = lyricsLineInfo.getLineLyrics();
         float curLrcTextWidth = getTextWidth(paint, curLyrics);
-        if (lyricsWordIndex != -1) {
-            String lyricsWords[] = lyricsLineInfo.getLyricsWords();
-            int wordsDisInterval[] = lyricsLineInfo
-                    .getWordsDisInterval();
-            // 当前歌词之前的歌词
-            StringBuilder lyricsBeforeWord = new StringBuilder();
-            for (int i = 0; i < lyricsWordIndex; i++) {
-                lyricsBeforeWord.append(lyricsWords[i]);
-            }
-            // 当前歌词字
-            String lrcNowWord = lyricsWords[lyricsWordIndex].trim();// 去掉空格
-            // 当前歌词之前的歌词长度
-            float lyricsBeforeWordWidth = paint
-                    .measureText(lyricsBeforeWord.toString());
-
-            // 当前歌词长度
-            float lyricsNowWordWidth = paint.measureText(lrcNowWord);
-
-            float len = lyricsNowWordWidth
-                    / wordsDisInterval[lyricsWordIndex]
-                    * lyricsWordHLTime;
-            lineLyricsHLWidth = lyricsBeforeWordWidth + len;
-        } else {
+        if (lyricsType == LyricsInfo.LRC) {
             // 整行歌词
             lineLyricsHLWidth = curLrcTextWidth;
+        } else {
+            if (lyricsWordIndex != -1) {
+                String lyricsWords[] = lyricsLineInfo.getLyricsWords();
+                int wordsDisInterval[] = lyricsLineInfo
+                        .getWordsDisInterval();
+                // 当前歌词之前的歌词
+                StringBuilder lyricsBeforeWord = new StringBuilder();
+                for (int i = 0; i < lyricsWordIndex; i++) {
+                    lyricsBeforeWord.append(lyricsWords[i]);
+                }
+                // 当前歌词字
+                String lrcNowWord = lyricsWords[lyricsWordIndex].trim();// 去掉空格
+                // 当前歌词之前的歌词长度
+                float lyricsBeforeWordWidth = paint
+                        .measureText(lyricsBeforeWord.toString());
+
+                // 当前歌词长度
+                float lyricsNowWordWidth = paint.measureText(lrcNowWord);
+
+                float len = lyricsNowWordWidth
+                        / wordsDisInterval[lyricsWordIndex]
+                        * lyricsWordHLTime;
+                lineLyricsHLWidth = lyricsBeforeWordWidth + len;
+            }
         }
+
         return lineLyricsHLWidth;
     }
 
@@ -1103,6 +1109,8 @@ public abstract class AbstractLrcView extends View {
             } else {
                 //是否有歌词数据
                 mLrcStatus = LRCSTATUS_LRC;
+
+                updateView(mCurPlayingTime);
             }
             initExtraLrcTypeAndCallBack();
             invalidateView();
@@ -1175,10 +1183,11 @@ public abstract class AbstractLrcView extends View {
             mExtraLrcType = EXTRALRCTYPE_NOLRC;
             isHandToChangeExtraLrcStatus = false;
         }
+        if (!isHandToChangeExtraLrcStatus) {
+            mExtraLrcStatus = extraLrcStatus;
+            isHandToChangeExtraLrcStatus = false;
+        }
         if (mExtraLyricsListener != null) {
-            if (!isHandToChangeExtraLrcStatus) {
-                mExtraLrcStatus = extraLrcStatus;
-            }
             mExtraLyricsListener.extraLrcCallback();
         }
     }

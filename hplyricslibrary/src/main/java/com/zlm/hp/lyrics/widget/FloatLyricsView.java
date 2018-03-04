@@ -77,7 +77,7 @@ public class FloatLyricsView extends AbstractLrcView {
         List<LyricsLineInfo> splitLyricsLineInfos = mLrcLineInfos.get(mLyricsLineNum).getSplitLyricsLineInfos();
         LyricsLineInfo lyricsLineInfo = splitLyricsLineInfos.get(mSplitLyricsLineNum);
         //获取行歌词高亮宽度
-        mLineLyricsHLWidth = getLineLyricsHLWidth(mPaint, lyricsLineInfo, mSplitLyricsWordIndex, mLyricsWordHLTime);
+        mLineLyricsHLWidth = getLineLyricsHLWidth(mLyricsReader.getLyricsType(),mPaint, lyricsLineInfo, mSplitLyricsWordIndex, mLyricsWordHLTime);
         // 当行歌词
         String curLyrics = lyricsLineInfo.getLineLyrics();
         float curLrcTextWidth = getTextWidth(mPaint, curLyrics);
@@ -220,7 +220,7 @@ public class FloatLyricsView extends AbstractLrcView {
      */
     private void drawDynamiLyrics(Canvas canvas, Paint paint, Paint paintHL, Paint paintOutline, LyricsLineInfo lyricsLineInfo, float lyricsLineHLWidth, int lyricsWordIndex, float lyricsWordHLTime, float highLightMoveX, float textY) {
         //获取行歌词高亮宽度
-        lyricsLineHLWidth = getLineLyricsHLWidth(paint, lyricsLineInfo, lyricsWordIndex, lyricsWordHLTime);
+        lyricsLineHLWidth = getLineLyricsHLWidth(mLyricsReader.getLyricsType(), paint, lyricsLineInfo, lyricsWordIndex, lyricsWordHLTime);
         // 当行歌词
         String curLyrics = lyricsLineInfo.getLineLyrics();
         float curLrcTextWidth = getTextWidth(paint, curLyrics);

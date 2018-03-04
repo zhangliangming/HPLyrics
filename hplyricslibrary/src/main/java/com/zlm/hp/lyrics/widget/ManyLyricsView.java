@@ -332,7 +332,7 @@ public class ManyLyricsView extends AbstractLrcView {
         float lineY = (getHeight() - lineH) / 2;
         float lineLeft = textX + textWidth + linePadding;
         float lineR = rectL - linePadding;
-        LinearGradient linearGradientHL = new LinearGradient(lineLeft, lineY + lineH, lineR, lineY + lineH, new int[]{Color.WHITE, Color.TRANSPARENT, Color.WHITE}, new float[]{0f, 0.5f, 1f}, Shader.TileMode.CLAMP);
+        LinearGradient linearGradientHL = new LinearGradient(lineLeft, lineY + lineH, lineR, lineY + lineH, new int[]{ColorUtils.parserColor(Color.WHITE, 200), ColorUtils.parserColor(Color.WHITE, 10), ColorUtils.parserColor(Color.WHITE, 200)}, new float[]{0f, 0.5f, 1f}, Shader.TileMode.CLAMP);
         mPaintLine.setShader(linearGradientHL);
         canvas.drawRect(lineLeft, lineY, lineR, lineY + lineH, mPaintLine);
 
@@ -404,7 +404,7 @@ public class ManyLyricsView extends AbstractLrcView {
 
             } else if (i == curLyricsLineNum) {
                 //绘画动感歌词
-                float lineLyricsHLWidth = getLineLyricsHLWidth(paint, splitLyricsLineInfos.get(i), splitLyricsWordIndex, lyricsWordHLTime);
+                float lineLyricsHLWidth = getLineLyricsHLWidth(mLyricsReader.getLyricsType(), paint, splitLyricsLineInfos.get(i), splitLyricsWordIndex, lyricsWordHLTime);
                 drawDynamicText(canvas, paint, paintHL, text, lineLyricsHLWidth, textX, lineBottomY);
 
             } else if (i > curLyricsLineNum) {
@@ -813,7 +813,7 @@ public class ManyLyricsView extends AbstractLrcView {
             if (mExtraLrcType == EXTRALRCTYPE_BOTH || mExtraLrcType == EXTRALRCTYPE_TRANSLATELRC) {
                 setTranslateDrawType(TRANSLATE_DRAW_TYPE_DYNAMIC);
             }
-        }else{
+        } else {
             super.setLyricsReader(lyricsReader);
         }
     }
