@@ -3,6 +3,9 @@
 
 # 日志 #
 
+## v1.8##
+
+- 修复未读到下一行歌词时，上一行歌词渐变宽度为0的问题
 ## v1.7##
 
 - 修复设置歌词读取器的问题
@@ -82,7 +85,7 @@
 2.app build.gradle
 
 `dependencies {
-	         compile 'com.github.zhangliangming:HPLyrics:v1.7'
+	         compile 'com.github.zhangliangming:HPLyrics:v1.8'
 	}`
 
 # 调用Demo #

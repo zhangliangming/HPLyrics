@@ -581,7 +581,7 @@ public abstract class AbstractLrcView extends View {
         // 当行歌词
         String curLyrics = lyricsLineInfo.getLineLyrics();
         float curLrcTextWidth = getTextWidth(paint, curLyrics);
-        if (lyricsType == LyricsInfo.LRC) {
+        if (lyricsType == LyricsInfo.LRC || lyricsWordIndex == -2) {
             // 整行歌词
             lineLyricsHLWidth = curLrcTextWidth;
         } else {

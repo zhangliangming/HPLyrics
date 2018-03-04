@@ -815,7 +815,8 @@ public class LyricsUtils {
             }
 
         }
-        return -1;
+        //整句已经播放完成
+        return -2;
     }
 
     /**
@@ -847,7 +848,8 @@ public class LyricsUtils {
             return lyrLine.getLyricsWords().length - 1;
         }
 
-        return -1;
+        //整句已经播放完成
+        return -2;
     }
 
     /**
@@ -882,7 +884,8 @@ public class LyricsUtils {
             }
 
         }
-        return -1;
+        //整句已经播放完成
+        return -2;
     }
 
     /**
@@ -913,7 +916,8 @@ public class LyricsUtils {
             return lyrLine.getLyricsWords().length - 1;
         }
 
-        return -1;
+        //整句已经播放完成
+        return -2;
     }
 
     /**
@@ -936,11 +940,6 @@ public class LyricsUtils {
             if (curPlayingTime <= elapseTime) {
                 return lyrLine.getWordsDisInterval()[i] - (elapseTime - curPlayingTime);
             }
-        }
-
-        int endTime = lyrLine.getEndTime();
-        if (elapseTime < curPlayingTime && curPlayingTime <= endTime) {
-            return lyrLine.getWordsDisInterval()[lyrLine.getLyricsWords().length - 1];
         }
 
         return 0;
@@ -968,10 +967,6 @@ public class LyricsUtils {
             if (curPlayingTime <= elapseTime) {
                 return lyrLine.getWordsDisInterval()[i] - (elapseTime - curPlayingTime);
             }
-        }
-        int endTime = lyrLine.getEndTime();
-        if (elapseTime < curPlayingTime && curPlayingTime <= endTime) {
-            return lyrLine.getWordsDisInterval()[lyrLine.getLyricsWords().length - 1];
         }
         return 0;
     }
