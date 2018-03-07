@@ -362,7 +362,7 @@ public abstract class AbstractLrcView extends View {
                     //
                     long endTime = System.currentTimeMillis();
                     mPlayerSpendTime = (endTime - mPlayerStartTime);
-                    mLrcPlayerHandler.postDelayed(mLrcPlayerRunnable, 0);
+                    mLrcPlayerHandler.postDelayed(mLrcPlayerRunnable, 20);
                 }
             }
         }

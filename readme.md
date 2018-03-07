@@ -5,6 +5,9 @@
 
 ## v1.8##
 
+- 修改歌词每次刷新的间隔最少为20ms
+## v1.8##
+
 - 修复未读到下一行歌词时，上一行歌词渐变宽度为0的问题
 ## v1.7##
 
@@ -85,7 +88,7 @@
 2.app build.gradle
 
 `dependencies {
-	         compile 'com.github.zhangliangming:HPLyrics:v1.8'
+	         compile 'com.github.zhangliangming:HPLyrics:v1.9'
 	}`
 
 # 调用Demo #
