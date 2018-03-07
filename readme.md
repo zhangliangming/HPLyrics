@@ -3,7 +3,10 @@
 
 # 日志 #
 
-## v1.8##
+## v1.10##
+
+- 修改歌词每次刷新的间隔最少为100ms
+## v1.9##
 
 - 修改歌词每次刷新的间隔最少为20ms
 ## v1.8##
@@ -88,7 +91,7 @@
 2.app build.gradle
 
 `dependencies {
-	         compile 'com.github.zhangliangming:HPLyrics:v1.9'
+	         compile 'com.github.zhangliangming:HPLyrics:v1.10'
 	}`
 
 # 调用Demo #

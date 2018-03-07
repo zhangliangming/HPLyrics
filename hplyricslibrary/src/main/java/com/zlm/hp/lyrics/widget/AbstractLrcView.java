@@ -11,6 +11,7 @@ import android.graphics.Typeface;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -361,8 +362,12 @@ public abstract class AbstractLrcView extends View {
                     invalidateView();
                     //
                     long endTime = System.currentTimeMillis();
+                    long updateTime = (endTime - mPlayerStartTime) - mPlayerSpendTime;
+                    Log.e("AbstractLrcView", "updateTime = " + updateTime);
                     mPlayerSpendTime = (endTime - mPlayerStartTime);
-                    mLrcPlayerHandler.postDelayed(mLrcPlayerRunnable, 20);
+                    long delayMs = 100 - updateTime;
+                    Log.e("AbstractLrcView", "delayMs = " + Math.max(0, delayMs));
+                    mLrcPlayerHandler.postDelayed(mLrcPlayerRunnable, Math.max(0, delayMs));
                 }
             }
         }
