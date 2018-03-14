@@ -3,6 +3,9 @@
 
 # 日志 #
 
+## v1.11##
+
+- 修复最后一个字渐变出错的问题
 ## v1.10##
 
 - 修改歌词每次刷新的间隔最少为100ms
@@ -91,7 +94,7 @@
 2.app build.gradle
 
 `dependencies {
-	         compile 'com.github.zhangliangming:HPLyrics:v1.10'
+	         compile 'com.github.zhangliangming:HPLyrics:v1.11'
 	}`
 
 # 调用Demo #
