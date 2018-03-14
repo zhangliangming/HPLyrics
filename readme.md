@@ -3,6 +3,9 @@
 
 # 日志 #
 
+## v1.12##
+
+- 修复多行歌词未读时渐变的问题
 ## v1.11##
 
 - 修复最后一个字渐变出错的问题
@@ -94,7 +97,7 @@
 2.app build.gradle
 
 `dependencies {
-	         compile 'com.github.zhangliangming:HPLyrics:v1.11'
+	         compile 'com.github.zhangliangming:HPLyrics:v1.12'
 	}`
 
 # 调用Demo #
