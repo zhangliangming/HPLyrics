@@ -30,7 +30,7 @@ public class LyricsUtils {
     public static File getLrcFile(String fileName, String filePathDirectory) {
         List<String> lrcExts = LyricsIOUtils.getSupportLyricsExts();
         for (int i = 0; i < lrcExts.size(); i++) {
-            String lrcFilePath = filePathDirectory + File.separator + fileName + File.separator + lrcExts.get(i);
+            String lrcFilePath = filePathDirectory + File.separator + fileName + "." + lrcExts.get(i);
             File lrcFile = new File(lrcFilePath);
             if (lrcFile.exists()) {
                 return lrcFile;
