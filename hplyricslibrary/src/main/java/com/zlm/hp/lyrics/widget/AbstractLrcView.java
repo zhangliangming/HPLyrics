@@ -195,16 +195,16 @@ public abstract class AbstractLrcView extends View {
     /**
      * 空行高度
      */
-    public int mSpaceLineHeight = 60;
+    public float mSpaceLineHeight = 60;
     /**
      * 歌词字体大小
      */
-    public int mFontSize = 30;
+    public float mFontSize = 30;
 
     /**
      * 左右间隔距离
      */
-    public int mPaddingLeftOrRight = 15;
+    public float mPaddingLeftOrRight = 15;
     /**
      * 歌词处理类
      */
@@ -212,7 +212,7 @@ public abstract class AbstractLrcView extends View {
     /**
      * 歌词的最大宽度
      */
-    public int mTextMaxWidth = 0;
+    public float mTextMaxWidth = 0;
     /**
      * 当前歌词的所在行数
      */
@@ -266,11 +266,11 @@ public abstract class AbstractLrcView extends View {
     /**
      * 额外歌词空行高度
      */
-    public int mExtraLrcSpaceLineHeight = 30;
+    public float mExtraLrcSpaceLineHeight = 30;
     /**
      * 额外歌词字体大小
      */
-    public int mExtraLrcFontSize = 30;
+    public float mExtraLrcFontSize = 30;
     /**
      * 额外歌词画笔
      */
@@ -343,7 +343,7 @@ public abstract class AbstractLrcView extends View {
     /**
      * 当前播放进度
      */
-    private int mCurPlayingTime = 0;
+    private long mCurPlayingTime = 0;
 
     /**
      * 歌词刷新
@@ -358,7 +358,7 @@ public abstract class AbstractLrcView extends View {
             synchronized (lock) {
                 if (mLrcPlayerStatus == LRCPLAYERSTATUS_PLAY) {
                     //
-                    updateView((int) (mCurPlayingTime + mPlayerSpendTime));
+                    updateView(mCurPlayingTime + mPlayerSpendTime);
                     invalidateView();
                     //
                     long endTime = System.currentTimeMillis();
@@ -494,8 +494,6 @@ public abstract class AbstractLrcView extends View {
         canvas.drawRoundRect(mGotoSearchBtnRect, 15, 15, paintRect);
         canvas.drawText(btnText, textX, textY, paintText);
     }
-
-
 
 
     /**
@@ -637,7 +635,7 @@ public abstract class AbstractLrcView extends View {
      * @param curPlayingTime 当前播放进度
      * @return
      */
-    public String getLineLrc(int curPlayingTime) {
+    public String getLineLrc(long curPlayingTime) {
         if (mLyricsReader == null || mLrcLineInfos == null || mLrcLineInfos.size() == 0)
             return null;
         return LyricsUtils.getLineLrc(mLyricsReader.getLyricsType(), mLrcLineInfos, curPlayingTime, mLyricsReader.getPlayOffset());
@@ -649,7 +647,7 @@ public abstract class AbstractLrcView extends View {
      * @param curPlayingTime 当前播放进度
      * @return
      */
-    public String getSplitLineLrc(int curPlayingTime) {
+    public String getSplitLineLrc(long curPlayingTime) {
         if (mLyricsReader == null || mLrcLineInfos == null || mLrcLineInfos.size() == 0)
             return null;
         return LyricsUtils.getSplitLineLrc(mLyricsReader.getLyricsType(), mLrcLineInfos, curPlayingTime, mLyricsReader.getPlayOffset());
@@ -661,7 +659,7 @@ public abstract class AbstractLrcView extends View {
      * @param curPlayingTime 当前播放进度
      * @return
      */
-    public int getLineLrcStartTime(int curPlayingTime) {
+    public int getLineLrcStartTime(long curPlayingTime) {
         if (mLyricsReader == null || mLrcLineInfos == null || mLrcLineInfos.size() == 0)
             return -1;
         return LyricsUtils.getLineLrcStartTime(mLyricsReader.getLyricsType(), mLrcLineInfos, curPlayingTime, mLyricsReader.getPlayOffset());
@@ -673,7 +671,7 @@ public abstract class AbstractLrcView extends View {
      * @param curPlayingTime 当前播放进度
      * @return
      */
-    public int getSplitLineLrcStartTime(int curPlayingTime) {
+    public int getSplitLineLrcStartTime(long curPlayingTime) {
         if (mLyricsReader == null || mLrcLineInfos == null || mLrcLineInfos.size() == 0)
             return -1;
         return LyricsUtils.getSplitLineLrcStartTime(mLyricsReader.getLyricsType(), mLrcLineInfos, curPlayingTime, mLyricsReader.getPlayOffset());
@@ -698,7 +696,7 @@ public abstract class AbstractLrcView extends View {
      *
      * @param playProgress
      */
-    public void updateSplitData(int playProgress) {
+    public void updateSplitData(long playProgress) {
         //动感歌词
         if (mLyricsReader.getLyricsType() == LyricsInfo.DYNAMIC) {
             //获取分割后的索引
@@ -878,7 +876,7 @@ public abstract class AbstractLrcView extends View {
                 mExtraLyricsHighLightMoveX = 0;
             }
             //更新行和索引等数据
-            updateView((int) (mCurPlayingTime + mPlayerSpendTime));
+            updateView(mCurPlayingTime + mPlayerSpendTime);
             invalidateView();
         }
     }
@@ -1030,25 +1028,25 @@ public abstract class AbstractLrcView extends View {
         }
     }
 
-    public void setSpaceLineHeight(int mSpaceLineHeight, boolean isInvalidateView) {
+    public void setSpaceLineHeight(float mSpaceLineHeight, boolean isInvalidateView) {
         this.mSpaceLineHeight = mSpaceLineHeight;
         if (isInvalidateView) {
             invalidateView();
         }
     }
 
-    public void setExtraLrcSpaceLineHeight(int mExtraLrcSpaceLineHeight, boolean isInvalidateView) {
+    public void setExtraLrcSpaceLineHeight(float mExtraLrcSpaceLineHeight, boolean isInvalidateView) {
         this.mExtraLrcSpaceLineHeight = mExtraLrcSpaceLineHeight;
         if (isInvalidateView) {
             invalidateView();
         }
     }
 
-    public int getFontSize() {
+    public float getFontSize() {
         return mFontSize;
     }
 
-    public int getExtraLrcFontSize() {
+    public float getExtraLrcFontSize() {
         return mExtraLrcFontSize;
     }
 
@@ -1060,7 +1058,7 @@ public abstract class AbstractLrcView extends View {
      * @param isReloadLrcData  是否重新加载歌词数据
      * @param isInvalidateView 是否刷新视图
      */
-    public void setFontSize(int fontSize, boolean isReloadLrcData, boolean isInvalidateView) {
+    public void setFontSize(float fontSize, boolean isReloadLrcData, boolean isInvalidateView) {
         synchronized (lock) {
 
             this.mFontSize = fontSize;
@@ -1094,7 +1092,7 @@ public abstract class AbstractLrcView extends View {
             if (isReloadLrcData) {
                 //加载歌词数据
                 if (hasLrcLineInfos()) {
-                    updateView((int) (mCurPlayingTime + mPlayerSpendTime));
+                    updateView(mCurPlayingTime + mPlayerSpendTime);
                 }
             }
             if (isInvalidateView) {
@@ -1110,7 +1108,7 @@ public abstract class AbstractLrcView extends View {
      * @param isReloadLrcData  是否重新加载歌词数据
      * @param isInvalidateView 是否刷新视图
      */
-    public void setExtraLrcFontSize(int extraLrcFontSize, boolean isReloadLrcData, boolean isInvalidateView) {
+    public void setExtraLrcFontSize(float extraLrcFontSize, boolean isReloadLrcData, boolean isInvalidateView) {
         synchronized (lock) {
             this.mExtraLrcFontSize = extraLrcFontSize;
 
@@ -1122,7 +1120,7 @@ public abstract class AbstractLrcView extends View {
 
             if (isReloadLrcData) {
                 if (hasLrcLineInfos()) {
-                    updateView((int) (mCurPlayingTime + mPlayerSpendTime));
+                    updateView(mCurPlayingTime + mPlayerSpendTime);
                 }
             }
             if (isInvalidateView) {
@@ -1139,13 +1137,13 @@ public abstract class AbstractLrcView extends View {
      * @param isReloadLrcData  是否重新加载歌词数据
      * @param isInvalidateView 是否刷新视图
      */
-    public void setFontSize(int fontSize, int extraLrcFontSize, boolean isReloadLrcData, boolean isInvalidateView) {
+    public void setFontSize(float fontSize, float extraLrcFontSize, boolean isReloadLrcData, boolean isInvalidateView) {
         synchronized (lock) {
             setFontSize(fontSize, false, false);
             setExtraLrcFontSize(extraLrcFontSize, false, false);
             if (isReloadLrcData) {
                 if (hasLrcLineInfos()) {
-                    updateView((int) (mCurPlayingTime + mPlayerSpendTime));
+                    updateView(mCurPlayingTime + mPlayerSpendTime);
                 }
             }
             if (isInvalidateView) {
@@ -1233,7 +1231,7 @@ public abstract class AbstractLrcView extends View {
      *
      * @param playProgress
      */
-    protected abstract void updateView(int playProgress);
+    protected abstract void updateView(long playProgress);
 
     /**
      * 搜索歌词接口

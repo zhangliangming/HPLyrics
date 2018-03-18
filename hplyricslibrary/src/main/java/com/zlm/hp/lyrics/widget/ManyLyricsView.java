@@ -352,14 +352,14 @@ public class ManyLyricsView extends AbstractLrcView {
      * @param fristLineTextY       第一行文字位置
      * @return
      */
-    private float drawDownLyrics(Canvas canvas, Paint paint, Paint paintHL, List<LyricsLineInfo> splitLyricsLineInfos, int splitLyricsLineNum, int splitLyricsWordIndex, int spaceLineHeight, float lyricsWordHLTime, float fristLineTextY) {
+    private float drawDownLyrics(Canvas canvas, Paint paint, Paint paintHL, List<LyricsLineInfo> splitLyricsLineInfos, int splitLyricsLineNum, int splitLyricsWordIndex, float spaceLineHeight, float lyricsWordHLTime, float fristLineTextY) {
 
         float lineBottomY = 0;
 
         int curLyricsLineNum = splitLyricsLineNum;
 
         //歌词和空行高度
-        int lineHeight = LyricsUtils.getTextHeight(paint) + spaceLineHeight;
+        float lineHeight = LyricsUtils.getTextHeight(paint) + spaceLineHeight;
         //往下绘画歌词
         for (int i = 0; i < splitLyricsLineInfos.size(); i++) {
 
@@ -431,7 +431,7 @@ public class ManyLyricsView extends AbstractLrcView {
      * @param lineBottomY
      * @return
      */
-    private float drawDownExtraLyrics(Canvas canvas, Paint paint, Paint paintHL, int lyricsLineNum, int extraSplitLyricsLineNum, int extraSplitLyricsWordIndex, int extraLrcSpaceLineHeight, float lyricsWordHLTime, float translateLyricsWordHLTime, float lineBottomY) {
+    private float drawDownExtraLyrics(Canvas canvas, Paint paint, Paint paintHL, int lyricsLineNum, int extraSplitLyricsLineNum, int extraSplitLyricsWordIndex, float extraLrcSpaceLineHeight, float lyricsWordHLTime, float translateLyricsWordHLTime, float lineBottomY) {
         if (mExtraLrcStatus == EXTRALRCSTATUS_SHOWTRANSLATELRC) {
             //画翻译歌词
             if (mTranslateLrcLineInfos != null && mTranslateLrcLineInfos.size() > 0) {
@@ -469,7 +469,7 @@ public class ManyLyricsView extends AbstractLrcView {
      * @param extraLrcSpaceLineHeight
      * @param lineTopY                @return
      */
-    private float drawUpExtraLyrics(Canvas canvas, Paint paint, List<LyricsLineInfo> splitLyricsLineInfos, int lyricsLineNum, int extraLrcSpaceLineHeight, float lineTopY) {
+    private float drawUpExtraLyrics(Canvas canvas, Paint paint, List<LyricsLineInfo> splitLyricsLineInfos, int lyricsLineNum, float extraLrcSpaceLineHeight, float lineTopY) {
         if (mExtraLrcStatus == EXTRALRCSTATUS_SHOWTRANSLATELRC) {
             //画翻译歌词
             if (mTranslateLrcLineInfos != null && mTranslateLrcLineInfos.size() > 0) {
@@ -511,11 +511,11 @@ public class ManyLyricsView extends AbstractLrcView {
      * @param fristLineTextY       第一行文字位置
      * @return
      */
-    private float drawUpLyrics(Canvas canvas, Paint paint, List<LyricsLineInfo> splitLyricsLineInfos, int spaceLineHeight, float fristLineTextY) {
+    private float drawUpLyrics(Canvas canvas, Paint paint, List<LyricsLineInfo> splitLyricsLineInfos, float spaceLineHeight, float fristLineTextY) {
 
         float lineTopY = fristLineTextY;
         //歌词和空行高度
-        int lineHeight = LyricsUtils.getTextHeight(paint) + spaceLineHeight;
+        float lineHeight = LyricsUtils.getTextHeight(paint) + spaceLineHeight;
         for (int i = splitLyricsLineInfos.size() - 1; i >= 0; i--) {
             if (i != splitLyricsLineInfos.size() - 1) {
                 lineTopY -= lineHeight;
@@ -838,7 +838,7 @@ public class ManyLyricsView extends AbstractLrcView {
     }
 
     @Override
-    protected void updateView(int playProgress) {
+    protected void updateView(long playProgress) {
         int newLyricsLineNum = LyricsUtils.getLineNumber(mLyricsReader.getLyricsType(), mLrcLineInfos, playProgress, mLyricsReader.getPlayOffset());
         if (newLyricsLineNum != mLyricsLineNum) {
             if (mTouchEventStatus == TOUCHEVENTSTATUS_INIT && !isChangeScrollerFinalY && !mTouchIntercept) {
@@ -935,19 +935,19 @@ public class ManyLyricsView extends AbstractLrcView {
     }
 
     @Override
-    public void setFontSize(int fontSize, boolean isReloadLrcData, boolean isInvalidateView) {
+    public void setFontSize(float fontSize, boolean isReloadLrcData, boolean isInvalidateView) {
         isChangeScrollerFinalY = true;
         super.setFontSize(fontSize, isReloadLrcData, isInvalidateView);
     }
 
     @Override
-    public void setExtraLrcFontSize(int extraLrcFontSize, boolean isReloadLrcData, boolean isInvalidateView) {
+    public void setExtraLrcFontSize(float extraLrcFontSize, boolean isReloadLrcData, boolean isInvalidateView) {
         isChangeScrollerFinalY = true;
         super.setExtraLrcFontSize(extraLrcFontSize, isReloadLrcData, isInvalidateView);
     }
 
     @Override
-    public void setFontSize(int fontSize, int extraLrcFontSize, boolean isReloadLrcData, boolean isInvalidateView) {
+    public void setFontSize(float fontSize, float extraLrcFontSize, boolean isReloadLrcData, boolean isInvalidateView) {
         isChangeScrollerFinalY = true;
         super.setFontSize(fontSize, extraLrcFontSize, isReloadLrcData, isInvalidateView);
     }
@@ -959,13 +959,13 @@ public class ManyLyricsView extends AbstractLrcView {
     }
 
     @Override
-    public void setSpaceLineHeight(int mSpaceLineHeight, boolean isInvalidateView) {
+    public void setSpaceLineHeight(float mSpaceLineHeight, boolean isInvalidateView) {
         super.setSpaceLineHeight(mSpaceLineHeight, false);
         setFontSize(getFontSize(), true, isInvalidateView);
     }
 
     @Override
-    public void setExtraLrcSpaceLineHeight(int mExtraLrcSpaceLineHeight, boolean isInvalidateView) {
+    public void setExtraLrcSpaceLineHeight(float mExtraLrcSpaceLineHeight, boolean isInvalidateView) {
         super.setExtraLrcSpaceLineHeight(mExtraLrcSpaceLineHeight, false);
         setFontSize(getFontSize(), true, isInvalidateView);
     }

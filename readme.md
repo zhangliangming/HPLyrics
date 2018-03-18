@@ -3,6 +3,11 @@
 
 # 日志 #
 
+## v1.15##
+
+- 修改部分int变量的类型为long
+- 修改部分int变量的类型为float
+
 ## v1.14##
 
 - 添加歌词生成图片文件接口
@@ -105,7 +110,7 @@
 2.app build.gradle
 
 `dependencies {
-	         compile 'com.github.zhangliangming:HPLyrics:v1.14'
+	         compile 'com.github.zhangliangming:HPLyrics:v1.15'
 	}`
 
 # 调用Demo #

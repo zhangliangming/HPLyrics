@@ -24,11 +24,11 @@ public class LyricsReader {
     /**
      * 时间补偿值,其单位是毫秒，正值表示整体提前，负值相反。这是用于总体调整显示快慢的。
      */
-    private int mDefOffset = 0;
+    private long mDefOffset = 0;
     /**
      * 增量
      */
-    private int mOffset = 0;
+    private long mOffset = 0;
 
     /**
      * 歌词类型
@@ -120,7 +120,7 @@ public class LyricsReader {
         if (tags.containsKey(LyricsTag.TAG_OFFSET)) {
             mDefOffset = 0;
             try {
-                mDefOffset = Integer.parseInt((String) tags.get(LyricsTag.TAG_OFFSET));
+                mDefOffset =  Long.parseLong((String) tags.get(LyricsTag.TAG_OFFSET));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -174,11 +174,11 @@ public class LyricsReader {
         this.mLrcFilePath = mLrcFilePath;
     }
 
-    public int getOffset() {
+    public long getOffset() {
         return mOffset;
     }
 
-    public void setOffset(int offset) {
+    public void setOffset(long offset) {
         this.mOffset = offset;
     }
 
@@ -193,7 +193,7 @@ public class LyricsReader {
      *
      * @return
      */
-    public int getPlayOffset() {
+    public long getPlayOffset() {
         return mDefOffset + mOffset;
     }
 }

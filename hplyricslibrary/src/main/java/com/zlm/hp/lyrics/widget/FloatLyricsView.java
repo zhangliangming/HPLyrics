@@ -216,7 +216,7 @@ public class FloatLyricsView extends AbstractLrcView {
 
 
     @Override
-    protected void updateView(int playProgress) {
+    protected void updateView(long playProgress) {
         //不在转换中，则进行歌词的绘画
         mLyricsLineNum = LyricsUtils.getLineNumber(mLyricsReader.getLyricsType(), mLrcLineInfos, playProgress, mLyricsReader.getPlayOffset());
         updateSplitData(playProgress);
