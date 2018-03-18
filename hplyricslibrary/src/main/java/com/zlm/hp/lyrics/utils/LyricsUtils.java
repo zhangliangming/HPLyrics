@@ -129,7 +129,7 @@ public class LyricsUtils {
                     String lrcLeftText = nextSplitLyricsLineInfos.get(0).getLineLyrics();
                     drawOutline(canvas, paintOutline, lrcLeftText, paddingLeftOrRight,
                             preLrcTextY);
-                    drawText(canvas, paintHL, paintHLColor, lrcLeftText, paddingLeftOrRight,
+                    drawText(canvas, paint, paintColor, lrcLeftText, paddingLeftOrRight,
                             preLrcTextY);
                 }
             }
@@ -178,7 +178,7 @@ public class LyricsUtils {
                     String lrcLeftText = lyricsLineInfos.get(lyricsLineNum + 1).getLineLyrics();
                     drawOutline(canvas, paintOutline, lrcLeftText, paddingLeftOrRight,
                             preLrcTextY);
-                    drawText(canvas, paintHL, paintHLColor, lrcLeftText, paddingLeftOrRight,
+                    drawText(canvas, paint, paintColor, lrcLeftText, paddingLeftOrRight,
                             preLrcTextY);
                 }
             }
