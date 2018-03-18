@@ -42,7 +42,7 @@ public class LyricsUtils {
      * @param playOffset         歌词增补
      * @return
      */
-    public static Bitmap getLrcImage(int lyricsType, int viewWidth, int viewHeight, int lineHeight, int paddingLeftOrRight, Paint paint, Paint paintHL, Paint paintOutline, int[] paintColor, int[] paintHLColor, TreeMap<Integer, LyricsLineInfo> defLrcLineInfos, long curPlayingTime, long playOffset) {
+    public static Bitmap getLrcImage(int lyricsType, int viewWidth, int viewHeight, float lineHeight, float paddingLeftOrRight, Paint paint, Paint paintHL, Paint paintOutline, int[] paintColor, int[] paintHLColor, TreeMap<Integer, LyricsLineInfo> defLrcLineInfos, long curPlayingTime, long playOffset) {
         Bitmap result = Bitmap.createBitmap(viewWidth, viewHeight, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(result);
 
@@ -76,7 +76,7 @@ public class LyricsUtils {
             // 当前歌词行的y坐标
             float textY = 0;
             int textHeight = getTextHeight(paint);
-            int topOrBottom = (viewHeight - 2 * textHeight - lineHeight) / 2;
+            float topOrBottom = (viewHeight - 2 * textHeight - lineHeight) / 2;
             if (splitLyricsRealLineNum % 2 == 0) {
 
                 textX = paddingLeftOrRight;

@@ -3,6 +3,10 @@
 
 # 日志 #
 
+## v1.17##
+
+- 修复歌词生成图片问题
+
 ## v1.16##
 
 - 修复歌词生成图片视图的字体
@@ -114,7 +118,7 @@
 2.app build.gradle
 
 `dependencies {
-	         compile 'com.github.zhangliangming:HPLyrics:v1.16'
+	         compile 'com.github.zhangliangming:HPLyrics:v1.17'
 	}`
 
 # 调用Demo #
