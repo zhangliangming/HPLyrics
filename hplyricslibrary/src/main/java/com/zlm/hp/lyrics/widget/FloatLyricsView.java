@@ -140,7 +140,7 @@ public class FloatLyricsView extends AbstractLrcView {
                 String lrcLeftText = nextSplitLyricsLineInfos.get(0).getLineLyrics();
                 LyricsUtils.drawOutline(canvas, mPaintOutline, lrcLeftText, mPaddingLeftOrRight,
                         preLrcTextY);
-                LyricsUtils.drawText(canvas, mPaintHL, mPaintHLColors, lrcLeftText, mPaddingLeftOrRight,
+                LyricsUtils.drawText(canvas, mPaint, mPaintColors, lrcLeftText, mPaddingLeftOrRight,
                         preLrcTextY);
             }
         }
