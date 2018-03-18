@@ -55,16 +55,16 @@ public class LrcImgPreView extends View {
     /**
      * 空行高度
      */
-    public int mSpaceLineHeight = 30;
+    public float mSpaceLineHeight = 30;
     /**
      * 歌词字体大小
      */
-    public int mFontSize = 35;
+    public float mFontSize = 35;
 
     /**
      * 左右间隔距离
      */
-    public int mPaddingLeftOrRight = 15;
+    public float mPaddingLeftOrRight = 15;
 
 
     public LrcImgPreView(Context context) {
@@ -106,19 +106,19 @@ public class LrcImgPreView extends View {
     protected void onDraw(Canvas canvas) {
         int viewHeight = getHeight();
         int textHeight = getTextHeight(mPaint);
-        int topOrBottom = (viewHeight - 2 * textHeight - mSpaceLineHeight) / 2;
+        float topOrBottom = (viewHeight - 2 * textHeight - mSpaceLineHeight) / 2;
 
         //绘画高度文本
         String hlText = "♩ ♪ ♫ ♬ ∮";
-        int hlTextX = mPaddingLeftOrRight;
-        int hlTextY = topOrBottom + getTextHeight(mPaint);
+        float hlTextX = mPaddingLeftOrRight;
+        float hlTextY = topOrBottom + getTextHeight(mPaint);
         drawOutline(canvas, mPaintOutline, hlText, hlTextX, hlTextY);
         drawText(canvas, mPaintHL, mPaintHLColor, hlText, hlTextX, hlTextY);
 
         //绘画文本
         String text = mDefText;
         float textX = mPaddingLeftOrRight;
-        int textY = viewHeight - topOrBottom;
+        float textY = viewHeight - topOrBottom;
         drawOutline(canvas, mPaintOutline, text, textX, textY);
         drawText(canvas, mPaint, mPaintColor, text, textX, textY);
     }
@@ -217,15 +217,19 @@ public class LrcImgPreView extends View {
         this.mDefText = mDefText;
     }
 
-    public void setSpaceLineHeight(int mSpaceLineHeight) {
+    public void setSpaceLineHeight(float mSpaceLineHeight) {
         this.mSpaceLineHeight = mSpaceLineHeight;
     }
 
-    public void setFontSize(int mFontSize) {
+    public void setFontSize(float mFontSize) {
         this.mFontSize = mFontSize;
+
+        mPaint.setTextSize(mFontSize);
+        mPaintHL.setTextSize(mFontSize);
+        mPaintOutline.setTextSize(mFontSize);
     }
 
-    public void setPaddingLeftOrRight(int mPaddingLeftOrRight) {
+    public void setPaddingLeftOrRight(float mPaddingLeftOrRight) {
         this.mPaddingLeftOrRight = mPaddingLeftOrRight;
     }
 }

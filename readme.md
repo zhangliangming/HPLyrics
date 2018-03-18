@@ -3,6 +3,10 @@
 
 # 日志 #
 
+## v1.16##
+
+- 修复歌词生成图片视图的字体
+
 ## v1.15##
 
 - 修改部分int变量的类型为long
@@ -110,7 +114,7 @@
 2.app build.gradle
 
 `dependencies {
-	         compile 'com.github.zhangliangming:HPLyrics:v1.15'
+	         compile 'com.github.zhangliangming:HPLyrics:v1.16'
 	}`
 
 # 调用Demo #
