@@ -476,15 +476,15 @@ public abstract class AbstractLrcView extends View {
         paintRect.setColor(mGotoSearchTextColor);
 
         //
-        int textY = (getHeight() + getTextHeight(paintText)) / 2;
-        int textWidth = (int) getTextWidth(paintText, btnText);
+        int textY = (getHeight() + LyricsUtils.getTextHeight(paintText)) / 2;
+        int textWidth = (int) LyricsUtils.getTextWidth(paintText, btnText);
         int textX = (getWidth() - textWidth) / 2;
 
 
         //初始化搜索
         if (mGotoSearchBtnRect == null) {
-            int padding = getRealTextHeight(paintText) / 2;
-            int rectTop = textY - getTextHeight(paintText) - padding;
+            int padding = LyricsUtils.getRealTextHeight(paintText) / 2;
+            int rectTop = textY - LyricsUtils.getTextHeight(paintText) - padding;
             int rectLeft = textX - padding;
             int rectRight = rectLeft + textWidth + padding * 2;
             int rectBottom = textY + padding;
@@ -495,128 +495,8 @@ public abstract class AbstractLrcView extends View {
         canvas.drawText(btnText, textX, textY, paintText);
     }
 
-    /**
-     * 绘画文本
-     *
-     * @param canvas
-     * @param paint  默认画笔
-     * @param text   文本
-     * @param x
-     * @param y
-     */
-    public void drawText(Canvas canvas, Paint paint, String text, float x, float y) {
-        //设置为上下渐变
-        LinearGradient linearGradient = new LinearGradient(x, y - getTextHeight(paint), x, y, mPaintColors, null, Shader.TileMode.CLAMP);
-        paint.setShader(linearGradient);
-        canvas.drawText(text, x, y, paint);
-    }
 
-    /**
-     * 绘画高亮文本
-     *
-     * @param canvas
-     * @param paintHL 默认画笔
-     * @param text    文本
-     * @param x
-     * @param y
-     */
-    public void drawHLText(Canvas canvas, Paint paintHL, String text, float x, float y) {
-        //设置为上下渐变
-        LinearGradient linearGradient = new LinearGradient(x, y - getTextHeight(paintHL), x, y, mPaintHLColors, null, Shader.TileMode.CLAMP);
-        paintHL.setShader(linearGradient);
-        canvas.drawText(text, x, y, paintHL);
-    }
 
-    /**
-     * 绘画动感文本
-     *
-     * @param canvas
-     * @param paint   默认画笔
-     * @param paintHL 高亮画笔
-     * @param text    文本
-     * @param hlWidth 高亮宽度
-     * @param x
-     * @param y
-     */
-    public void drawDynamicText(Canvas canvas, Paint paint, Paint paintHL, String text, float hlWidth, float x, float y) {
-        canvas.save();
-
-        //设置为上下渐变
-        LinearGradient linearGradient = new LinearGradient(x, y - getTextHeight(paint), x, y, mPaintColors, null, Shader.TileMode.CLAMP);
-        paint.setShader(linearGradient);
-        canvas.drawText(text, x, y, paint);
-        //设置动感歌词过渡效果
-        canvas.clipRect(x, y - getRealTextHeight(paint), x + hlWidth,
-                y + getRealTextHeight(paint));
-
-        //设置为上下渐变
-        LinearGradient linearGradientHL = new LinearGradient(x, y - getTextHeight(paint), x, y, mPaintHLColors, null, Shader.TileMode.CLAMP);
-        paintHL.setShader(linearGradientHL);
-        canvas.drawText(text, x, y, paintHL);
-        canvas.restore();
-    }
-
-    /**
-     * 描绘轮廓
-     *
-     * @param canvas
-     * @param text
-     * @param x
-     * @param y
-     */
-    public void drawOutline(Canvas canvas, Paint paint, String text, float x, float y) {
-        canvas.drawText(text, x - 1, y, paint);
-        canvas.drawText(text, x + 1, y, paint);
-        canvas.drawText(text, x, y + 1, paint);
-        canvas.drawText(text, x, y - 1, paint);
-    }
-
-    /**
-     * 获取行歌词高亮的宽度
-     *
-     * @param paint
-     * @param lyricsLineInfo
-     * @param lyricsWordIndex
-     * @param lyricsWordHLTime
-     * @return
-     */
-    public float getLineLyricsHLWidth(int lyricsType, Paint paint, LyricsLineInfo lyricsLineInfo, int lyricsWordIndex, float lyricsWordHLTime) {
-        float lineLyricsHLWidth = 0;
-
-        // 当行歌词
-        String curLyrics = lyricsLineInfo.getLineLyrics();
-        float curLrcTextWidth = getTextWidth(paint, curLyrics);
-        if (lyricsType == LyricsInfo.LRC || lyricsWordIndex == -2) {
-            // 整行歌词
-            lineLyricsHLWidth = curLrcTextWidth;
-        } else {
-            if (lyricsWordIndex != -1) {
-                String lyricsWords[] = lyricsLineInfo.getLyricsWords();
-                int wordsDisInterval[] = lyricsLineInfo
-                        .getWordsDisInterval();
-                // 当前歌词之前的歌词
-                StringBuilder lyricsBeforeWord = new StringBuilder();
-                for (int i = 0; i < lyricsWordIndex; i++) {
-                    lyricsBeforeWord.append(lyricsWords[i]);
-                }
-                // 当前歌词字
-                String lrcNowWord = lyricsWords[lyricsWordIndex].trim();// 去掉空格
-                // 当前歌词之前的歌词长度
-                float lyricsBeforeWordWidth = paint
-                        .measureText(lyricsBeforeWord.toString());
-
-                // 当前歌词长度
-                float lyricsNowWordWidth = paint.measureText(lrcNowWord);
-
-                float len = lyricsNowWordWidth
-                        / wordsDisInterval[lyricsWordIndex]
-                        * lyricsWordHLTime;
-                lineLyricsHLWidth = lyricsBeforeWordWidth + len;
-            }
-        }
-
-        return lineLyricsHLWidth;
-    }
 
     /**
      * 获取高亮移动的x位置（注：该方法在歌词不换行时使用）
@@ -750,39 +630,6 @@ public abstract class AbstractLrcView extends View {
         }
     }
 
-    /**
-     * 获取真实的歌词高度
-     *
-     * @param paint
-     * @return
-     */
-    public int getRealTextHeight(Paint paint) {
-        Paint.FontMetrics fm = paint.getFontMetrics();
-        return (int) (-fm.leading - fm.ascent + fm.descent);
-    }
-
-    /**
-     * 获取行歌词高度。用于y轴位置计算
-     *
-     * @param paint
-     * @return
-     */
-    public int getTextHeight(Paint paint) {
-        Paint.FontMetrics fm = paint.getFontMetrics();
-        return (int) -(fm.ascent + fm.descent);
-    }
-
-    /**
-     * 获取文本宽度
-     *
-     * @param paint
-     * @param text
-     * @return
-     */
-    public float getTextWidth(Paint paint, String text) {
-        return paint
-                .measureText(text);
-    }
 
     /**
      * 获取当前时间对应的行歌词文本
@@ -896,13 +743,13 @@ public abstract class AbstractLrcView extends View {
             if (mLrcStatus == LRCSTATUS_INIT || mLrcStatus == LRCSTATUS_NOLRC_DEFTEXT) {
                 //绘画默认文本
                 String defText = getDefText();
-                float textWidth = getTextWidth(mPaint, defText);
-                int textHeight = getTextHeight(mPaint);
+                float textWidth = LyricsUtils.getTextWidth(mPaint, defText);
+                int textHeight = LyricsUtils.getTextHeight(mPaint);
                 float hlWidth = textWidth / 2;
                 float x = (getWidth() - textWidth) / 2;
                 float y = (getHeight() + textHeight) / 2;
-                drawOutline(canvas, mPaintOutline, defText, x, y);
-                drawDynamicText(canvas, mPaint, mPaintHL, defText, hlWidth, x, y);
+                LyricsUtils.drawOutline(canvas, mPaintOutline, defText, x, y);
+                LyricsUtils.drawDynamicText(canvas, mPaint, mPaintHL, mPaintColors, mPaintHLColors, defText, hlWidth, x, y);
             } else if (mLrcStatus == LRCSTATUS_LOADING || mLrcStatus == LRCSTATUS_ERROR || mLrcStatus == LRCSTATUS_NONSUPPORT) {
                 //绘画加载中文本
                 String text = getDefText();
@@ -913,12 +760,12 @@ public abstract class AbstractLrcView extends View {
                 } else if (mLrcStatus == LRCSTATUS_NONSUPPORT) {
                     text = getNonsupportText();
                 }
-                float textWidth = getTextWidth(mPaint, text);
-                int textHeight = getTextHeight(mPaint);
+                float textWidth = LyricsUtils.getTextWidth(mPaint, text);
+                int textHeight = LyricsUtils.getTextHeight(mPaint);
                 float x = (getWidth() - textWidth) / 2;
                 float y = (getHeight() + textHeight) / 2;
-                drawOutline(canvas, mPaintOutline, text, x, y);
-                drawText(canvas, mPaint, text, x, y);
+                LyricsUtils.drawOutline(canvas, mPaintOutline, text, x, y);
+                LyricsUtils.drawText(canvas, mPaint, mPaintColors, text, x, y);
             } else if (mLrcStatus == LRCSTATUS_NOLRC_GOTOSEARCH) {
                 String btnText = getGotoSearchText();
                 //绘画搜索歌词按钮
@@ -1231,12 +1078,12 @@ public abstract class AbstractLrcView extends View {
                 //初始化搜索
                 if (mGotoSearchBtnRect != null) {
 
-                    int textY = (getHeight() + getTextHeight(mGotoSearchTextPaint)) / 2;
-                    int textWidth = (int) getTextWidth(mGotoSearchTextPaint, getGotoSearchText());
+                    int textY = (getHeight() + LyricsUtils.getTextHeight(mGotoSearchTextPaint)) / 2;
+                    int textWidth = (int) LyricsUtils.getTextWidth(mGotoSearchTextPaint, getGotoSearchText());
                     int textX = (getWidth() - textWidth) / 2;
 
-                    int padding = getRealTextHeight(mGotoSearchTextPaint) / 2;
-                    int rectTop = textY - getTextHeight(mGotoSearchTextPaint) - padding;
+                    int padding = LyricsUtils.getRealTextHeight(mGotoSearchTextPaint) / 2;
+                    int rectTop = textY - LyricsUtils.getTextHeight(mGotoSearchTextPaint) - padding;
                     int rectLeft = textX - padding;
                     int rectRight = rectLeft + textWidth + padding * 2;
                     int rectBottom = textY + padding;

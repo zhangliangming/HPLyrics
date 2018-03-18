@@ -1,6 +1,6 @@
 ﻿<resources>
-    <string name="app_name">HPLyricsLibrary</string>
-    <string name="def_text">乐乐音乐，就是任性</string>
+    <string name="app_name">乐乐歌词库</string>
+    <string name="def_text">乐乐音乐 就是任性</string>
     <string name="loading_text">正在获取歌词...</string>
     <string name="goto_search_text">搜索歌词</string>
     <string name="load_error_text">加载歌词出错</string>

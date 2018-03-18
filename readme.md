@@ -3,6 +3,11 @@
 
 # 日志 #
 
+## v1.14##
+
+- 添加歌词生成图片文件接口
+- 添加歌词生成图片预览视图
+
 ## v1.13##
 
 - 修复通过歌曲文件名获取歌词文件问题
@@ -100,7 +105,7 @@
 2.app build.gradle
 
 `dependencies {
-	         compile 'com.github.zhangliangming:HPLyrics:v1.13'
+	         compile 'com.github.zhangliangming:HPLyrics:v1.14'
 	}`
 
 # 调用Demo #
