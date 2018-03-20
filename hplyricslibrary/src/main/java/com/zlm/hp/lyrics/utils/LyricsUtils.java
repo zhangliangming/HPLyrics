@@ -25,11 +25,12 @@ import java.util.TreeMap;
 public class LyricsUtils {
 
     /**
-     * 获取默认歌词图片
+     * 获取双行动感歌词图片
      *
      * @param lyricsType         歌词类型
      * @param viewWidth          歌词视图宽度
      * @param viewHeight         歌词视图高度
+     * @param textMaxWidth       行歌词最长长度
      * @param lineHeight         行高度
      * @param paddingLeftOrRight 左右间隔大小
      * @param paint              默认画笔
@@ -39,14 +40,15 @@ public class LyricsUtils {
      * @param paintHLColor       高亮画笔颜色
      * @param defLrcLineInfos    歌词集合
      * @param curPlayingTime     当前播放时间
-     * @param playOffset         歌词增补
+     * @param playOffset         歌词时间增量
      * @return
      */
-    public static Bitmap getLrcImage(int lyricsType, int viewWidth, int viewHeight, float lineHeight, float paddingLeftOrRight, Paint paint, Paint paintHL, Paint paintOutline, int[] paintColor, int[] paintHLColor, TreeMap<Integer, LyricsLineInfo> defLrcLineInfos, long curPlayingTime, long playOffset) {
+    public static Bitmap getDynamicLyricsImage(int lyricsType, int viewWidth, int viewHeight, int textMaxWidth, float lineHeight, float paddingLeftOrRight, Paint paint, Paint paintHL, Paint paintOutline, int[] paintColor, int[] paintHLColor, TreeMap<Integer, LyricsLineInfo> defLrcLineInfos, long curPlayingTime, long playOffset) {
         Bitmap result = Bitmap.createBitmap(viewWidth, viewHeight, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(result);
 
-        int textMaxWidth = viewWidth;
+        int textHeight = getTextHeight(paint);
+        float topOrBottom = (viewHeight - 2 * textHeight - lineHeight) / 2;
         //当前行号
         int lyricsLineNum = getLineNumber(lyricsType, defLrcLineInfos, curPlayingTime, playOffset);
         //动感歌词
@@ -75,8 +77,6 @@ public class LyricsUtils {
             float textX = 0;
             // 当前歌词行的y坐标
             float textY = 0;
-            int textHeight = getTextHeight(paint);
-            float topOrBottom = (viewHeight - 2 * textHeight - lineHeight) / 2;
             if (splitLyricsRealLineNum % 2 == 0) {
 
                 textX = paddingLeftOrRight;
@@ -151,12 +151,11 @@ public class LyricsUtils {
             float textX = 0;
             // 当前歌词行的y坐标
             float textY = 0;
-            float topPadding = (viewHeight - lineHeight - 2 * getTextHeight(paint)) / 2;
             //lrc不做任何处理，直接绘画
             if (lyricsLineNum % 2 == 0) {
 
                 textX = paddingLeftOrRight;
-                textY = topPadding + getTextHeight(paint);
+                textY = topOrBottom + getTextHeight(paint);
                 float nextLrcTextY = textY + lineHeight + getTextHeight(paint);
                 if (lyricsLineNum + 1 < lyricsLineInfos.size()) {
                     //画下一句歌词
@@ -171,7 +170,7 @@ public class LyricsUtils {
                 }
             } else {
                 textX = viewWidth - curLrcTextWidth - paddingLeftOrRight;
-                float preLrcTextY = topPadding + getTextHeight(paint);
+                float preLrcTextY = topOrBottom + getTextHeight(paint);
                 textY = preLrcTextY + lineHeight + getTextHeight(paint);
                 if (lyricsLineNum + 1 < lyricsLineInfos.size()) {
                     //绘画下一句歌词
@@ -191,6 +190,161 @@ public class LyricsUtils {
         canvas.save(Canvas.ALL_SAVE_FLAG);
         canvas.restore();
         return result;
+    }
+
+    /**
+     * 获取单行动感歌词和单行额外歌词
+     *
+     * @param lyricsType         歌词类型
+     * @param viewWidth          歌词视图宽度
+     * @param viewHeight         歌词视图高度
+     * @param lineHeight         行高度
+     * @param paddingLeftOrRight 左右间隔大小
+     * @param paint              默认画笔
+     * @param paintHL            高亮画笔
+     * @param paintOutline       轮廓画笔
+     * @param paintColor         默认画笔颜色
+     * @param paintHLColor       高亮画笔颜色
+     * @param lyricsLineInfos    默认歌词集合
+     * @param extraLrcLineInfos  额外歌词集合
+     * @param extraLrcType       1是翻译，0是音译
+     * @param curPlayingTime     当前播放时间
+     * @param playOffset         歌词时间增量
+     * @return
+     */
+    public static Bitmap getDynamiAndExtraLyricsImage(int lyricsType, int viewWidth, int viewHeight, float lineHeight, float paddingLeftOrRight, Paint paint, Paint paintHL, Paint paintOutline, int[] paintColor, int[] paintHLColor, TreeMap<Integer, LyricsLineInfo> lyricsLineInfos, List<LyricsLineInfo> extraLrcLineInfos, int extraLrcType, long curPlayingTime, long playOffset) {
+        Bitmap result = Bitmap.createBitmap(viewWidth, viewHeight, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(result);
+
+        int textHeight = getTextHeight(paint);
+        float topOrBottom = (viewHeight - 2 * textHeight - lineHeight) / 2;
+        float textY = topOrBottom + getTextHeight(paint);
+        //当前行号
+        int lyricsLineNum = getLineNumber(lyricsType, lyricsLineInfos, curPlayingTime, playOffset);
+        //动感歌词
+        if (lyricsType == LyricsInfo.DYNAMIC) {
+            //获取当前歌词字索引
+            int lyricsWordIndex = getLyricsWordIndex(lyricsLineInfos, lyricsLineNum, curPlayingTime, playOffset);
+            //获取当前字的高亮时间
+            long lyricsWordHLTime = getDisWordsIndexLenTime(lyricsLineInfos, lyricsLineNum, curPlayingTime, playOffset);
+            LyricsLineInfo lyricsLineInfo = lyricsLineInfos.get(lyricsLineNum);
+            //获取行高亮宽度
+            float lineLyricsHLWidth = getLineLyricsHLWidth(lyricsType, paint, lyricsLineInfo, lyricsWordIndex, lyricsWordHLTime);
+            // 当行歌词
+            String curLyrics = lyricsLineInfo.getLineLyrics();
+            float curLrcTextWidth = getTextWidth(paint, curLyrics);
+
+            // 当前歌词行的x坐标
+            float textX = getHLMoveTextX(curLrcTextWidth, lineLyricsHLWidth, viewWidth, paddingLeftOrRight);
+            drawOutline(canvas, paintOutline, curLyrics, textX, textY);
+            drawDynamicText(canvas, paint, paintHL, paintColor, paintHLColor, curLyrics, lineLyricsHLWidth, textX, textY);
+
+        } else {
+            //lrc歌词，直接居中绘画歌词
+            LyricsLineInfo lyricsLineInfo = lyricsLineInfos.get(lyricsLineNum);
+            // 当行歌词
+            String curLyrics = lyricsLineInfo.getLineLyrics();
+            float curLrcTextWidth = getTextWidth(paint, curLyrics);
+            float textX = (viewWidth - curLrcTextWidth) / 2;
+            //画歌词
+            drawOutline(canvas, paintOutline, curLyrics, textX, textY);
+            drawText(canvas, paintHL, paintHLColor, curLyrics, textX, textY);
+        }
+
+        //设置额外歌词的y位置
+        float preLrcTextY = topOrBottom + getTextHeight(paint);
+        textY = preLrcTextY + lineHeight + getTextHeight(paint);
+
+        //额外歌词索引
+        int extraLyricsWordIndex = getExtraLyricsWordIndex(extraLrcLineInfos, lyricsLineNum, curPlayingTime, playOffset);
+        //绘画额外歌词
+        if (extraLrcType == 1) {
+
+            LyricsLineInfo translateLyricsLineInfo = extraLrcLineInfos.get(lyricsLineNum);
+            //翻译
+            if (lyricsType == LyricsInfo.DYNAMIC) {
+                long translateLyricsWordHLTime = getTranslateLrcDisWordsIndexLenTime(extraLrcLineInfos, lyricsLineNum, curPlayingTime, playOffset);
+                float translateLyricsLineHLWidth = getLineLyricsHLWidth(lyricsType, paint, translateLyricsLineInfo, extraLyricsWordIndex, translateLyricsWordHLTime);
+                //动感歌词，翻译歌词将以动感歌词的形式绘画
+                drawDynamiLyrics(canvas, lyricsType, paint, paintHL, paintOutline, translateLyricsLineInfo, translateLyricsLineHLWidth, viewWidth, extraLyricsWordIndex, translateLyricsWordHLTime, textY, paddingLeftOrRight, paintColor, paintHLColor);
+            } else {
+                //默认绘画lrc歌词
+                String lrcText = translateLyricsLineInfo.getLineLyrics();
+                float lrcTextWidth = getTextWidth(paint, lrcText);
+                float textX = (viewWidth - lrcTextWidth) / 2;
+                drawText(canvas, paintHL, paintHLColor, translateLyricsLineInfo.getLineLyrics(), textX, textY);
+            }
+        } else if (extraLrcType == 0) {
+            //音译
+            LyricsLineInfo transliterationLineInfo = extraLrcLineInfos.get(lyricsLineNum);
+            //获取当前字的高亮时间
+            long lyricsWordHLTime = getDisWordsIndexLenTime(lyricsLineInfos, lyricsLineNum, curPlayingTime, playOffset);
+            float transliterationLyricsLineHLWidth = getLineLyricsHLWidth(lyricsType, paint, transliterationLineInfo, extraLyricsWordIndex, lyricsWordHLTime);
+            drawDynamiLyrics(canvas, lyricsType, paint, paintHL, paintOutline, transliterationLineInfo, transliterationLyricsLineHLWidth, viewWidth, extraLyricsWordIndex, transliterationLyricsLineHLWidth, textY, paddingLeftOrRight, paintColor, paintHLColor);
+        }
+        // 保存绘图
+        canvas.save(Canvas.ALL_SAVE_FLAG);
+        canvas.restore();
+        return result;
+    }
+
+    /**
+     * 绘画单行动感歌词行
+     *
+     * @param canvas
+     * @param lyricsType         歌词类型
+     * @param paint              默认画笔
+     * @param paintHL            高亮画笔
+     * @param paintOutline       轮廓画笔
+     * @param lyricsLineInfo     行歌词数据
+     * @param lyricsLineHLWidth  歌词行高亮宽度
+     * @param viewWidth          视频宽度
+     * @param lyricsWordIndex    行歌词字索引
+     * @param lyricsWordHLTime   行歌词高亮时间
+     * @param textY              y轴位置
+     * @param paddingLeftOrRight
+     * @param paintColor
+     * @param paintHLColor
+     */
+    public static void drawDynamiLyrics(Canvas canvas, int lyricsType, Paint paint, Paint paintHL, Paint paintOutline, LyricsLineInfo lyricsLineInfo, float lyricsLineHLWidth, int viewWidth, int lyricsWordIndex, float lyricsWordHLTime, float textY, float paddingLeftOrRight, int[] paintColor, int[] paintHLColor) {
+        //获取行歌词高亮宽度
+        lyricsLineHLWidth = getLineLyricsHLWidth(lyricsType, paint, lyricsLineInfo, lyricsWordIndex, lyricsWordHLTime);
+        // 当行歌词
+        String curLyrics = lyricsLineInfo.getLineLyrics();
+        float curLrcTextWidth = getTextWidth(paint, curLyrics);
+        // 当前歌词行的x坐标
+        float textX = getHLMoveTextX(curLrcTextWidth, lyricsLineHLWidth, viewWidth, paddingLeftOrRight);
+        drawOutline(canvas, paintOutline, curLyrics, textX, textY);
+        drawDynamicText(canvas, paint, paintHL, paintColor, paintHLColor, curLyrics, lyricsLineHLWidth, textX, textY);
+    }
+
+    /**
+     * 获取高亮移动的x位置（注：该方法在歌词不换行时使用）
+     *
+     * @param curLrcTextWidth    当前行宽度
+     * @param lineLyricsHLWidth  当前行高亮歌词宽度
+     * @param viewWidth          视图宽度
+     * @param paddingLeftOrRight 左右间隔距离
+     * @return
+     */
+    public static float getHLMoveTextX(float curLrcTextWidth, float lineLyricsHLWidth, int viewWidth, float paddingLeftOrRight) {
+        float textX = 0;
+        if (curLrcTextWidth > viewWidth) {
+            if (lineLyricsHLWidth >= viewWidth / 2) {
+                if ((curLrcTextWidth - lineLyricsHLWidth) >= viewWidth / 2) {
+                    textX = (viewWidth / 2 - lineLyricsHLWidth);
+                } else {
+                    textX = viewWidth - curLrcTextWidth
+                            - paddingLeftOrRight;
+                }
+            } else {
+                textX = paddingLeftOrRight;
+            }
+        } else {
+            // 如果歌词宽度小于view的宽
+            textX = (viewWidth - curLrcTextWidth) / 2;
+        }
+        return textX;
     }
 
 

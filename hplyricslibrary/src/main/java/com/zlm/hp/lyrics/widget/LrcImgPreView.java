@@ -66,6 +66,19 @@ public class LrcImgPreView extends View {
      */
     public float mPaddingLeftOrRight = 15;
 
+    /**
+     * 显示默认歌词
+     */
+    public static final int SHOWDEFLRC = 0;
+    /**
+     * 显示额外歌词
+     */
+    public static final int SHOWEXTRALRC = 1;
+    /**
+     * 显示歌词类型
+     */
+    private int mShowLrcType = SHOWDEFLRC;
+
 
     public LrcImgPreView(Context context) {
         super(context);
@@ -111,6 +124,11 @@ public class LrcImgPreView extends View {
         //绘画高度文本
         String hlText = "♩ ♪ ♫ ♬ ∮";
         float hlTextX = mPaddingLeftOrRight;
+        if (mShowLrcType == SHOWEXTRALRC) {
+            float textWidth = getTextWidth(mPaintHL, hlText);
+            hlTextX = (getWidth() - textWidth) / 2;
+        }
+
         float hlTextY = topOrBottom + getTextHeight(mPaint);
         drawOutline(canvas, mPaintOutline, hlText, hlTextX, hlTextY);
         drawText(canvas, mPaintHL, mPaintHLColor, hlText, hlTextX, hlTextY);
@@ -118,6 +136,10 @@ public class LrcImgPreView extends View {
         //绘画文本
         String text = mDefText;
         float textX = mPaddingLeftOrRight;
+        if (mShowLrcType == SHOWEXTRALRC) {
+            float textWidth = getTextWidth(mPaint, text);
+            textX = (getWidth() - textWidth) / 2;
+        }
         float textY = viewHeight - topOrBottom;
         drawOutline(canvas, mPaintOutline, text, textX, textY);
         drawText(canvas, mPaint, mPaintColor, text, textX, textY);
@@ -231,5 +253,9 @@ public class LrcImgPreView extends View {
 
     public void setPaddingLeftOrRight(float mPaddingLeftOrRight) {
         this.mPaddingLeftOrRight = mPaddingLeftOrRight;
+    }
+
+    public void setShowLrcType(int mShowLrcType) {
+        this.mShowLrcType = mShowLrcType;
     }
 }

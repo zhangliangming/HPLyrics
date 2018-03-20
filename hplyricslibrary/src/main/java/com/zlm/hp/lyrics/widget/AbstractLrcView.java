@@ -229,18 +229,11 @@ public abstract class AbstractLrcView extends View {
      * 分割歌词当前歌词的第几个字
      */
     public int mSplitLyricsWordIndex = -1;
-    /**
-     * 当前歌词第几个字 已经播放的长度
-     */
-    public float mLineLyricsHLWidth = 0;
+
     /**
      * 当前歌词第几个字 已经播放的时间
      */
     public float mLyricsWordHLTime = 0;
-    /**
-     * 高亮歌词的X移动位置
-     */
-    public float mHighLightLrcMoveX = 0;
 
     //////////////////////////////////翻译歌词和音译歌词///////////////////////////////////////
     /**
@@ -295,16 +288,6 @@ public abstract class AbstractLrcView extends View {
      * 当前额外分割歌词的第几个字
      */
     public int mExtraSplitLyricsWordIndex = -1;
-    /**
-     * 额外歌词当前歌词第几个字 已经播放的长度
-     */
-    public float mExtraLyricsLineHLWidth = 0;
-
-    /**
-     * 额外歌词高亮歌词的X移动位置
-     */
-    public float mExtraLyricsHighLightMoveX = 0;
-
     /**
      * 绘画类型：lrc类型
      */
@@ -495,37 +478,6 @@ public abstract class AbstractLrcView extends View {
         canvas.drawText(btnText, textX, textY, paintText);
     }
 
-
-    /**
-     * 获取高亮移动的x位置（注：该方法在歌词不换行时使用）
-     *
-     * @param curLrcTextWidth
-     * @param lineLyricsHLWidth
-     * @param highLightLrcMoveX
-     * @return
-     */
-    public float getHLMoveTextX(float curLrcTextWidth, float lineLyricsHLWidth, float highLightLrcMoveX) {
-        float textX = 0;
-        if (curLrcTextWidth > getWidth()) {
-            if (lineLyricsHLWidth >= getWidth() / 2) {
-                if ((curLrcTextWidth - lineLyricsHLWidth) >= getWidth() / 2) {
-                    highLightLrcMoveX = (getWidth() / 2 - lineLyricsHLWidth);
-                } else {
-                    highLightLrcMoveX = getWidth() - curLrcTextWidth
-                            - mPaddingLeftOrRight;
-                }
-            } else {
-                highLightLrcMoveX = mPaddingLeftOrRight;
-            }
-            // 如果歌词宽度大于view的宽，则需要动态设置歌词的起始x坐标，以实现水平滚动
-            textX = highLightLrcMoveX;
-        } else {
-            // 如果歌词宽度小于view的宽
-            textX = (getWidth() - curLrcTextWidth) / 2;
-        }
-        return textX;
-    }
-
     /**
      * 播放
      *
@@ -599,9 +551,7 @@ public abstract class AbstractLrcView extends View {
         mSplitLyricsLineNum = 0;
         mLyricsWordIndex = -1;
         mSplitLyricsWordIndex = -1;
-        mLineLyricsHLWidth = 0;
         mLyricsWordHLTime = 0;
-        mHighLightLrcMoveX = 0;
 
         //
         mLrcLineInfos = null;
@@ -610,8 +560,6 @@ public abstract class AbstractLrcView extends View {
         mExtraSplitLyricsLineNum = 0;
         mExtraLyricsWordIndex = -1;
         mExtraSplitLyricsWordIndex = -1;
-        mExtraLyricsLineHLWidth = 0;
-        mExtraLyricsHighLightMoveX = 0;
         mTranslateLyricsWordHLTime = 0;
         //
         mLrcPlayerStatus = LRCPLAYERSTATUS_INIT;
@@ -868,13 +816,6 @@ public abstract class AbstractLrcView extends View {
         synchronized (lock) {
             isHandToChangeExtraLrcStatus = true;
             this.mExtraLrcStatus = mExtraLrcStatus;
-            if (mExtraLrcStatus == EXTRALRCSTATUS_NOSHOWEXTRALRC) {
-                //不显示额外歌词
-                mHighLightLrcMoveX = 0;
-                mExtraLyricsHighLightMoveX = 0;
-            } else {
-                mExtraLyricsHighLightMoveX = 0;
-            }
             //更新行和索引等数据
             updateView(mCurPlayingTime + mPlayerSpendTime);
             invalidateView();
