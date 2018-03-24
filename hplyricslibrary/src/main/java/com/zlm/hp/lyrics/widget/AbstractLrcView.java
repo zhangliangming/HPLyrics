@@ -40,6 +40,16 @@ public abstract class AbstractLrcView extends View {
      * 加载中
      */
     public static final int LRCSTATUS_LOADING = 1;
+
+    /**
+     * 无歌词-去搜索（SearchLyricsListener不为空时）
+     */
+    public final int LRCSTATUS_NOLRC_GOTOSEARCH = 2;
+    /**
+     * 无歌词-显示默认文本
+     */
+    public final int LRCSTATUS_NOLRC_DEFTEXT = 3;
+
     /**
      * 绘画歌词
      */
@@ -78,14 +88,7 @@ public abstract class AbstractLrcView extends View {
      * 播放
      */
     public static final int LRCPLAYERSTATUS_PLAY = 1;
-    /**
-     * 无歌词-去搜索（SearchLyricsListener不为空时）
-     */
-    public final int LRCSTATUS_NOLRC_GOTOSEARCH = 2;
-    /**
-     * 无歌词-显示默认文本
-     */
-    public final int LRCSTATUS_NOLRC_DEFTEXT = 3;
+
 
     /**
      * 默认歌词画笔
