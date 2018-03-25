@@ -25,7 +25,7 @@ public class LyricsLineInfo {
     /**
      * 歌词数组，用来分隔每个歌词
      */
-    public String[] mLyricsWords;
+    private String[] mLyricsWords;
     /**
      * 数组，用来存放每个歌词的时间
      */

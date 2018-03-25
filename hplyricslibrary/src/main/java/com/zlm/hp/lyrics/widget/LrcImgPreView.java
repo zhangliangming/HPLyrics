@@ -23,11 +23,11 @@ public class LrcImgPreView extends View {
     /**
      * 默认歌词画笔
      */
-    public Paint mPaint;
+    private Paint mPaint;
     /**
      * 默认画笔颜色
      */
-    public int[] mPaintColor = new int[]{
+    private int[] mPaintColor = new int[]{
             ColorUtils.parserColor("#00348a"),
             ColorUtils.parserColor("#0080c0"),
             ColorUtils.parserColor("#03cafc")
@@ -35,9 +35,9 @@ public class LrcImgPreView extends View {
     /**
      * 高亮歌词画笔
      */
-    public Paint mPaintHL;
+    private Paint mPaintHL;
     //高亮颜色
-    public int[] mPaintHLColor = new int[]{
+    private int[] mPaintHLColor = new int[]{
             ColorUtils.parserColor("#82f7fd"),
             ColorUtils.parserColor("#ffffff"),
             ColorUtils.parserColor("#03e9fc")
@@ -45,26 +45,26 @@ public class LrcImgPreView extends View {
     /**
      * 轮廓画笔
      */
-    public Paint mPaintOutline;
+    private Paint mPaintOutline;
 
     /**
      * 默认提示文本
      */
-    public String mDefText;
+    private String mDefText;
 
     /**
      * 空行高度
      */
-    public float mSpaceLineHeight = 30;
+    private float mSpaceLineHeight = 30;
     /**
      * 歌词字体大小
      */
-    public float mFontSize = 35;
+    private float mFontSize = 35;
 
     /**
      * 左右间隔距离
      */
-    public float mPaddingLeftOrRight = 15;
+    private float mPaddingLeftOrRight = 15;
 
     /**
      * 显示默认歌词

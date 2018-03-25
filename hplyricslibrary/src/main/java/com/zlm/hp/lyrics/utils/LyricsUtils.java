@@ -446,6 +446,26 @@ public class LyricsUtils {
         canvas.restore();
     }
 
+    /**
+     * 绘画动感文本
+     *
+     * @param canvas
+     * @param paint   默认画笔
+     * @param paintHL 高亮画笔
+     * @param text    文本
+     * @param hlWidth 高亮宽度
+     * @param x
+     * @param y
+     */
+    public static void drawDynamicText(Canvas canvas, Paint paint, Paint paintHL, String text, float hlWidth, float x, float y) {
+        canvas.save();
+        canvas.drawText(text, x, y, paint);
+        //设置动感歌词过渡效果
+        canvas.clipRect(x, y - getRealTextHeight(paint), x + hlWidth,
+                y + getRealTextHeight(paint));
+        canvas.drawText(text, x, y, paintHL);
+        canvas.restore();
+    }
 
     /**
      * 描绘轮廓

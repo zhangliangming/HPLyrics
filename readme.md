@@ -8,6 +8,10 @@
 
 # 日志 #
 
+## v1.20##
+
+- 添加制作歌词预览视图
+
 ## v1.19##
 
 - 添加额外歌词生成图片视图预览和生成额外歌词图片功能
@@ -131,7 +135,7 @@
 2.app build.gradle
 
 `dependencies {
-	         compile 'com.github.zhangliangming:HPLyrics:v1.19'
+	         compile 'com.github.zhangliangming:HPLyrics:v1.20'
 	}`
 
 # 调用Demo #
