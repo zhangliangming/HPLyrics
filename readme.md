@@ -8,6 +8,10 @@
 
 # 日志 #
 
+## v1.21##
+
+- 添加获取制作后的歌词接口
+
 ## v1.20##
 
 - 添加制作歌词预览视图
@@ -135,7 +139,7 @@
 2.app build.gradle
 
 `dependencies {
-	         compile 'com.github.zhangliangming:HPLyrics:v1.20'
+	         compile 'com.github.zhangliangming:HPLyrics:v1.21'
 	}`
 
 # 调用Demo #

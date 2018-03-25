@@ -180,12 +180,12 @@ public class MakeLrcPreView extends View {
             if (mWordDisIntervals.containsKey(preLrcIndex)) {
                 //设置前一个字的结束时间
                 WordDisInterval wordDisInterval = mWordDisIntervals.get(preLrcIndex);
-                wordDisInterval.setEndTime(curPlayingTime);
+                wordDisInterval.setEndTime((int) curPlayingTime);
                 mWordDisIntervals.put(preLrcIndex, wordDisInterval);
             }
             //设置当前字的开始时间
             WordDisInterval wordDisInterval = new WordDisInterval();
-            wordDisInterval.setStartTime(curPlayingTime);
+            wordDisInterval.setStartTime((int) curPlayingTime);
             mWordDisIntervals.put(mLrcIndex, wordDisInterval);
 
             //判断是否完成
@@ -233,6 +233,37 @@ public class MakeLrcPreView extends View {
         mWordDisIntervals.clear();
     }
 
+    /**
+     * 获取该行的歌曲数据
+     *
+     * @return
+     */
+    public LyricsLineInfo getLyricsLineInfo() {
+        if (mStatus == STATUS_FINISH) {
+            int startTime = 0;
+            int endTime = 0;
+            int[] wDisIntervals = new int[mWordDisIntervals.size()];
+            for (int j = 0; j < mWordDisIntervals.size(); j++) {
+                WordDisInterval wordDisInterval = mWordDisIntervals.get(j);
+                if (j == 0) {
+                    startTime = wordDisInterval.getStartTime();
+                }
+                if (j == mWordDisIntervals.size() - 1) {
+                    endTime = wordDisInterval.getEndTime();
+
+                }
+                int time = wordDisInterval.getEndTime()
+                        - wordDisInterval.getStartTime();
+                wDisIntervals[j] = time;
+            }
+            mLyricsLineInfo.setStartTime(startTime);
+            mLyricsLineInfo.setEndTime(endTime);
+            mLyricsLineInfo.setWordsDisInterval(wDisIntervals);
+            return mLyricsLineInfo;
+        }
+        return null;
+    }
+
     public void setStatus(int status) {
         if (mStatus != STATUS_FINISH) {
             this.mStatus = status;
@@ -268,25 +299,25 @@ public class MakeLrcPreView extends View {
         /**
          * 开始时间
          */
-        long startTime;
+        int startTime;
         /**
          * 结束时间
          */
-        long endTime;
+        int endTime;
 
-        public long getStartTime() {
+        public int getStartTime() {
             return startTime;
         }
 
-        public void setStartTime(long startTime) {
+        public void setStartTime(int startTime) {
             this.startTime = startTime;
         }
 
-        public long getEndTime() {
+        public int getEndTime() {
             return endTime;
         }
 
-        public void setEndTime(long endTime) {
+        public void setEndTime(int endTime) {
             this.endTime = endTime;
         }
     }
