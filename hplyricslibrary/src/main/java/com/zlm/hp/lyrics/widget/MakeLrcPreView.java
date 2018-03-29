@@ -8,10 +8,8 @@ import android.util.AttributeSet;
 import android.view.View;
 
 import com.zlm.hp.lyrics.model.LyricsLineInfo;
+import com.zlm.hp.lyrics.model.MakeLrcLineInfo;
 import com.zlm.hp.lyrics.utils.LyricsUtils;
-
-import java.util.List;
-import java.util.TreeMap;
 
 /**
  * 歌词制作预览视图
@@ -50,37 +48,9 @@ public class MakeLrcPreView extends View {
      */
     private float mPaddingLeftOrRight = 15;
     /**
-     * 初始
+     * 制作歌词
      */
-    public static final int STATUS_NONE = 0;
-    /**
-     * 选中
-     */
-    public static final int STATUS_SELECTED = 1;
-
-    /**
-     * 完成
-     */
-    public static final int STATUS_FINISH = 2;
-    /**
-     * 状态
-     */
-    private int mStatus = STATUS_NONE;
-
-    /**
-     * 歌词索引，-1是未读，-2是已经完成
-     */
-    private int mLrcIndex = -1;
-    /**
-     * 行歌词
-     */
-    private LyricsLineInfo mLyricsLineInfo;
-
-    /**
-     * 每个字时间集合
-     */
-    private TreeMap<Integer, WordDisInterval> mWordDisIntervals = new TreeMap<Integer, WordDisInterval>();
-
+    private MakeLrcLineInfo mMakeLrcLineInfo;
 
     public MakeLrcPreView(Context context) {
         super(context);
@@ -121,27 +91,32 @@ public class MakeLrcPreView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        if (mLyricsLineInfo == null) return;
+        if (mMakeLrcLineInfo == null) return;
+        if (mMakeLrcLineInfo.getLyricsLineInfo() == null) return;
         int viewHeight = getHeight();
         int viewWidth = getWidth();
         int textHeight = LyricsUtils.getTextHeight(mPaint);
         float textY = (viewHeight + textHeight) / 2;
 
+        LyricsLineInfo lyricsLineInfo = mMakeLrcLineInfo.getLyricsLineInfo();
+        int lrcIndex = mMakeLrcLineInfo.getLrcIndex();
+        int status = mMakeLrcLineInfo.getStatus();
+
         //歌词字集合
-        String[] lyricsWords = mLyricsLineInfo.getLyricsWords();
-        String lineLyrics = mLyricsLineInfo.getLineLyrics();
+        String[] lyricsWords = lyricsLineInfo.getLyricsWords();
+        String lineLyrics = lyricsLineInfo.getLineLyrics();
         float textWidth = LyricsUtils.getTextWidth(mPaint, lineLyrics);
         float textHLWidth = 0;
         //计算高亮宽度
-        if (mLrcIndex == -1) {
+        if (lrcIndex == -1) {
             //未读
             textHLWidth = 0;
-        } else if (mLrcIndex == -2) {
+        } else if (lrcIndex == -2) {
             textHLWidth = textWidth;
         } else {
-            if (mLrcIndex < lyricsWords.length) {
+            if (lrcIndex < lyricsWords.length) {
                 StringBuilder temp = new StringBuilder();
-                for (int i = 0; i <= mLrcIndex; i++) {
+                for (int i = 0; i <= lrcIndex; i++) {
                     temp.append(lyricsWords[i]);
                 }
                 textHLWidth = LyricsUtils.getTextWidth(mPaint, temp.toString());
@@ -155,123 +130,16 @@ public class MakeLrcPreView extends View {
         LyricsUtils.drawDynamicText(canvas, mPaint, mPaintHL, lineLyrics, textHLWidth, textX, textY);
 
         //画边框
-        if (mStatus != STATUS_NONE) {
-            if (mStatus == STATUS_SELECTED) {
+        if (status != MakeLrcLineInfo.STATUS_NONE) {
+            if (status == MakeLrcLineInfo.STATUS_SELECTED) {
                 //选中
                 mPaintRect.setColor(Color.RED);
-            } else if (mStatus == STATUS_FINISH) {
+            } else if (status == MakeLrcLineInfo.STATUS_FINISH) {
                 //完成
                 mPaintRect.setColor(mPaintHLColor);
             }
             canvas.drawRect(2, 2, viewWidth - 2, viewHeight - 2, mPaintRect);
         }
-    }
-
-    /**
-     * 设置当前歌曲索引
-     *
-     * @param curPlayingTime
-     */
-    public boolean play(long curPlayingTime) {
-        //选中
-        if (mStatus == STATUS_SELECTED) {
-            mLrcIndex++;
-            int preLrcIndex = mLrcIndex - 1;
-            if (mWordDisIntervals.containsKey(preLrcIndex)) {
-                //设置前一个字的结束时间
-                WordDisInterval wordDisInterval = mWordDisIntervals.get(preLrcIndex);
-                wordDisInterval.setEndTime((int) curPlayingTime);
-                mWordDisIntervals.put(preLrcIndex, wordDisInterval);
-            }
-            //设置当前字的开始时间
-            WordDisInterval wordDisInterval = new WordDisInterval();
-            wordDisInterval.setStartTime((int) curPlayingTime);
-            mWordDisIntervals.put(mLrcIndex, wordDisInterval);
-
-            //判断是否完成
-            if (mLrcIndex == mLyricsLineInfo.getLyricsWords().length) {
-
-                mStatus = STATUS_FINISH;
-
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * 设置回滚
-     */
-    public void back() {
-        //选中
-        if (mStatus == STATUS_SELECTED) {
-            mLrcIndex--;
-            if (mLrcIndex < -1) {
-                mLrcIndex = -1;
-            }
-            //后退时，删除当前的歌词字时间
-            int nextLrcIndex = mLrcIndex + 1;
-            if (mWordDisIntervals.containsKey(nextLrcIndex)) {
-                mWordDisIntervals.remove(nextLrcIndex);
-            }
-            //
-            if (mWordDisIntervals.containsKey(mLrcIndex)) {
-                WordDisInterval wordDisInterval = mWordDisIntervals.get(mLrcIndex);
-                wordDisInterval.setEndTime(0);
-                mWordDisIntervals.put(mLrcIndex, wordDisInterval);
-            }
-        }
-    }
-
-
-    /**
-     * 重置
-     */
-    public void reset() {
-        mStatus = STATUS_NONE;
-        mLrcIndex = -1;
-        mWordDisIntervals.clear();
-    }
-
-    /**
-     * 获取该行的歌曲数据
-     *
-     * @return
-     */
-    public LyricsLineInfo getLyricsLineInfo() {
-        if (mStatus == STATUS_FINISH) {
-            int startTime = 0;
-            int endTime = 0;
-            int[] wDisIntervals = new int[mWordDisIntervals.size()];
-            for (int j = 0; j < mWordDisIntervals.size(); j++) {
-                WordDisInterval wordDisInterval = mWordDisIntervals.get(j);
-                if (j == 0) {
-                    startTime = wordDisInterval.getStartTime();
-                }
-                if (j == mWordDisIntervals.size() - 1) {
-                    endTime = wordDisInterval.getEndTime();
-
-                }
-                int time = wordDisInterval.getEndTime()
-                        - wordDisInterval.getStartTime();
-                wDisIntervals[j] = time;
-            }
-            mLyricsLineInfo.setStartTime(startTime);
-            mLyricsLineInfo.setEndTime(endTime);
-            mLyricsLineInfo.setWordsDisInterval(wDisIntervals);
-            return mLyricsLineInfo;
-        }
-        return null;
-    }
-
-    public void setStatus(int status) {
-        if (mStatus != STATUS_FINISH) {
-            this.mStatus = status;
-        }
-    }
-
-    public void setLyricsLineInfo(LyricsLineInfo mLyricsLineInfo) {
-        this.mLyricsLineInfo = mLyricsLineInfo;
     }
 
     public void setPaintColor(int mPaintColor) {
@@ -290,39 +158,7 @@ public class MakeLrcPreView extends View {
         mPaintHL.setTextSize(mFontSize);
     }
 
-    public int getStatus() {
-        return mStatus;
-    }
-
-    /**
-     * 单个歌词字时间实体类
-     *
-     * @author zhangliangming
-     */
-    class WordDisInterval {
-        /**
-         * 开始时间
-         */
-        int startTime;
-        /**
-         * 结束时间
-         */
-        int endTime;
-
-        public int getStartTime() {
-            return startTime;
-        }
-
-        public void setStartTime(int startTime) {
-            this.startTime = startTime;
-        }
-
-        public int getEndTime() {
-            return endTime;
-        }
-
-        public void setEndTime(int endTime) {
-            this.endTime = endTime;
-        }
+    public void setMakeLrcLineInfo(MakeLrcLineInfo mMakeLrcLineInfo) {
+        this.mMakeLrcLineInfo = mMakeLrcLineInfo;
     }
 }
