@@ -290,6 +290,10 @@ public class MakeLrcPreView extends View {
         mPaintHL.setTextSize(mFontSize);
     }
 
+    public int getStatus() {
+        return mStatus;
+    }
+
     /**
      * 单个歌词字时间实体类
      *
