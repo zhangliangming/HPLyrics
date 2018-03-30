@@ -8,6 +8,11 @@
 
 # 日志 #
 
+
+## v1.25##
+
+- 修复制作歌词问题
+
 ## v1.24##
 
 - LyricsReader添加设置歌词数据
@@ -152,7 +157,7 @@
 2.app build.gradle
 
 `dependencies {
-	         compile 'com.github.zhangliangming:HPLyrics:v1.24'
+	         compile 'com.github.zhangliangming:HPLyrics:v1.25'
 	}`
 
 # 调用Demo #

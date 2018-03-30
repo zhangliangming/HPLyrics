@@ -57,18 +57,22 @@ public class MakeLrcLineInfo {
                 wordDisInterval.setEndTime((int) curPlayingTime);
                 mWordDisIntervals.put(preLrcIndex, wordDisInterval);
             }
+
+            //判断是否完成
+            if (mLrcIndex == mLyricsLineInfo.getLyricsWords().length) {
+
+                mLrcIndex = mLyricsLineInfo.getLyricsWords().length - 1;
+                mStatus = STATUS_FINISH;
+
+                return true;
+            }
+
             //设置当前字的开始时间
             WordDisInterval wordDisInterval = new WordDisInterval();
             wordDisInterval.setStartTime((int) curPlayingTime);
             mWordDisIntervals.put(mLrcIndex, wordDisInterval);
 
-            //判断是否完成
-            if (mLrcIndex == mLyricsLineInfo.getLyricsWords().length) {
 
-                mStatus = STATUS_FINISH;
-
-                return true;
-            }
         }
         return false;
     }
@@ -159,7 +163,6 @@ public class MakeLrcLineInfo {
     public int getStatus() {
         return mStatus;
     }
-
 
 
     /**
