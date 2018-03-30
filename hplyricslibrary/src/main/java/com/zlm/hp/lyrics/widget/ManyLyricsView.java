@@ -61,6 +61,12 @@ public class ManyLyricsView extends AbstractLrcView {
      * 画线
      */
     private Paint mPaintLine;
+
+    /**
+     * 画线颜色
+     */
+    private int mPaintLineColor = Color.WHITE;
+
     /**
      * 绘画播放按钮
      */
@@ -332,7 +338,7 @@ public class ManyLyricsView extends AbstractLrcView {
         float lineY = (getHeight() - lineH) / 2;
         float lineLeft = textX + textWidth + linePadding;
         float lineR = rectL - linePadding;
-        LinearGradient linearGradientHL = new LinearGradient(lineLeft, lineY + lineH, lineR, lineY + lineH, new int[]{ColorUtils.parserColor(Color.WHITE, 200), ColorUtils.parserColor(Color.WHITE, 10), ColorUtils.parserColor(Color.WHITE, 200)}, new float[]{0f, 0.5f, 1f}, Shader.TileMode.CLAMP);
+        LinearGradient linearGradientHL = new LinearGradient(lineLeft, lineY + lineH, lineR, lineY + lineH, new int[]{ColorUtils.parserColor(mPaintLineColor, 200), ColorUtils.parserColor(mPaintLineColor, 10), ColorUtils.parserColor(mPaintLineColor, 200)}, new float[]{0f, 0.5f, 1f}, Shader.TileMode.CLAMP);
         mPaintLine.setShader(linearGradientHL);
         canvas.drawRect(lineLeft, lineY, lineR, lineY + lineH, mPaintLine);
 
@@ -993,6 +999,10 @@ public class ManyLyricsView extends AbstractLrcView {
 
     public void setTouchAble(boolean mTouchAble) {
         this.mTouchAble = mTouchAble;
+    }
+
+    public void setPaintLineColor(int mPaintLineColor) {
+        this.mPaintLineColor = mPaintLineColor;
     }
 
     /**
