@@ -120,7 +120,7 @@ public class LyricsReader {
         if (tags.containsKey(LyricsTag.TAG_OFFSET)) {
             mDefOffset = 0;
             try {
-                mDefOffset =  Long.parseLong((String) tags.get(LyricsTag.TAG_OFFSET));
+                mDefOffset = Long.parseLong((String) tags.get(LyricsTag.TAG_OFFSET));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -184,6 +184,26 @@ public class LyricsReader {
 
     public LyricsInfo getLyricsInfo() {
         return mLyricsInfo;
+    }
+
+    public void setLyricsType(int mLyricsType) {
+        this.mLyricsType = mLyricsType;
+    }
+
+    public void setLrcLineInfos(TreeMap<Integer, LyricsLineInfo> mLrcLineInfos) {
+        this.mLrcLineInfos = mLrcLineInfos;
+    }
+
+    public void setTranslateLrcLineInfos(List<LyricsLineInfo> mTranslateLrcLineInfos) {
+        this.mTranslateLrcLineInfos = mTranslateLrcLineInfos;
+    }
+
+    public void setTransliterationLrcLineInfos(List<LyricsLineInfo> mTransliterationLrcLineInfos) {
+        this.mTransliterationLrcLineInfos = mTransliterationLrcLineInfos;
+    }
+
+    public void setLyricsInfo(LyricsInfo mLyricsInfo) {
+        this.mLyricsInfo = mLyricsInfo;
     }
 
     ////////////////////////////////////////////////////////////////////////////////
