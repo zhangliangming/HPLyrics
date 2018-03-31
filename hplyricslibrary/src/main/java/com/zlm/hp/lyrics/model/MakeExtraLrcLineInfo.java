@@ -17,6 +17,36 @@ public class MakeExtraLrcLineInfo {
      */
     private String extraLineLyrics;
 
+    /**
+     * 初始
+     */
+    public static final int STATUS_NONE = 0;
+
+    /**
+     * 完成
+     */
+    public static final int STATUS_FINISH = 2;
+
+    /**
+     * 状态
+     */
+    private int mStatus = STATUS_NONE;
+
+    /**
+     * 音译歌词
+     */
+    public static final int TRANSLITERATIONLRC = 0;
+
+    /**
+     * 翻译歌词
+     */
+    public static final int TRANSLATELRC = 1;
+
+    /**
+     * 额外歌词类型
+     */
+    private int extraLyricsType = TRANSLATELRC;
+
     public String getLineLyrics() {
         return lineLyrics;
     }
@@ -32,4 +62,31 @@ public class MakeExtraLrcLineInfo {
     public void setExtraLineLyrics(String extraLineLyrics) {
         this.extraLineLyrics = extraLineLyrics;
     }
+
+    public int getExtraLyricsType() {
+        return extraLyricsType;
+    }
+
+    public void setExtraLyricsType(int extraLyricsType) {
+        this.extraLyricsType = extraLyricsType;
+    }
+
+    /**
+     * 重置
+     */
+    public void reset() {
+        mStatus = STATUS_NONE;
+        extraLineLyrics = "";
+    }
+
+    public void setStatus(int status) {
+        if (mStatus != STATUS_FINISH) {
+            this.mStatus = status;
+        }
+    }
+
+    public int getStatus() {
+        return mStatus;
+    }
+
 }

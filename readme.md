@@ -8,6 +8,11 @@
 
 # 日志 #
 
+
+## v1.27 ##
+
+- 添加制作翻译歌词实体
+
 ## v1.26 ##
 
 - 添加修改绘画指示器颜色接口
@@ -160,7 +165,7 @@
 2.app build.gradle
 
 `dependencies {
-	         compile 'com.github.zhangliangming:HPLyrics:v1.26'
+	         compile 'com.github.zhangliangming:HPLyrics:v1.27'
 	}`
 
 # 调用Demo #
