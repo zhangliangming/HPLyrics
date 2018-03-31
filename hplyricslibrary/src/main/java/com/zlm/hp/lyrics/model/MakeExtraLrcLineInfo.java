@@ -21,6 +21,10 @@ public class MakeExtraLrcLineInfo {
      * 初始
      */
     public static final int STATUS_NONE = 0;
+    /**
+     * 选中
+     */
+    public static final int STATUS_SELECTED = 1;
 
     /**
      * 完成
