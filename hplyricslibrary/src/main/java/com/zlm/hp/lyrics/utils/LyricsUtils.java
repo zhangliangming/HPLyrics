@@ -637,11 +637,15 @@ public class LyricsUtils {
                     newLyricsWords[j] = origLyricsWords[j].trim() + " ";
                 } else {
                     String origLyricsWordsString = origLyricsWords[j].trim();
-                    boolean isWord = origLyricsWordsString.matches("[a-zA-Z]+");
-                    if (isWord) {
-                        newLyricsWords[j] = origLyricsWords[j].trim() + " ";
+                    if (StringUtils.isBlank(origLyricsWordsString)) {
+                        newLyricsWords[j] += " ";
                     } else {
-                        newLyricsWords[j] = origLyricsWords[j].trim();
+                        boolean isWord = origLyricsWordsString.matches("[a-zA-Z]+");
+                        if (isWord) {
+                            newLyricsWords[j] = origLyricsWords[j].trim() + " ";
+                        } else {
+                            newLyricsWords[j] = origLyricsWords[j].trim();
+                        }
                     }
                 }
                 newLineLyrics += newLyricsWords[j];
