@@ -7,7 +7,7 @@
 - 对于歌词view，以后考虑使用surfaceview来实现
 
 # 日志 #
-## v1.30 ##
+## v1.31 ##
 
 - 修改音译歌词显示
 
@@ -175,7 +175,7 @@
 2.app build.gradle
 
 `dependencies {
-	         compile 'com.github.zhangliangming:HPLyrics:v1.30'
+	         compile 'com.github.zhangliangming:HPLyrics:v1.31'
 	}`
 
 # 调用Demo #

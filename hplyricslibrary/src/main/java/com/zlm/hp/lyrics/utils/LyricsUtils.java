@@ -638,7 +638,7 @@ public class LyricsUtils {
                 } else {
                     String origLyricsWordsString = origLyricsWords[j].trim();
                     if (StringUtils.isBlank(origLyricsWordsString)) {
-                        newLyricsWords[j] += " ";
+                        newLyricsWords[j] = " ";
                     } else {
                         boolean isWord = origLyricsWordsString.matches("[a-zA-Z]+");
                         if (isWord) {
