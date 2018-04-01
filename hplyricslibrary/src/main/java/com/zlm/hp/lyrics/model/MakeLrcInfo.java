@@ -48,7 +48,7 @@ public class MakeLrcInfo {
     }
 
     public void setStatus(int status) {
-        if (status != STATUS_FINISH) {
+        if (this.status != STATUS_FINISH) {
             this.status = status;
         }
     }
