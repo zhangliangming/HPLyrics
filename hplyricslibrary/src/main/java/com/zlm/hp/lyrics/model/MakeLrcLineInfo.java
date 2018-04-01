@@ -7,34 +7,7 @@ import java.util.TreeMap;
  * Created by zhangliangming on 2018-03-29.
  */
 
-public class MakeLrcLineInfo {
-
-    /**
-     * 初始
-     */
-    public static final int STATUS_NONE = 0;
-    /**
-     * 选中
-     */
-    public static final int STATUS_SELECTED = 1;
-
-    /**
-     * 完成
-     */
-    public static final int STATUS_FINISH = 2;
-    /**
-     * 状态
-     */
-    private int mStatus = STATUS_NONE;
-
-    /**
-     * 歌词索引，-1是未读，-2是已经完成
-     */
-    private int mLrcIndex = -1;
-    /**
-     * 行歌词
-     */
-    private LyricsLineInfo mLyricsLineInfo;
+public class MakeLrcLineInfo extends MakeLrcInfo {
 
     /**
      * 每个字时间集合
@@ -48,9 +21,11 @@ public class MakeLrcLineInfo {
      */
     public boolean play(long curPlayingTime) {
         //选中
-        if (mStatus == STATUS_SELECTED) {
-            mLrcIndex++;
-            int preLrcIndex = mLrcIndex - 1;
+        if (getStatus() == STATUS_SELECTED) {
+            int lrcIndex = getLrcIndex();
+            lrcIndex++;
+            setLrcIndex(lrcIndex);
+            int preLrcIndex = lrcIndex - 1;
             if (mWordDisIntervals.containsKey(preLrcIndex)) {
                 //设置前一个字的结束时间
                 WordDisInterval wordDisInterval = mWordDisIntervals.get(preLrcIndex);
@@ -58,11 +33,13 @@ public class MakeLrcLineInfo {
                 mWordDisIntervals.put(preLrcIndex, wordDisInterval);
             }
 
+            LyricsLineInfo lyricsLineInfo = getLyricsLineInfo();
             //判断是否完成
-            if (mLrcIndex == mLyricsLineInfo.getLyricsWords().length) {
+            if (lrcIndex == lyricsLineInfo.getLyricsWords().length) {
 
-                mLrcIndex = mLyricsLineInfo.getLyricsWords().length - 1;
-                mStatus = STATUS_FINISH;
+                lrcIndex = lyricsLineInfo.getLyricsWords().length - 1;
+                setStatus(STATUS_FINISH);
+                setLrcIndex(lrcIndex);
 
                 return true;
             }
@@ -70,7 +47,7 @@ public class MakeLrcLineInfo {
             //设置当前字的开始时间
             WordDisInterval wordDisInterval = new WordDisInterval();
             wordDisInterval.setStartTime((int) curPlayingTime);
-            mWordDisIntervals.put(mLrcIndex, wordDisInterval);
+            mWordDisIntervals.put(lrcIndex, wordDisInterval);
 
 
         }
@@ -82,36 +59,30 @@ public class MakeLrcLineInfo {
      */
     public void back() {
         //选中
-        if (mStatus == STATUS_SELECTED) {
-            mLrcIndex--;
-            if (mLrcIndex < -1) {
-                mLrcIndex = -1;
+        if (getStatus() == STATUS_SELECTED) {
+            int lrcIndex = getLrcIndex();
+            lrcIndex--;
+            if (lrcIndex < -1) {
+                lrcIndex = -1;
             }
+            setLrcIndex(lrcIndex);
             //后退时，删除当前的歌词字时间
-            int nextLrcIndex = mLrcIndex + 1;
+            int nextLrcIndex = lrcIndex + 1;
             if (mWordDisIntervals.containsKey(nextLrcIndex)) {
                 mWordDisIntervals.remove(nextLrcIndex);
             }
             //
-            if (mWordDisIntervals.containsKey(mLrcIndex)) {
-                WordDisInterval wordDisInterval = mWordDisIntervals.get(mLrcIndex);
+            if (mWordDisIntervals.containsKey(lrcIndex)) {
+                WordDisInterval wordDisInterval = mWordDisIntervals.get(lrcIndex);
                 wordDisInterval.setEndTime(0);
-                mWordDisIntervals.put(mLrcIndex, wordDisInterval);
+                mWordDisIntervals.put(lrcIndex, wordDisInterval);
             }
         }
     }
 
-    public void setLyricsLineInfo(LyricsLineInfo mLyricsLineInfo) {
-        this.mLyricsLineInfo = mLyricsLineInfo;
-    }
-
-
-    /**
-     * 重置
-     */
+    @Override
     public void reset() {
-        mStatus = STATUS_NONE;
-        mLrcIndex = -1;
+        super.reset();
         mWordDisIntervals.clear();
     }
 
@@ -121,7 +92,7 @@ public class MakeLrcLineInfo {
      * @return
      */
     public LyricsLineInfo getFinishLrcLineInfo() {
-        if (mStatus == STATUS_FINISH) {
+        if (getStatus() == STATUS_FINISH) {
             int startTime = 0;
             int endTime = 0;
             int[] wDisIntervals = new int[mWordDisIntervals.size()];
@@ -138,30 +109,13 @@ public class MakeLrcLineInfo {
                         - wordDisInterval.getStartTime();
                 wDisIntervals[j] = time;
             }
-            mLyricsLineInfo.setStartTime(startTime);
-            mLyricsLineInfo.setEndTime(endTime);
-            mLyricsLineInfo.setWordsDisInterval(wDisIntervals);
-            return mLyricsLineInfo;
+            LyricsLineInfo lyricsLineInfo = getLyricsLineInfo();
+            lyricsLineInfo.setStartTime(startTime);
+            lyricsLineInfo.setEndTime(endTime);
+            lyricsLineInfo.setWordsDisInterval(wDisIntervals);
+            return lyricsLineInfo;
         }
         return null;
-    }
-
-    public LyricsLineInfo getLyricsLineInfo() {
-        return mLyricsLineInfo;
-    }
-
-    public int getLrcIndex() {
-        return mLrcIndex;
-    }
-
-    public void setStatus(int status) {
-        if (mStatus != STATUS_FINISH) {
-            this.mStatus = status;
-        }
-    }
-
-    public int getStatus() {
-        return mStatus;
     }
 
 

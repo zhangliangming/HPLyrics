@@ -8,7 +8,7 @@ import android.util.AttributeSet;
 import android.view.View;
 
 import com.zlm.hp.lyrics.model.LyricsLineInfo;
-import com.zlm.hp.lyrics.model.MakeLrcLineInfo;
+import com.zlm.hp.lyrics.model.MakeLrcInfo;
 import com.zlm.hp.lyrics.utils.LyricsUtils;
 
 /**
@@ -50,7 +50,11 @@ public class MakeLrcPreView extends View {
     /**
      * 制作歌词
      */
-    private MakeLrcLineInfo mMakeLrcLineInfo;
+    private MakeLrcInfo mMakeLrcInfo;
+    /**
+     * 绘画边框
+     */
+    private boolean isPaintRect = true;
 
     public MakeLrcPreView(Context context) {
         super(context);
@@ -91,16 +95,16 @@ public class MakeLrcPreView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        if (mMakeLrcLineInfo == null) return;
-        if (mMakeLrcLineInfo.getLyricsLineInfo() == null) return;
+        if (mMakeLrcInfo == null) return;
+        LyricsLineInfo lyricsLineInfo = mMakeLrcInfo.getLyricsLineInfo();
+        if (lyricsLineInfo == null) return;
         int viewHeight = getHeight();
         int viewWidth = getWidth();
         int textHeight = LyricsUtils.getTextHeight(mPaint);
         float textY = (viewHeight + textHeight) / 2;
 
-        LyricsLineInfo lyricsLineInfo = mMakeLrcLineInfo.getLyricsLineInfo();
-        int lrcIndex = mMakeLrcLineInfo.getLrcIndex();
-        int status = mMakeLrcLineInfo.getStatus();
+        int lrcIndex = mMakeLrcInfo.getLrcIndex();
+        int status = mMakeLrcInfo.getStatus();
 
         //歌词字集合
         String[] lyricsWords = lyricsLineInfo.getLyricsWords();
@@ -130,11 +134,11 @@ public class MakeLrcPreView extends View {
         LyricsUtils.drawDynamicText(canvas, mPaint, mPaintHL, lineLyrics, textHLWidth, textX, textY);
 
         //画边框
-        if (status != MakeLrcLineInfo.STATUS_NONE) {
-            if (status == MakeLrcLineInfo.STATUS_SELECTED) {
+        if (status != MakeLrcInfo.STATUS_NONE && isPaintRect) {
+            if (status == MakeLrcInfo.STATUS_SELECTED) {
                 //选中
                 mPaintRect.setColor(Color.RED);
-            } else if (status == MakeLrcLineInfo.STATUS_FINISH) {
+            } else if (status == MakeLrcInfo.STATUS_FINISH) {
                 //完成
                 mPaintRect.setColor(mPaintHLColor);
             }
@@ -158,7 +162,11 @@ public class MakeLrcPreView extends View {
         mPaintHL.setTextSize(mFontSize);
     }
 
-    public void setMakeLrcLineInfo(MakeLrcLineInfo mMakeLrcLineInfo) {
-        this.mMakeLrcLineInfo = mMakeLrcLineInfo;
+    public void setPaintRect(boolean paintRect) {
+        isPaintRect = paintRect;
+    }
+
+    public void setMakeLrcInfo(MakeLrcInfo mMakeLrcInfo) {
+        this.mMakeLrcInfo = mMakeLrcInfo;
     }
 }
