@@ -1227,7 +1227,7 @@ public abstract class AbstractLrcView extends SurfaceView implements SurfaceHold
     ///////////////////////////////////////////////
 
 
-    public void setmTextMaxWidth(float mTextMaxWidth) {
+    public void setTextMaxWidth(float mTextMaxWidth) {
         this.mTextMaxWidth = mTextMaxWidth;
     }
 

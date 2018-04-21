@@ -277,7 +277,7 @@ public class ManyLyricsView extends LinearLayout {
         mShadeHeight = getHeight() / 4;
         //设置歌词的最大宽度
         int textMaxWidth = getWidth() / 3 * 2;
-        mAbstractLrcView.setmTextMaxWidth(textMaxWidth);
+        mAbstractLrcView.setTextMaxWidth(textMaxWidth);
     }
 
     /**
@@ -1072,6 +1072,22 @@ public class ManyLyricsView extends LinearLayout {
         mAbstractLrcView.invalidateView();
     }
 
+    /**
+     * 设置歌词宽度
+     * @param mTextMaxWidth
+     */
+    public void setTextMaxWidth(float mTextMaxWidth) {
+        mAbstractLrcView.setTextMaxWidth(mTextMaxWidth);
+    }
+
+    /**
+     * 指示线颜色
+     * @param mPaintLineColor
+     */
+    public void setPaintLineColor(int mPaintLineColor) {
+        this.mPaintLineColor = mPaintLineColor;
+    }
+
     public void setTouchAble(boolean mTouchAble) {
         this.mTouchAble = mTouchAble;
     }
@@ -1345,7 +1361,6 @@ public class ManyLyricsView extends LinearLayout {
     }
 
     /**
-     *
      * @return
      */
     public LyricsReader getLyricsReader() {
