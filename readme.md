@@ -12,7 +12,7 @@
 
 # 日志 #
 
-## v2.3 ##
+## v2.4 ##
 - 2018-04-21
 - 自定义view替换成surfaceview
 - 添加获取歌词参数方法
@@ -117,7 +117,7 @@
 2.app build.gradle
 
 `dependencies {
-	         compile 'com.github.zhangliangming:HPLyrics:v2.3'
+	         compile 'com.github.zhangliangming:HPLyrics:v2.4'
 	}`
 
 # 调用Demo #

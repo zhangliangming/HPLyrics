@@ -541,6 +541,8 @@ public class ManyLyricsView extends LinearLayout {
      * @return
      */
     private float drawUpLyrics(Canvas canvas, Paint paint, List<LyricsLineInfo> splitLyricsLineInfos, float spaceLineHeight, float fristLineTextY) {
+        int[] paintColors = mAbstractLrcView.getPaintColors();
+
 
         float lineTopY = fristLineTextY;
         //歌词和空行高度
@@ -577,7 +579,7 @@ public class ManyLyricsView extends LinearLayout {
             float textWidth = LyricsUtils.getTextWidth(paint, text);
             float textX = (getWidth() - textWidth) * 0.5f;
 
-            canvas.drawText(text, textX, lineTopY, paint);
+            LyricsUtils.drawText(canvas, paint, paintColors, text, textX, lineTopY);
 
 //            canvas.drawLine(0, lineTopY - getTextHeight(paint), 720, lineTopY - getTextHeight(paint), paint);
 //            canvas.drawLine(0, lineTopY, 720, lineTopY, paint);
