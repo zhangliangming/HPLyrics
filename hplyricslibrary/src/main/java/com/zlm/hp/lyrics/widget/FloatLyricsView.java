@@ -289,10 +289,10 @@ public class FloatLyricsView extends LinearLayout {
     }
 
     /**
-         * 获取额外歌词类型
-         *
-         * @return
-         */
+     * 获取额外歌词类型
+     *
+     * @return
+     */
     public int getExtraLrcType() {
         return mAbstractLrcView.getExtraLrcType();
     }
@@ -551,6 +551,14 @@ public class FloatLyricsView extends LinearLayout {
         } else {
             mAbstractLrcView.setLrcStatus(AbstractLrcView.LRCSTATUS_NONSUPPORT);
         }
+    }
+
+    /**
+     *
+     * @return
+     */
+    public LyricsReader getLyricsReader() {
+        return mAbstractLrcView.getLyricsReader();
     }
 
     /**

@@ -1345,6 +1345,14 @@ public class ManyLyricsView extends LinearLayout {
     }
 
     /**
+     *
+     * @return
+     */
+    public LyricsReader getLyricsReader() {
+        return mAbstractLrcView.getLyricsReader();
+    }
+
+    /**
      * 设置字体大小
      *
      * @param fontSize

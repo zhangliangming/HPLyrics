@@ -12,7 +12,7 @@
 
 # 日志 #
 
-## v2.0 ##
+## v2.1 ##
 - 2018-04-21
 - 自定义view替换成surfaceview
 
@@ -116,7 +116,7 @@
 2.app build.gradle
 
 `dependencies {
-	         compile 'com.github.zhangliangming:HPLyrics:v2.0'
+	         compile 'com.github.zhangliangming:HPLyrics:v2.1'
 	}`
 
 # 调用Demo #
