@@ -76,7 +76,7 @@ public class FloatLyricsView extends LinearLayout {
 
         //设置歌词的最大宽度
         int textMaxWidth = getWidth() / 3 * 2;
-        mAbstractLrcView.setmTextMaxWidth(textMaxWidth);
+        mAbstractLrcView.setTextMaxWidth(textMaxWidth);
 
         //字体大小
         float fontSize = getHeight() / 4;
@@ -618,6 +618,10 @@ public class FloatLyricsView extends LinearLayout {
      */
     public void setExtraLrcFontSize(float extraLrcFontSize, boolean isReloadData) {
         mAbstractLrcView.setExtraLrcFontSize(extraLrcFontSize, isReloadData);
+    }
+
+    public FloatAbstractLrcView getmAbstractLrcView() {
+        return mAbstractLrcView;
     }
 
     /**

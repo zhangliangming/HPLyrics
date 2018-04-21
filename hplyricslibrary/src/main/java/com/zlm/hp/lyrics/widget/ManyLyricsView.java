@@ -1398,6 +1398,10 @@ public class ManyLyricsView extends LinearLayout {
         this.mOnLrcClickListener = onLrcClickListener;
     }
 
+    public ManyAbstractLrcView getAbstractLrcView() {
+        return mAbstractLrcView;
+    }
+
     /**
      * @Description: 多行歌词抽象类
      * @author: zhangliangming
