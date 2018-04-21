@@ -3,112 +3,48 @@
 
 # 使用注意 #
 
-- 歌词渐变，有时会有卡顿，其实主要歌词view主要在100ms内刷新一次的话，渐变效果就会流畅，目前歌词是自定义view的方式实现的，每次都使用handler去刷新view，但是如果handler队列中有很多任务执行，那就无法保证歌词每次都在100ms内刷新一次。
-- 对于歌词view，以后考虑使用surfaceview来实现
+- 1.x版本，只要是使用自定义view来实现，每次都使用handler去刷新view，但是如果handler队列中有很多任务执行，那就无法保证歌词每次都在100ms内刷新一次。
+- 2.x版本，主要是使用surfaceview来实现，每次刷新时间为40ms，歌词渐变相对会流畅。
+
+# 2.x版本使用注意 #
+- 主题：我主要是使用Theme.AppCompat.Light.NoActionBar的主题，我试过其它的主题，会导致surfaceview背景为黑色，并且不能透明的问题。
+- 
 
 # 日志 #
 
-## v1.32 ##
+## v2.0 ##
+- 2018-04-21
+- 自定义view替换成surfaceview
+
+## v1.x ##
 
 - 修复制作歌词无法完成的问题
-
-## v1.31 ##
-
 - 修改音译歌词显示
-
-## v1.29 ##
-
 - 添加制作音译歌词实体
-
-## v1.28 ##
-
 - 修改制作翻译歌词实体
-
-## v1.27 ##
-
 - 添加制作翻译歌词实体
-
-## v1.26 ##
-
 - 添加修改绘画指示器颜色接口
-
-## v1.25 ##
-
 - 修复制作歌词问题
-
-## v1.24 ##
-
 - LyricsReader添加设置歌词数据
-
-
-## v1.23 ##
-
 - 添加制作歌词实体
-
-## v1.22 ##
-
 - 添加获取制作歌词状态接口
-
-## v1.21 ##
-
 - 添加获取制作后的歌词接口
-
-## v1.20 ##
-
 - 添加制作歌词预览视图
-
-## v1.19 ##
-
 - 添加额外歌词生成图片视图预览和生成额外歌词图片功能
-
-## v1.18 ##
-
 - 修复歌词生成图片问题
-
-## v1.17 ##
-
 - 修复歌词生成图片问题
-
-## v1.16 ##
-
 - 修复歌词生成图片视图的字体
-
-## v1.15 ##
-
 - 修改部分int变量的类型为long
 - 修改部分int变量的类型为float
-
-## v1.14 ##
-
 - 添加歌词生成图片文件接口
 - 添加歌词生成图片预览视图
-
-## v1.13 ##
-
 - 修复通过歌曲文件名获取歌词文件问题
-## v1.12 ##
-
 - 修复多行歌词未读时渐变的问题
-## v1.11 ##
-
 - 修复最后一个字渐变出错的问题
-## v1.10 ##
-
 - 修改歌词每次刷新的间隔最少为100ms
-## v1.9 ##
-
 - 修改歌词每次刷新的间隔最少为20ms
-## v1.8 ##
-
 - 修复未读到下一行歌词时，上一行歌词渐变宽度为0的问题
-## v1.7 ##
-
 - 修复设置歌词读取器的问题
-## v1.6 ##
-
-- 还原
-## v1.3 ##
-
 - 2018-03-04
 - 修复双行歌词加载歌词完成后，显示额外歌词渐变出错的问题
 - 修改了多行歌词，滑动时的指示器渐变颜色
@@ -180,12 +116,12 @@
 2.app build.gradle
 
 `dependencies {
-	         compile 'com.github.zhangliangming:HPLyrics:v1.32'
+	         compile 'com.github.zhangliangming:HPLyrics:v2.0'
 	}`
 
 # 调用Demo #
 
-链接: [https://pan.baidu.com/s/1GAOKwfKqYCwFayOqgg-yCw](https://pan.baidu.com/s/1GAOKwfKqYCwFayOqgg-yCw) 密码: f29d
+链接: [https://pan.baidu.com/s/1eA5pcs0pUnr9gXhosek9Bw](https://pan.baidu.com/s/1eA5pcs0pUnr9gXhosek9Bw "https://pan.baidu.com/s/1eA5pcs0pUnr9gXhosek9Bw") 密码: awcf
 
 # 调用用法 #
 
@@ -202,7 +138,7 @@
 - setFontSize：设置默认画笔的字体大小，可根据参数来设置是否要刷新view
 - setExtraLrcStatus：设置额外歌词状态
 - setLyricsReader：设置歌词读取器
-- play：设置歌词当前的播放进度
+- play：设置歌词当前的播放进度（播放歌曲时调用一次即可）
 - pause：暂停歌词
 - seekto：快进歌词
 - resume：唤醒

@@ -3,18 +3,16 @@ package com.zlm.hp.lyrics.widget;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.LinearGradient;
 import android.graphics.Paint;
+import android.graphics.PixelFormat;
+import android.graphics.PorterDuff;
 import android.graphics.RectF;
-import android.graphics.Shader;
 import android.graphics.Typeface;
 import android.os.Handler;
-import android.os.Looper;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.ViewTreeObserver;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 
 import com.zlm.hp.lyrics.LyricsReader;
 import com.zlm.hp.lyrics.model.LyricsInfo;
@@ -27,11 +25,22 @@ import java.util.List;
 import java.util.TreeMap;
 
 /**
- * 歌词视图抽象类
- * Created by zhangliangming on 2018-02-25.
+ * @Description: 歌词抽象视图
+ * @param:
+ * @return:
+ * @throws
+ * @author: zhangliangming
+ * @date: 2018-04-21 9:06
  */
+public abstract class AbstractLrcView extends SurfaceView implements SurfaceHolder.Callback {
 
-public abstract class AbstractLrcView extends View {
+    // SurfaceHolder
+    private SurfaceHolder mSurfaceHolder;
+    /**
+     * 画布
+     */
+    private Canvas mCanvas;
+
     /**
      * 初始
      */
@@ -93,49 +102,61 @@ public abstract class AbstractLrcView extends View {
     /**
      * 默认歌词画笔
      */
-    public Paint mPaint;
+    private Paint mPaint;
     /**
      * 默认画笔颜色
      */
-    public int[] mPaintColors = new int[]{
-            ColorUtils.parserColor("#00348a"),
-            ColorUtils.parserColor("#0080c0"),
-            ColorUtils.parserColor("#03cafc")
+    private int[] mPaintColors = new int[]{
+            ColorUtils.parserColor("#555555"),
+            ColorUtils.parserColor("#555555")
     };
     /**
      * 高亮歌词画笔
      */
-    public Paint mPaintHL;
+    private Paint mPaintHL;
     //高亮颜色
-    public int[] mPaintHLColors = new int[]{
-            ColorUtils.parserColor("#82f7fd"),
-            ColorUtils.parserColor("#ffffff"),
-            ColorUtils.parserColor("#03e9fc")
+    private int[] mPaintHLColors = new int[]{
+            ColorUtils.parserColor("#0288d1"),
+            ColorUtils.parserColor("#0288d1")
     };
     /**
      * 轮廓画笔
      */
-    public Paint mPaintOutline;
+    private Paint mPaintOutline;
+
+    /**
+     * 额外歌词画笔
+     */
+    private Paint mExtraLrcPaint;
+    /**
+     * 额外歌词高亮画笔
+     */
+    private Paint mExtraLrcPaintHL;
+    /**
+     * 轮廓画笔
+     */
+    private Paint mExtraLrcPaintOutline;
+
     /**
      * 默认提示文本
      */
-    public String mDefText;
+    private String mDefText;
     /**
      * 正在加载提示文本
      */
-    public String mLoadingText;
+    private String mLoadingText;
     /**
      * 加载歌词出错
      */
-    public String mLoadErrorText;
+    private String mLoadErrorText;
     /**
      * 不支持歌词格式文本
      */
-    public String mNonsupportText;
+    private String mNonsupportText;
     /**
      * 搜索提示文本
      */
-    public String mGotoSearchText;
+    private String mGotoSearchText;
 
     /**
      * 搜索歌词区域
@@ -149,30 +170,30 @@ public abstract class AbstractLrcView extends View {
     /**
      * 绘画去搜索歌词文字矩形画笔
      */
-    public Paint mGotoSearchRectPaint;
+    private Paint mGotoSearchRectPaint;
 
     /**
      * 去搜索歌词文字颜色
      */
-    public int mGotoSearchTextColor = ColorUtils.parserColor("#0288d1");
+    private int mGotoSearchTextColor = ColorUtils.parserColor("#0288d1");
 
     /**
      * 绘画去搜索歌词文字画笔
      */
-    public Paint mGotoSearchTextPaint;
+    private Paint mGotoSearchTextPaint;
     /**
      * 按下搜索歌词文字颜色
      */
-    public int mGotoSearchTextPressedColor = ColorUtils.parserColor("#ffffff");
+    private int mGotoSearchTextPressedColor = ColorUtils.parserColor("#ffffff");
 
     /**
      * 歌词状态
      */
-    public int mLrcStatus = LRCSTATUS_INIT;
+    private int mLrcStatus = LRCSTATUS_INIT;
     /**
      * 搜索歌词回调
      */
-    public SearchLyricsListener mSearchLyricsListener;
+    private SearchLyricsListener mSearchLyricsListener;
 
     /**
      * 显示翻译歌词
@@ -193,104 +214,77 @@ public abstract class AbstractLrcView extends View {
     /**
      * 是否是手动去设置显示的歌词类型
      */
-    public boolean isHandToChangeExtraLrcStatus = false;
+    private boolean isHandToChangeExtraLrcStatus = false;
 
     /**
      * 空行高度
      */
-    public float mSpaceLineHeight = 60;
+    private float mSpaceLineHeight = 60;
     /**
      * 歌词字体大小
      */
-    public float mFontSize = 30;
+    private float mFontSize = 30;
 
     /**
      * 左右间隔距离
      */
-    public float mPaddingLeftOrRight = 15;
-    /**
-     * 歌词处理类
-     */
-    public LyricsReader mLyricsReader;
+    private float mPaddingLeftOrRight = 15;
+
     /**
      * 歌词的最大宽度
      */
-    public float mTextMaxWidth = 0;
+    private float mTextMaxWidth = 0;
     /**
      * 当前歌词的所在行数
      */
-    public int mLyricsLineNum = 0;
+    private int mLyricsLineNum = 0;
     /**
      * 分割歌词的行索引
      */
-    public int mSplitLyricsLineNum = 0;
+    private int mSplitLyricsLineNum = 0;
     /**
      * 当前歌词的第几个字
      */
-    public int mLyricsWordIndex = -1;
+    private int mLyricsWordIndex = -1;
     /**
      * 分割歌词当前歌词的第几个字
      */
-    public int mSplitLyricsWordIndex = -1;
+    private int mSplitLyricsWordIndex = -1;
 
     /**
      * 当前歌词第几个字 已经播放的时间
      */
-    public float mLyricsWordHLTime = 0;
+    private float mLyricsWordHLTime = 0;
 
-    //////////////////////////////////翻译歌词和音译歌词///////////////////////////////////////
-    /**
-     * 歌词列表
-     */
-    public TreeMap<Integer, LyricsLineInfo> mLrcLineInfos;
-    /**
-     * 翻译行歌词列表
-     */
-    public List<LyricsLineInfo> mTranslateLrcLineInfos;
-    /**
-     * 音译歌词行
-     */
-    public List<LyricsLineInfo> mTransliterationLrcLineInfos;
     /**
      * 额外的歌词类型
      */
-    public int mExtraLrcType = EXTRALRCTYPE_NOLRC;
+    private int mExtraLrcType = EXTRALRCTYPE_NOLRC;
     /**
      * 额外歌词监听事件
      */
-    public ExtraLyricsListener mExtraLyricsListener;
+    private ExtraLyricsListener mExtraLyricsListener;
     /**
      * 额外歌词空行高度
      */
-    public float mExtraLrcSpaceLineHeight = 30;
+    private float mExtraLrcSpaceLineHeight = 30;
     /**
      * 额外歌词字体大小
      */
-    public float mExtraLrcFontSize = 30;
-    /**
-     * 额外歌词画笔
-     */
-    public Paint mExtraLrcPaint;
-    /**
-     * 额外歌词高亮画笔
-     */
-    public Paint mExtraLrcPaintHL;
-    /**
-     * 轮廓画笔
-     */
-    public Paint mExtraLrcPaintOutline;
+    private float mExtraLrcFontSize = 30;
+
     /**
      * 当前额外分割歌词的所在行数
      */
-    public int mExtraSplitLyricsLineNum = 0;
+    private int mExtraSplitLyricsLineNum = 0;
     /**
      * 当前额外歌词的第几个字
      */
-    public int mExtraLyricsWordIndex = -1;
+    private int mExtraLyricsWordIndex = -1;
     /**
      * 当前额外分割歌词的第几个字
      */
-    public int mExtraSplitLyricsWordIndex = -1;
+    private int mExtraSplitLyricsWordIndex = -1;
     /**
      * 绘画类型：lrc类型
      */
@@ -302,12 +296,32 @@ public abstract class AbstractLrcView extends View {
     /**
      * 翻译歌词绘画类型
      */
-    public int mTranslateDrawType = TRANSLATE_DRAW_TYPE_LRC;
+    private int mTranslateDrawType = TRANSLATE_DRAW_TYPE_LRC;
 
     /**
      * 翻译歌词的高亮宽度
      */
-    public float mTranslateLyricsWordHLTime = 0;
+    private float mTranslateLyricsWordHLTime = 0;
+
+    ////////////////////////////////////////////////////////////////////
+
+    /**
+     * 歌词处理类
+     */
+    private LyricsReader mLyricsReader;
+
+    /**
+     * 歌词列表
+     */
+    private TreeMap<Integer, LyricsLineInfo> mLrcLineInfos;
+    /**
+     * 翻译行歌词列表
+     */
+    private List<LyricsLineInfo> mTranslateLrcLineInfos;
+    /**
+     * 音译歌词行
+     */
+    private List<LyricsLineInfo> mTransliterationLrcLineInfos;
 
     ///////////////////////////////歌词绘画播放器//////////////////////////////////
 
@@ -330,6 +344,10 @@ public abstract class AbstractLrcView extends View {
      * 当前播放进度
      */
     private long mCurPlayingTime = 0;
+    /**
+     * 刷新时间
+     */
+    private int mDelayMs = 40;
 
     /**
      * 歌词刷新
@@ -349,15 +367,15 @@ public abstract class AbstractLrcView extends View {
                     //
                     long endTime = System.currentTimeMillis();
                     long updateTime = (endTime - mPlayerStartTime) - mPlayerSpendTime;
-                    Log.e("AbstractLrcView", "updateTime = " + updateTime);
                     mPlayerSpendTime = (endTime - mPlayerStartTime);
-                    long delayMs = 100 - updateTime;
-                    Log.e("AbstractLrcView", "delayMs = " + Math.max(0, delayMs));
+                    long delayMs = mDelayMs - updateTime;
+                    Log.e("AbstractLrcView", "oldDelayMs = " + delayMs + " , newDelayMs = " + Math.max(0, delayMs));
                     mLrcPlayerHandler.postDelayed(mLrcPlayerRunnable, Math.max(0, delayMs));
                 }
             }
         }
     };
+
 
     public AbstractLrcView(Context context) {
         super(context);
@@ -370,9 +388,20 @@ public abstract class AbstractLrcView extends View {
     }
 
     /**
-     * @param context
+     * @throws
+     * @Description: 初始
+     * @param:
+     * @return:
+     * @author: zhangliangming
+     * @date: 2018-04-21 9:08
      */
-    protected void init(Context context) {
+    private void init(Context context) {
+        mSurfaceHolder = getHolder();
+        mSurfaceHolder.addCallback(this);
+
+        //背景透明
+        setZOrderOnTop(true);
+        mSurfaceHolder.setFormat(PixelFormat.TRANSLUCENT);
 
         //初始默认数据
         mDefText = context.getString(R.string.def_text);
@@ -431,16 +460,91 @@ public abstract class AbstractLrcView extends View {
         mGotoSearchRectPaint.setAntiAlias(true);
         mGotoSearchRectPaint.setStrokeWidth(2);
         mGotoSearchRectPaint.setTextSize(mFontSize);
+    }
 
-        viewInit(context);
-        //加载完成后回调
-        getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                viewLoadFinish();
+    @Override
+    public void surfaceCreated(SurfaceHolder holder) {
+        onDrawView();
+    }
+
+    @Override
+    public void surfaceDestroyed(SurfaceHolder holder) {
+        resetData();
+    }
+
+
+    /**
+     * @throws
+     * @Description: 绘画
+     * @param:
+     * @return:
+     * @author: zhangliangming
+     * @date: 2018-04-21 9:19
+     */
+    private synchronized void onDrawView() {
+        mCanvas = mSurfaceHolder.lockCanvas();
+        if (mCanvas != null) {
+            try {
+
+                //清屏
+                mCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+
+                onDrawView(mCanvas);
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                if (mCanvas != null) {
+                    mSurfaceHolder.unlockCanvasAndPost(mCanvas);
+                }
             }
-        });
+        }
+    }
+
+    /**
+     * 绘画视图
+     *
+     * @param canvas
+     */
+    private void onDrawView(Canvas canvas) {
+        synchronized (lock) {
+            mPaint.setAlpha(255);
+            mPaintHL.setAlpha(255);
+            mExtraLrcPaint.setAlpha(255);
+            mExtraLrcPaintHL.setAlpha(255);
+            if (mLrcStatus == LRCSTATUS_INIT || mLrcStatus == LRCSTATUS_NOLRC_DEFTEXT) {
+                //绘画默认文本
+                String defText = getDefText();
+                float textWidth = LyricsUtils.getTextWidth(mPaint, defText);
+                int textHeight = LyricsUtils.getTextHeight(mPaint);
+                float hlWidth = textWidth / 2;
+                float x = (getWidth() - textWidth) / 2;
+                float y = (getHeight() + textHeight) / 2;
+                LyricsUtils.drawOutline(canvas, mPaintOutline, defText, x, y);
+                LyricsUtils.drawDynamicText(canvas, mPaint, mPaintHL, mPaintColors, mPaintHLColors, defText, hlWidth, x, y);
+            } else if (mLrcStatus == LRCSTATUS_LOADING || mLrcStatus == LRCSTATUS_ERROR || mLrcStatus == LRCSTATUS_NONSUPPORT) {
+                //绘画加载中文本
+                String text = getDefText();
+                if (mLrcStatus == LRCSTATUS_LOADING) {
+                    text = getLoadingText();
+                } else if (mLrcStatus == LRCSTATUS_ERROR) {
+                    text = getLoadErrorText();
+                } else if (mLrcStatus == LRCSTATUS_NONSUPPORT) {
+                    text = getNonsupportText();
+                }
+                float textWidth = LyricsUtils.getTextWidth(mPaint, text);
+                int textHeight = LyricsUtils.getTextHeight(mPaint);
+                float x = (getWidth() - textWidth) / 2;
+                float y = (getHeight() + textHeight) / 2;
+                LyricsUtils.drawOutline(canvas, mPaintOutline, text, x, y);
+                LyricsUtils.drawText(canvas, mPaint, mPaintColors, text, x, y);
+            } else if (mLrcStatus == LRCSTATUS_NOLRC_GOTOSEARCH) {
+                String btnText = getGotoSearchText();
+                //绘画搜索歌词按钮
+                drawGoToSearchBtn(canvas, mGotoSearchRectPaint, mGotoSearchTextPaint, btnText);
+            } else if (mLrcStatus == LRCSTATUS_LRC) {
+                onDrawLrcView(canvas);
+            }
+        }
     }
 
     /**
@@ -482,13 +586,291 @@ public abstract class AbstractLrcView extends View {
     }
 
     /**
-     * 播放
-     *
-     * @param curPlayingTime
+     * @throws
+     * @Description: 刷新视图
+     * @param:
+     * @return:
+     * @author: zhangliangming
+     * @date: 2018-04-21 9:24
      */
-    public void play(int curPlayingTime) {
+    public void invalidateView() {
+        onDrawView();
+    }
+
+    /**
+     * view的draw歌词调用方法
+     *
+     * @param canvas
+     * @return
+     */
+    protected abstract void onDrawLrcView(Canvas canvas);
+
+    /**
+     * 更新视图
+     *
+     * @param playProgress
+     */
+    protected abstract void updateView(long playProgress);
+
+    /**
+     * 获取额外歌词类型
+     *
+     * @return
+     */
+    public int getExtraLrcType() {
+        return mExtraLrcType;
+    }
+
+    /**
+     * 获取额外歌词的显示状态
+     *
+     * @return
+     */
+    public int getExtraLrcStatus() {
+        return mExtraLrcStatus;
+    }
+
+    /**
+     * 获取歌词状态
+     *
+     * @return
+     */
+    public int getLrcStatus() {
+        return mLrcStatus;
+    }
+
+    /**
+     * 初始歌词数据
+     */
+    public void initLrcData() {
         synchronized (lock) {
-            this.mCurPlayingTime = curPlayingTime;
+            mLyricsReader = null;
+            mLrcStatus = LRCSTATUS_INIT;
+            resetData();
+            initExtraLrcTypeAndCallBack();
+            invalidateView();
+        }
+    }
+
+    /**
+     * 设置歌词状态
+     *
+     * @param lrcStatus
+     */
+    public void setLrcStatus(int lrcStatus) {
+        this.mLrcStatus = lrcStatus;
+        invalidateView();
+    }
+
+    /**
+     * 设置默认颜色
+     *
+     * @param paintColor       至少两种颜色
+     * @param isInvalidateView 是否更新视图
+     */
+    public void setPaintColor(int[] paintColor, boolean isInvalidateView) {
+        this.mPaintColors = paintColor;
+        if (isInvalidateView) {
+            invalidateView();
+        }
+    }
+
+    /**
+     * 设置高亮颜色
+     *
+     * @param paintHLColor     至少两种颜色
+     * @param isInvalidateView 是否更新视图
+     */
+    public void setPaintHLColor(int[] paintHLColor, boolean isInvalidateView) {
+        this.mPaintHLColors = paintHLColor;
+        if (isInvalidateView) {
+            invalidateView();
+        }
+    }
+
+    /**
+     * 设置搜索文字颜色
+     *
+     * @param mGotoSearchTextColor
+     */
+    public void setGotoSearchTextColor(int mGotoSearchTextColor) {
+        setGotoSearchTextColor(mGotoSearchTextColor, false);
+    }
+
+    /**
+     * 设置搜索文字颜色
+     *
+     * @param mGotoSearchTextColor
+     * @param isInvalidateView
+     */
+    public void setGotoSearchTextColor(int mGotoSearchTextColor, boolean isInvalidateView) {
+        this.mGotoSearchTextColor = mGotoSearchTextColor;
+        if (isInvalidateView) {
+            invalidateView();
+        }
+    }
+
+    /**
+     * 设置搜索点击文字颜色
+     *
+     * @param mGotoSearchTextPressedColor
+     */
+    public void setGotoSearchTextPressedColor(int mGotoSearchTextPressedColor) {
+        setGotoSearchTextPressedColor(mGotoSearchTextPressedColor, false);
+    }
+
+    /**
+     * 设置搜索点击文字颜色
+     *
+     * @param mGotoSearchTextPressedColor
+     * @param isInvalidateView
+     */
+    public void setGotoSearchTextPressedColor(int mGotoSearchTextPressedColor, boolean isInvalidateView) {
+        this.mGotoSearchTextPressedColor = mGotoSearchTextPressedColor;
+        if (isInvalidateView) {
+            invalidateView();
+        }
+    }
+
+    /**
+     * 设置字体文件
+     *
+     * @param typeFace
+     * @param isInvalidateView 是否更新视图
+     */
+    public void setTypeFace(Typeface typeFace, boolean isInvalidateView) {
+
+        if (typeFace != null) {
+            mPaint.setTypeface(typeFace);
+            mPaintHL.setTypeface(typeFace);
+            mPaintOutline.setTypeface(typeFace);
+            mExtraLrcPaint.setTypeface(typeFace);
+            mExtraLrcPaintHL.setTypeface(typeFace);
+            mExtraLrcPaintOutline.setTypeface(typeFace);
+        }
+
+        if (isInvalidateView) {
+            invalidateView();
+        }
+    }
+
+    /**
+     * 设置额外歌词事件
+     *
+     * @param extraLyricsListener
+     */
+    public void setExtraLyricsListener(ExtraLyricsListener extraLyricsListener) {
+        this.mExtraLyricsListener = extraLyricsListener;
+    }
+
+    /**
+     * 设置搜索歌词事件
+     *
+     * @param searchLyricsListener
+     */
+    public void setSearchLyricsListener(SearchLyricsListener searchLyricsListener) {
+        this.mSearchLyricsListener = searchLyricsListener;
+    }
+
+    /**
+     * 获取分隔歌词的开始时间
+     *
+     * @param playProgress
+     * @return
+     */
+    public int getSplitLineLrcStartTime(int playProgress) {
+        if (mLyricsReader == null || mLrcLineInfos == null || mLrcLineInfos.size() == 0)
+            return -1;
+        return LyricsUtils.getSplitLineLrcStartTime(mLyricsReader.getLyricsType(), mLrcLineInfos, playProgress, mLyricsReader.getPlayOffset());
+
+    }
+
+    /**
+     * 获取行歌词的开始时间
+     *
+     * @param playProgress
+     * @return
+     */
+    public int getLineLrcStartTime(int playProgress) {
+        if (mLyricsReader == null || mLrcLineInfos == null || mLrcLineInfos.size() == 0)
+            return -1;
+        return LyricsUtils.getLineLrcStartTime(mLyricsReader.getLyricsType(), mLrcLineInfos, playProgress, mLyricsReader.getPlayOffset());
+    }
+
+    /**
+     * 获取分隔行的歌词内容
+     *
+     * @param playProgress
+     * @return
+     */
+    public String getSplitLineLrc(int playProgress) {
+        if (mLyricsReader == null || mLrcLineInfos == null || mLrcLineInfos.size() == 0)
+            return null;
+        return LyricsUtils.getSplitLineLrc(mLyricsReader.getLyricsType(), mLrcLineInfos, playProgress, mLyricsReader.getPlayOffset());
+    }
+
+    /**
+     * 获取行的歌词内容
+     *
+     * @param playProgress
+     * @return
+     */
+    public String getLineLrc(int playProgress) {
+        if (mLyricsReader == null || mLrcLineInfos == null || mLrcLineInfos.size() == 0)
+            return null;
+        return LyricsUtils.getLineLrc(mLyricsReader.getLyricsType(), mLrcLineInfos, playProgress, mLyricsReader.getPlayOffset());
+
+    }
+
+    /**
+     * 设置空行高度
+     *
+     * @param spaceLineHeight
+     * @param isInvalidateView 是否更新视图
+     */
+    public void setSpaceLineHeight(float spaceLineHeight, boolean isInvalidateView) {
+        this.mSpaceLineHeight = spaceLineHeight;
+        if (isInvalidateView) {
+            invalidateView();
+        }
+    }
+
+    /**
+     * 设置额外空行高度
+     *
+     * @param extraLrcSpaceLineHeight
+     * @param isInvalidateView        是否更新视图
+     */
+    public void setExtraLrcSpaceLineHeight(float extraLrcSpaceLineHeight, boolean isInvalidateView) {
+        this.mExtraLrcSpaceLineHeight = extraLrcSpaceLineHeight;
+        if (isInvalidateView) {
+            invalidateView();
+        }
+    }
+
+    /**
+     * 设置额外歌词的显示状态
+     *
+     * @param extraLrcStatus
+     */
+    public void setExtraLrcStatus(int extraLrcStatus) {
+        synchronized (lock) {
+            isHandToChangeExtraLrcStatus = true;
+            this.mExtraLrcStatus = extraLrcStatus;
+            //更新行和索引等数据
+            updateView(mCurPlayingTime + mPlayerSpendTime);
+            invalidateView();
+        }
+    }
+
+    /**
+     * 歌词播放
+     *
+     * @param playProgress
+     */
+    public void play(int playProgress) {
+        synchronized (lock) {
+            this.mCurPlayingTime = playProgress;
             mLrcPlayerStatus = LRCPLAYERSTATUS_PLAY;
             mPlayerStartTime = System.currentTimeMillis();
             mPlayerSpendTime = 0;
@@ -497,28 +879,7 @@ public abstract class AbstractLrcView extends View {
     }
 
     /**
-     * 跳转
-     *
-     * @param curPlayingTime
-     */
-    public void seekto(int curPlayingTime) {
-        synchronized (lock) {
-            if (mLrcPlayerStatus == LRCPLAYERSTATUS_PLAY) {
-                mLrcPlayerStatus = LRCPLAYERSTATUS_INIT;
-                mLrcPlayerHandler.removeCallbacks(mLrcPlayerRunnable);
-
-                play(curPlayingTime);
-            } else {
-                this.mCurPlayingTime = curPlayingTime;
-                mPlayerSpendTime = 0;
-                updateView(curPlayingTime);
-                invalidateView();
-            }
-        }
-    }
-
-    /**
-     * 暂停
+     * 歌词暂停
      */
     public void pause() {
         synchronized (lock) {
@@ -528,6 +889,27 @@ public abstract class AbstractLrcView extends View {
             }
             mCurPlayingTime += mPlayerSpendTime;
             mPlayerSpendTime = 0;
+        }
+    }
+
+    /**
+     * 快进
+     *
+     * @param playProgress
+     */
+    public void seekto(int playProgress) {
+        synchronized (lock) {
+            if (mLrcPlayerStatus == LRCPLAYERSTATUS_PLAY) {
+                mLrcPlayerStatus = LRCPLAYERSTATUS_INIT;
+                mLrcPlayerHandler.removeCallbacks(mLrcPlayerRunnable);
+
+                play(playProgress);
+            } else {
+                this.mCurPlayingTime = playProgress;
+                mPlayerSpendTime = 0;
+                updateView(playProgress);
+                invalidateView();
+            }
         }
     }
 
@@ -543,316 +925,19 @@ public abstract class AbstractLrcView extends View {
         }
     }
 
-
     /**
-     * 重置数据
-     */
-    public void resetData() {
-        isHandToChangeExtraLrcStatus = false;
-        mExtraLrcStatus = EXTRALRCSTATUS_NOSHOWEXTRALRC;
-        mLyricsLineNum = 0;
-        mSplitLyricsLineNum = 0;
-        mLyricsWordIndex = -1;
-        mSplitLyricsWordIndex = -1;
-        mLyricsWordHLTime = 0;
-
-        //
-        mLrcLineInfos = null;
-        mTranslateLrcLineInfos = null;
-        mTransliterationLrcLineInfos = null;
-        mExtraSplitLyricsLineNum = 0;
-        mExtraLyricsWordIndex = -1;
-        mExtraSplitLyricsWordIndex = -1;
-        mTranslateLyricsWordHLTime = 0;
-        //
-        mLrcPlayerStatus = LRCPLAYERSTATUS_INIT;
-        mLrcPlayerHandler.removeCallbacks(mLrcPlayerRunnable);
-
-        //player
-        mCurPlayingTime = 0;
-        mPlayerStartTime = 0;
-        mPlayerSpendTime = 0;
-
-        //无额外歌词回调
-        if (mExtraLyricsListener != null) {
-            mExtraLyricsListener.extraLrcCallback();
-        }
-    }
-
-
-    /**
-     * 获取当前时间对应的行歌词文本
+     * 获取歌词播放器状态
      *
-     * @param curPlayingTime 当前播放进度
      * @return
      */
-    public String getLineLrc(long curPlayingTime) {
-        if (mLyricsReader == null || mLrcLineInfos == null || mLrcLineInfos.size() == 0)
-            return null;
-        return LyricsUtils.getLineLrc(mLyricsReader.getLyricsType(), mLrcLineInfos, curPlayingTime, mLyricsReader.getPlayOffset());
-    }
-
-    /**
-     * 获取分割后歌词的当前时间对应的行歌词文本
-     *
-     * @param curPlayingTime 当前播放进度
-     * @return
-     */
-    public String getSplitLineLrc(long curPlayingTime) {
-        if (mLyricsReader == null || mLrcLineInfos == null || mLrcLineInfos.size() == 0)
-            return null;
-        return LyricsUtils.getSplitLineLrc(mLyricsReader.getLyricsType(), mLrcLineInfos, curPlayingTime, mLyricsReader.getPlayOffset());
-    }
-
-    /**
-     * 获取当前时间对应的行歌词开始时间
-     *
-     * @param curPlayingTime 当前播放进度
-     * @return
-     */
-    public int getLineLrcStartTime(long curPlayingTime) {
-        if (mLyricsReader == null || mLrcLineInfos == null || mLrcLineInfos.size() == 0)
-            return -1;
-        return LyricsUtils.getLineLrcStartTime(mLyricsReader.getLyricsType(), mLrcLineInfos, curPlayingTime, mLyricsReader.getPlayOffset());
-    }
-
-    /**
-     * 获取分割后歌词的当前时间对应的行歌词开始时间
-     *
-     * @param curPlayingTime 当前播放进度
-     * @return
-     */
-    public int getSplitLineLrcStartTime(long curPlayingTime) {
-        if (mLyricsReader == null || mLrcLineInfos == null || mLrcLineInfos.size() == 0)
-            return -1;
-        return LyricsUtils.getSplitLineLrcStartTime(mLyricsReader.getLyricsType(), mLrcLineInfos, curPlayingTime, mLyricsReader.getPlayOffset());
-    }
-
-    /**
-     * 刷新View
-     */
-    public void invalidateView() {
-        if (Looper.getMainLooper() == Looper.myLooper()) {
-            //  当前线程是主UI线程，直接刷新。
-            invalidate();
-        } else {
-            //  当前线程是非UI线程，post刷新。
-            postInvalidate();
-        }
-    }
-
-
-    /**
-     * 更新分隔后的行号，字索引，高亮时间
-     *
-     * @param playProgress
-     */
-    public void updateSplitData(long playProgress) {
-        //动感歌词
-        if (mLyricsReader.getLyricsType() == LyricsInfo.DYNAMIC) {
-            //获取分割后的索引
-            mSplitLyricsLineNum = LyricsUtils.getSplitDynamicLyricsLineNum(mLrcLineInfos, mLyricsLineNum, playProgress, mLyricsReader.getPlayOffset());
-            //获取原始的歌词字索引
-            mLyricsWordIndex = LyricsUtils.getLyricsWordIndex(mLrcLineInfos, mLyricsLineNum, playProgress, mLyricsReader.getPlayOffset());
-            //获取分割后的歌词字索引
-            mSplitLyricsWordIndex = LyricsUtils.getSplitLyricsWordIndex(mLrcLineInfos, mLyricsLineNum, playProgress, mLyricsReader.getPlayOffset());
-            mLyricsWordHLTime = LyricsUtils.getDisWordsIndexLenTime(mLrcLineInfos, mLyricsLineNum, playProgress, mLyricsReader.getPlayOffset());
-        } else {
-            //lrc歌词
-            //获取分割后的索引
-            mSplitLyricsLineNum = LyricsUtils.getSplitLrcLyricsLineNum(mLrcLineInfos, mLyricsLineNum, playProgress, mLyricsReader.getPlayOffset());
-        }
-        if (mLyricsReader.getLyricsType() == LyricsInfo.DYNAMIC && mExtraLrcStatus == EXTRALRCSTATUS_SHOWTRANSLATELRC && mTranslateDrawType == TRANSLATE_DRAW_TYPE_DYNAMIC) {
-            //显示翻译歌词且歌词类型是动感歌词且以动感歌词的形式绘画翻译歌词
-            if (mTranslateLrcLineInfos != null && mTranslateLrcLineInfos.size() > 0) {
-                mExtraSplitLyricsLineNum = LyricsUtils.getSplitExtraLyricsLineNum(mTranslateLrcLineInfos, mLyricsLineNum, playProgress, mLyricsReader.getPlayOffset());
-
-                mExtraLyricsWordIndex = LyricsUtils.getExtraLyricsWordIndex(mTranslateLrcLineInfos, mLyricsLineNum, playProgress, mLyricsReader.getPlayOffset());
-                mExtraSplitLyricsWordIndex = LyricsUtils.getSplitExtraLyricsWordIndex(mTranslateLrcLineInfos, mLyricsLineNum, playProgress, mLyricsReader.getPlayOffset());
-                mTranslateLyricsWordHLTime = LyricsUtils.getTranslateLrcDisWordsIndexLenTime(mTranslateLrcLineInfos, mLyricsLineNum, playProgress, mLyricsReader.getPlayOffset());
-            }
-        } else if (mExtraLrcStatus == EXTRALRCSTATUS_SHOWTRANSLITERATIONLRC) {
-            //显示音译歌词
-            if (mTransliterationLrcLineInfos != null && mTransliterationLrcLineInfos.size() > 0) {
-                mExtraSplitLyricsLineNum = LyricsUtils.getSplitExtraLyricsLineNum(mTransliterationLrcLineInfos, mLyricsLineNum, playProgress, mLyricsReader.getPlayOffset());
-
-                mExtraLyricsWordIndex = LyricsUtils.getExtraLyricsWordIndex(mTransliterationLrcLineInfos, mLyricsLineNum, playProgress, mLyricsReader.getPlayOffset());
-                mExtraSplitLyricsWordIndex = LyricsUtils.getSplitExtraLyricsWordIndex(mTransliterationLrcLineInfos, mLyricsLineNum, playProgress, mLyricsReader.getPlayOffset());
-            }
-        }
-    }
-
-    @Override
-    protected void onDraw(Canvas canvas) {
-        synchronized (lock) {
-            mPaint.setAlpha(255);
-            mPaintHL.setAlpha(255);
-            mExtraLrcPaint.setAlpha(255);
-            mExtraLrcPaintHL.setAlpha(255);
-            if (mLrcStatus == LRCSTATUS_INIT || mLrcStatus == LRCSTATUS_NOLRC_DEFTEXT) {
-                //绘画默认文本
-                String defText = getDefText();
-                float textWidth = LyricsUtils.getTextWidth(mPaint, defText);
-                int textHeight = LyricsUtils.getTextHeight(mPaint);
-                float hlWidth = textWidth / 2;
-                float x = (getWidth() - textWidth) / 2;
-                float y = (getHeight() + textHeight) / 2;
-                LyricsUtils.drawOutline(canvas, mPaintOutline, defText, x, y);
-                LyricsUtils.drawDynamicText(canvas, mPaint, mPaintHL, mPaintColors, mPaintHLColors, defText, hlWidth, x, y);
-            } else if (mLrcStatus == LRCSTATUS_LOADING || mLrcStatus == LRCSTATUS_ERROR || mLrcStatus == LRCSTATUS_NONSUPPORT) {
-                //绘画加载中文本
-                String text = getDefText();
-                if (mLrcStatus == LRCSTATUS_LOADING) {
-                    text = getLoadingText();
-                } else if (mLrcStatus == LRCSTATUS_ERROR) {
-                    text = getLoadErrorText();
-                } else if (mLrcStatus == LRCSTATUS_NONSUPPORT) {
-                    text = getNonsupportText();
-                }
-                float textWidth = LyricsUtils.getTextWidth(mPaint, text);
-                int textHeight = LyricsUtils.getTextHeight(mPaint);
-                float x = (getWidth() - textWidth) / 2;
-                float y = (getHeight() + textHeight) / 2;
-                LyricsUtils.drawOutline(canvas, mPaintOutline, text, x, y);
-                LyricsUtils.drawText(canvas, mPaint, mPaintColors, text, x, y);
-            } else if (mLrcStatus == LRCSTATUS_NOLRC_GOTOSEARCH) {
-                String btnText = getGotoSearchText();
-                //绘画搜索歌词按钮
-                drawGoToSearchBtn(canvas, mGotoSearchRectPaint, mGotoSearchTextPaint, btnText);
-            } else if (mLrcStatus == LRCSTATUS_LRC) {
-                onViewDrawLrc(canvas);
-            }
-        }
-    }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-
-        if (mLrcStatus != LRCSTATUS_NOLRC_GOTOSEARCH) return onViewTouchEvent(event);
-
-
-        int actionId = event.getAction();
-        switch (actionId) {
-            case MotionEvent.ACTION_DOWN:
-                if (mGotoSearchBtnRect != null && mGotoSearchBtnRect.contains(event.getX(), event.getY())) {
-                    isInGotoSearchBtnRect = true;
-                }
-                break;
-            case MotionEvent.ACTION_CANCEL:
-            case MotionEvent.ACTION_UP:
-                if (isInGotoSearchBtnRect) {
-                    isInGotoSearchBtnRect = false;
-
-                    if (mSearchLyricsListener != null) mSearchLyricsListener.goToSearchLrc();
-                    invalidateView();
-                }
-                break;
-        }
-        if (isInGotoSearchBtnRect) {
-            invalidateView();
-        }
-        return true;
-
-    }
-
-    //////////////////////////////////////////////////////////////////////////////////////////
-
-
-    public String getDefText() {
-        return mDefText;
-    }
-
-    public void setDefText(String mDefText) {
-        this.mDefText = mDefText;
-    }
-
-    public String getLoadingText() {
-        return mLoadingText;
-    }
-
-    public void setLoadingText(String mLoadingText) {
-        this.mLoadingText = mLoadingText;
-    }
-
-    public String getLoadErrorText() {
-        return mLoadErrorText;
-    }
-
-    public void setLoadErrorText(String mLoadErrorText) {
-        this.mLoadErrorText = mLoadErrorText;
-    }
-
-    public String getNonsupportText() {
-        return mNonsupportText;
-    }
-
-    public void setNonsupportText(String mNonsupportText) {
-        this.mNonsupportText = mNonsupportText;
-    }
-
-    public String getGotoSearchText() {
-        return mGotoSearchText;
-    }
-
-    public void setGotoSearchText(String mGotoSearchText) {
-        this.mGotoSearchText = mGotoSearchText;
-    }
-
     public int getLrcPlayerStatus() {
         return mLrcPlayerStatus;
     }
 
-    public int getLrcStatus() {
-        return mLrcStatus;
-    }
-
-    public void setLrcStatus(int mLrcStatus) {
-        this.mLrcStatus = mLrcStatus;
-        invalidateView();
-    }
-
-    public int getExtraLrcStatus() {
-        return mExtraLrcStatus;
-    }
-
-    public void setExtraLrcStatus(int mExtraLrcStatus) {
-        synchronized (lock) {
-            isHandToChangeExtraLrcStatus = true;
-            this.mExtraLrcStatus = mExtraLrcStatus;
-            //更新行和索引等数据
-            updateView(mCurPlayingTime + mPlayerSpendTime);
-            invalidateView();
-        }
-    }
-
-    public LyricsReader getLyricsReader() {
-        return mLyricsReader;
-    }
-
-    public void setTranslateDrawType(int mTranslateDrawType) {
-        this.mTranslateDrawType = mTranslateDrawType;
-    }
-
-    public void setExtraLyricsListener(ExtraLyricsListener mExtraLyricsListener) {
-        this.mExtraLyricsListener = mExtraLyricsListener;
-    }
-
-    public void setTextMaxWidth(int mTextMaxWidth) {
-        this.mTextMaxWidth = mTextMaxWidth;
-    }
-
-    public int getExtraLrcType() {
-        return mExtraLrcType;
-    }
-
-    public void setSearchLyricsListener(SearchLyricsListener mSearchLyricsListener) {
-        this.mSearchLyricsListener = mSearchLyricsListener;
-    }
-
     /**
-     * 设置歌词读取器
+     * 设置歌词解析器
      *
-     * @param lyricsReader 歌词读取器
+     * @param lyricsReader
      */
     public void setLyricsReader(LyricsReader lyricsReader) {
         synchronized (lock) {
@@ -872,19 +957,6 @@ public abstract class AbstractLrcView extends View {
 
                 updateView(mCurPlayingTime);
             }
-            initExtraLrcTypeAndCallBack();
-            invalidateView();
-        }
-    }
-
-    /**
-     * 初始化歌词数据
-     */
-    public void initLrcData() {
-        synchronized (lock) {
-            mLyricsReader = null;
-            mLrcStatus = LRCSTATUS_INIT;
-            resetData();
             initExtraLrcTypeAndCallBack();
             invalidateView();
         }
@@ -951,58 +1023,72 @@ public abstract class AbstractLrcView extends View {
             mExtraLyricsListener.extraLrcCallback();
         }
     }
-    /////////////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * 设置字体文件
-     *
-     * @param typeFace
+     * 重置数据
      */
-    public void setTypeFace(Typeface typeFace, boolean isInvalidateView) {
-        if (typeFace != null) {
-            mPaint.setTypeface(typeFace);
-            mPaintHL.setTypeface(typeFace);
-            mPaintOutline.setTypeface(typeFace);
-            mExtraLrcPaint.setTypeface(typeFace);
-            mExtraLrcPaintHL.setTypeface(typeFace);
-            mExtraLrcPaintOutline.setTypeface(typeFace);
+    public void resetData() {
+        isHandToChangeExtraLrcStatus = false;
+        mExtraLrcStatus = EXTRALRCSTATUS_NOSHOWEXTRALRC;
+        mLyricsLineNum = 0;
+        mSplitLyricsLineNum = 0;
+        mLyricsWordIndex = -1;
+        mSplitLyricsWordIndex = -1;
+        mLyricsWordHLTime = 0;
+
+        //
+        mLrcLineInfos = null;
+        mTranslateLrcLineInfos = null;
+        mTransliterationLrcLineInfos = null;
+        mExtraSplitLyricsLineNum = 0;
+        mExtraLyricsWordIndex = -1;
+        mExtraSplitLyricsWordIndex = -1;
+        mTranslateLyricsWordHLTime = 0;
+        //
+        mLrcPlayerStatus = LRCPLAYERSTATUS_INIT;
+        mLrcPlayerHandler.removeCallbacks(mLrcPlayerRunnable);
+
+        //player
+        mCurPlayingTime = 0;
+        mPlayerStartTime = 0;
+        mPlayerSpendTime = 0;
+
+        //无额外歌词回调
+        if (mExtraLyricsListener != null) {
+            mExtraLyricsListener.extraLrcCallback();
         }
-        if (isInvalidateView) {
-            invalidateView();
-        }
     }
-
-    public void setSpaceLineHeight(float mSpaceLineHeight, boolean isInvalidateView) {
-        this.mSpaceLineHeight = mSpaceLineHeight;
-        if (isInvalidateView) {
-            invalidateView();
-        }
-    }
-
-    public void setExtraLrcSpaceLineHeight(float mExtraLrcSpaceLineHeight, boolean isInvalidateView) {
-        this.mExtraLrcSpaceLineHeight = mExtraLrcSpaceLineHeight;
-        if (isInvalidateView) {
-            invalidateView();
-        }
-    }
-
-    public float getFontSize() {
-        return mFontSize;
-    }
-
-    public float getExtraLrcFontSize() {
-        return mExtraLrcFontSize;
-    }
-
 
     /**
-     * 设置歌词字体大小
+     * 设置字体大小
      *
      * @param fontSize
-     * @param isReloadLrcData  是否重新加载歌词数据
-     * @param isInvalidateView 是否刷新视图
+     * @param extraFontSize 额外歌词字体
+     * @param isReloadData  是否重新加载数据及刷新界面
      */
-    public void setFontSize(float fontSize, boolean isReloadLrcData, boolean isInvalidateView) {
+    public void setSize(int fontSize, int extraFontSize, boolean isReloadData) {
+        if (isReloadData) {
+            setFontSize(fontSize, false);
+            setExtraLrcFontSize(extraFontSize, false);
+            if (isReloadData) {
+                if (hasLrcLineInfos()) {
+                    updateView(mCurPlayingTime + mPlayerSpendTime);
+                }
+                invalidateView();
+            }
+        } else {
+            setFontSize(fontSize, false);
+            setExtraLrcFontSize(extraFontSize, false);
+        }
+    }
+
+    /**
+     * 设置字体大小
+     *
+     * @param fontSize
+     * @param isReloadData 是否重新加载数据及刷新界面
+     */
+    public void setFontSize(float fontSize, boolean isReloadData) {
         synchronized (lock) {
 
             this.mFontSize = fontSize;
@@ -1033,26 +1119,23 @@ public abstract class AbstractLrcView extends View {
                 }
             }
 
-            if (isReloadLrcData) {
+            if (isReloadData) {
                 //加载歌词数据
                 if (hasLrcLineInfos()) {
                     updateView(mCurPlayingTime + mPlayerSpendTime);
                 }
-            }
-            if (isInvalidateView) {
                 invalidateView();
             }
         }
     }
 
     /**
-     * 设置额外歌词字体大小
+     * 设置额外字体大小
      *
      * @param extraLrcFontSize
-     * @param isReloadLrcData  是否重新加载歌词数据
-     * @param isInvalidateView 是否刷新视图
+     * @param isReloadData     是否重新加载数据及刷新界面
      */
-    public void setExtraLrcFontSize(float extraLrcFontSize, boolean isReloadLrcData, boolean isInvalidateView) {
+    public void setExtraLrcFontSize(float extraLrcFontSize, boolean isReloadData) {
         synchronized (lock) {
             this.mExtraLrcFontSize = extraLrcFontSize;
 
@@ -1062,120 +1145,64 @@ public abstract class AbstractLrcView extends View {
             mExtraLrcPaintOutline.setTextSize(mExtraLrcFontSize);
 
 
-            if (isReloadLrcData) {
+            if (isReloadData) {
                 if (hasLrcLineInfos()) {
                     updateView(mCurPlayingTime + mPlayerSpendTime);
                 }
-            }
-            if (isInvalidateView) {
                 invalidateView();
             }
         }
     }
 
-    /**
-     * 设置字体大小
-     *
-     * @param fontSize
-     * @param extraLrcFontSize
-     * @param isReloadLrcData  是否重新加载歌词数据
-     * @param isInvalidateView 是否刷新视图
-     */
-    public void setFontSize(float fontSize, float extraLrcFontSize, boolean isReloadLrcData, boolean isInvalidateView) {
-        synchronized (lock) {
-            setFontSize(fontSize, false, false);
-            setExtraLrcFontSize(extraLrcFontSize, false, false);
-            if (isReloadLrcData) {
-                if (hasLrcLineInfos()) {
-                    updateView(mCurPlayingTime + mPlayerSpendTime);
-                }
-            }
-            if (isInvalidateView) {
-                invalidateView();
-            }
-        }
-    }
 
     /**
-     * 设置画笔颜色
-     *
-     * @param colors 颜色集合 至少两种颜色
-     */
-    public void setPaintColor(int[] colors, boolean isInvalidateView) {
-        if (colors.length < 2) {
-            int[] newolors = new int[]{colors[0], colors[0]};
-            colors = newolors;
-        }
-        this.mPaintColors = colors;
-        if (isInvalidateView) {
-            invalidateView();
-        }
-    }
-
-    /**
-     * 设置高亮画笔颜色
-     *
-     * @param colors 颜色集合 至少两种颜色
-     */
-    public void setPaintHLColor(int[] colors, boolean isInvalidateView) {
-        if (colors.length < 2) {
-            int[] newolors = new int[]{colors[0], colors[0]};
-            colors = newolors;
-        }
-        this.mPaintHLColors = colors;
-        if (isInvalidateView) {
-            invalidateView();
-        }
-    }
-
-    public void setGotoSearchTextColor(int mGotoSearchTextColor, boolean isInvalidateView) {
-        this.mGotoSearchTextColor = mGotoSearchTextColor;
-        if (isInvalidateView) {
-            invalidateView();
-        }
-    }
-
-    public void setGotoSearchTextPressedColor(int mGotoSearchTextPressedColor, boolean isInvalidateView) {
-        this.mGotoSearchTextPressedColor = mGotoSearchTextPressedColor;
-        if (isInvalidateView) {
-            invalidateView();
-        }
-    }
-
-    /**
-     * 初始化
-     *
-     * @param context
-     */
-    protected abstract void viewInit(Context context);
-
-    /**
-     * view视图加载完成
-     */
-    protected abstract void viewLoadFinish();
-
-    /**
-     * view的draw歌词调用方法
-     *
-     * @param canvas
-     * @return
-     */
-    protected abstract void onViewDrawLrc(Canvas canvas);
-
-    /**
-     * view的onTouchEvent调用方法
-     *
-     * @param event
-     * @return
-     */
-    protected abstract boolean onViewTouchEvent(MotionEvent event);
-
-    /**
-     * 更新视图
+     * 更新分隔后的行号，字索引，高亮时间
      *
      * @param playProgress
      */
-    protected abstract void updateView(long playProgress);
+    public void updateSplitData(long playProgress) {
+        //动感歌词
+        if (mLyricsReader.getLyricsType() == LyricsInfo.DYNAMIC) {
+            //获取分割后的索引
+            mSplitLyricsLineNum = LyricsUtils.getSplitDynamicLyricsLineNum(mLrcLineInfos, mLyricsLineNum, playProgress, mLyricsReader.getPlayOffset());
+            //获取原始的歌词字索引
+            mLyricsWordIndex = LyricsUtils.getLyricsWordIndex(mLrcLineInfos, mLyricsLineNum, playProgress, mLyricsReader.getPlayOffset());
+            //获取分割后的歌词字索引
+            mSplitLyricsWordIndex = LyricsUtils.getSplitLyricsWordIndex(mLrcLineInfos, mLyricsLineNum, playProgress, mLyricsReader.getPlayOffset());
+            mLyricsWordHLTime = LyricsUtils.getDisWordsIndexLenTime(mLrcLineInfos, mLyricsLineNum, playProgress, mLyricsReader.getPlayOffset());
+        } else {
+            //lrc歌词
+            //获取分割后的索引
+            mSplitLyricsLineNum = LyricsUtils.getSplitLrcLyricsLineNum(mLrcLineInfos, mLyricsLineNum, playProgress, mLyricsReader.getPlayOffset());
+        }
+        if (mLyricsReader.getLyricsType() == LyricsInfo.DYNAMIC && mExtraLrcStatus == EXTRALRCSTATUS_SHOWTRANSLATELRC && mTranslateDrawType == TRANSLATE_DRAW_TYPE_DYNAMIC) {
+            //显示翻译歌词且歌词类型是动感歌词且以动感歌词的形式绘画翻译歌词
+            if (mTranslateLrcLineInfos != null && mTranslateLrcLineInfos.size() > 0) {
+                mExtraSplitLyricsLineNum = LyricsUtils.getSplitExtraLyricsLineNum(mTranslateLrcLineInfos, mLyricsLineNum, playProgress, mLyricsReader.getPlayOffset());
+
+                mExtraLyricsWordIndex = LyricsUtils.getExtraLyricsWordIndex(mTranslateLrcLineInfos, mLyricsLineNum, playProgress, mLyricsReader.getPlayOffset());
+                mExtraSplitLyricsWordIndex = LyricsUtils.getSplitExtraLyricsWordIndex(mTranslateLrcLineInfos, mLyricsLineNum, playProgress, mLyricsReader.getPlayOffset());
+                mTranslateLyricsWordHLTime = LyricsUtils.getTranslateLrcDisWordsIndexLenTime(mTranslateLrcLineInfos, mLyricsLineNum, playProgress, mLyricsReader.getPlayOffset());
+            }
+        } else if (mExtraLrcStatus == EXTRALRCSTATUS_SHOWTRANSLITERATIONLRC) {
+            //显示音译歌词
+            if (mTransliterationLrcLineInfos != null && mTransliterationLrcLineInfos.size() > 0) {
+                mExtraSplitLyricsLineNum = LyricsUtils.getSplitExtraLyricsLineNum(mTransliterationLrcLineInfos, mLyricsLineNum, playProgress, mLyricsReader.getPlayOffset());
+
+                mExtraLyricsWordIndex = LyricsUtils.getExtraLyricsWordIndex(mTransliterationLrcLineInfos, mLyricsLineNum, playProgress, mLyricsReader.getPlayOffset());
+                mExtraSplitLyricsWordIndex = LyricsUtils.getSplitExtraLyricsWordIndex(mTransliterationLrcLineInfos, mLyricsLineNum, playProgress, mLyricsReader.getPlayOffset());
+            }
+        }
+    }
+
+    /**
+     * 绘画类型
+     *
+     * @param translateDrawType
+     */
+    public void setTranslateDrawType(int translateDrawType) {
+        this.mTranslateDrawType = translateDrawType;
+    }
 
     /**
      * 搜索歌词接口
@@ -1195,5 +1222,156 @@ public abstract class AbstractLrcView extends View {
          * 额外歌词回调
          */
         void extraLrcCallback();
+    }
+
+    ///////////////////////////////////////////////
+
+
+    public void setmTextMaxWidth(float mTextMaxWidth) {
+        this.mTextMaxWidth = mTextMaxWidth;
+    }
+
+    public String getDefText() {
+        return mDefText;
+    }
+
+    public void setDefText(String mDefText) {
+        this.mDefText = mDefText;
+    }
+
+    public String getLoadingText() {
+        return mLoadingText;
+    }
+
+    public void setLoadingText(String mLoadingText) {
+        this.mLoadingText = mLoadingText;
+    }
+
+    public String getLoadErrorText() {
+        return mLoadErrorText;
+    }
+
+    public void setLoadErrorText(String mLoadErrorText) {
+        this.mLoadErrorText = mLoadErrorText;
+    }
+
+    public String getNonsupportText() {
+        return mNonsupportText;
+    }
+
+    public void setNonsupportText(String mNonsupportText) {
+        this.mNonsupportText = mNonsupportText;
+    }
+
+    public String getGotoSearchText() {
+        return mGotoSearchText;
+    }
+
+    public void setGotoSearchText(String mGotoSearchText) {
+        this.mGotoSearchText = mGotoSearchText;
+    }
+
+    public void setLyricsLineNum(int mLyricsLineNum) {
+        this.mLyricsLineNum = mLyricsLineNum;
+    }
+
+    public int getLyricsLineNum() {
+        return mLyricsLineNum;
+    }
+
+    public int getSplitLyricsLineNum() {
+        return mSplitLyricsLineNum;
+    }
+
+    public int getSplitLyricsWordIndex() {
+        return mSplitLyricsWordIndex;
+    }
+
+    public int getLyricsWordIndex() {
+        return mLyricsWordIndex;
+    }
+
+    public float getLyricsWordHLTime() {
+        return mLyricsWordHLTime;
+    }
+
+    public int getExtraSplitLyricsLineNum() {
+        return mExtraSplitLyricsLineNum;
+    }
+
+    public int getExtraSplitLyricsWordIndex() {
+        return mExtraSplitLyricsWordIndex;
+    }
+
+    public int getExtraLyricsWordIndex() {
+        return mExtraLyricsWordIndex;
+    }
+
+    public float getTranslateLyricsWordHLTime() {
+        return mTranslateLyricsWordHLTime;
+    }
+
+    public float getSpaceLineHeight() {
+        return mSpaceLineHeight;
+    }
+
+    public float getPaddingLeftOrRight() {
+        return mPaddingLeftOrRight;
+    }
+
+    public float getExtraLrcSpaceLineHeight() {
+        return mExtraLrcSpaceLineHeight;
+    }
+
+    public int getTranslateDrawType() {
+        return mTranslateDrawType;
+    }
+
+    public LyricsReader getLyricsReader() {
+        return mLyricsReader;
+    }
+
+    public TreeMap<Integer, LyricsLineInfo> getLrcLineInfos() {
+        return mLrcLineInfos;
+    }
+
+    public List<LyricsLineInfo> getTranslateLrcLineInfos() {
+        return mTranslateLrcLineInfos;
+    }
+
+    public List<LyricsLineInfo> getTransliterationLrcLineInfos() {
+        return mTransliterationLrcLineInfos;
+    }
+
+    public Paint getPaint() {
+        return mPaint;
+    }
+
+    public int[] getPaintColors() {
+        return mPaintColors;
+    }
+
+    public Paint getPaintHL() {
+        return mPaintHL;
+    }
+
+    public int[] getPaintHLColors() {
+        return mPaintHLColors;
+    }
+
+    public Paint getPaintOutline() {
+        return mPaintOutline;
+    }
+
+    public Paint getExtraLrcPaint() {
+        return mExtraLrcPaint;
+    }
+
+    public Paint getExtraLrcPaintHL() {
+        return mExtraLrcPaintHL;
+    }
+
+    public Paint getExtraLrcPaintOutline() {
+        return mExtraLrcPaintOutline;
     }
 }
