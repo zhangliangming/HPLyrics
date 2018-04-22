@@ -347,7 +347,7 @@ public abstract class AbstractLrcView extends SurfaceView implements SurfaceHold
     /**
      * 刷新时间
      */
-    private int mDelayMs = 40;
+    private int mDelayMs = 50;
 
     /**
      * 歌词刷新
@@ -469,7 +469,6 @@ public abstract class AbstractLrcView extends SurfaceView implements SurfaceHold
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-        resetData();
     }
 
 
@@ -481,11 +480,10 @@ public abstract class AbstractLrcView extends SurfaceView implements SurfaceHold
      * @author: zhangliangming
      * @date: 2018-04-21 9:19
      */
-    private synchronized void onDrawView() {
+    private void onDrawView() {
         mCanvas = mSurfaceHolder.lockCanvas();
         if (mCanvas != null) {
             try {
-
                 //清屏
                 mCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
 
@@ -593,7 +591,7 @@ public abstract class AbstractLrcView extends SurfaceView implements SurfaceHold
      * @author: zhangliangming
      * @date: 2018-04-21 9:24
      */
-    public void invalidateView() {
+    public synchronized void invalidateView() {
         onDrawView();
     }
 
@@ -1153,7 +1151,6 @@ public abstract class AbstractLrcView extends SurfaceView implements SurfaceHold
             }
         }
     }
-
 
     /**
      * 更新分隔后的行号，字索引，高亮时间

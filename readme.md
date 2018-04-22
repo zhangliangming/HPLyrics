@@ -11,6 +11,10 @@
 - 
 
 # 日志 #
+## v2.6 ##
+- 2018-04-22
+- 修复后台回到前台时，歌词视图内容为空的问题
+- 修复初始歌词数据时，OffsetY值没还原的问题
 
 ## v2.4 ##
 - 2018-04-21
@@ -117,7 +121,7 @@
 2.app build.gradle
 
 `dependencies {
-	         compile 'com.github.zhangliangming:HPLyrics:v2.4'
+	         compile 'com.github.zhangliangming:HPLyrics:v2.6'
 	}`
 
 # 调用Demo #

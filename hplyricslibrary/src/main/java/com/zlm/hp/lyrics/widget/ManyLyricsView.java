@@ -1076,6 +1076,7 @@ public class ManyLyricsView extends LinearLayout {
 
     /**
      * 设置歌词宽度
+     *
      * @param mTextMaxWidth
      */
     public void setTextMaxWidth(float mTextMaxWidth) {
@@ -1084,6 +1085,7 @@ public class ManyLyricsView extends LinearLayout {
 
     /**
      * 指示线颜色
+     *
      * @param mPaintLineColor
      */
     public void setPaintLineColor(int mPaintLineColor) {
@@ -1125,6 +1127,10 @@ public class ManyLyricsView extends LinearLayout {
      * 初始歌词数据
      */
     public void initLrcData() {
+        mScroller.setFinalY(0);
+        mOffsetY = 0;
+        mCentreY = 0;
+        mTouchEventStatus = TOUCHEVENTSTATUS_INIT;
         mAbstractLrcView.initLrcData();
     }
 
