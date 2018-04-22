@@ -131,7 +131,7 @@
 2.app build.gradle
 
 `dependencies {
-	         compile 'com.github.zhangliangming:HPLyrics:v2.6'
+	         compile 'com.github.zhangliangming:HPLyrics:v3.0'
 	}`
 
 # 调用Demo #
