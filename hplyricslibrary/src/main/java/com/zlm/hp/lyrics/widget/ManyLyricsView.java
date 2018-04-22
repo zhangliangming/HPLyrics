@@ -9,6 +9,7 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.Shader;
+import android.graphics.SurfaceTexture;
 import android.graphics.Typeface;
 import android.os.Handler;
 import android.os.Looper;
@@ -1417,6 +1418,7 @@ public class ManyLyricsView extends LinearLayout {
      **/
     private class ManyAbstractLrcView extends AbstractLrcView {
 
+
         public ManyAbstractLrcView(Context context) {
             super(context);
         }
@@ -1436,7 +1438,12 @@ public class ManyLyricsView extends LinearLayout {
         }
 
         @Override
-        public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+        public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
+
+        }
+
+        @Override
+        public void onSurfaceTextureUpdated(SurfaceTexture surface) {
 
         }
     }

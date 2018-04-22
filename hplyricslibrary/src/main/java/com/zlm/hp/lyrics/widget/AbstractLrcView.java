@@ -4,15 +4,14 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
 import android.graphics.RectF;
+import android.graphics.SurfaceTexture;
 import android.graphics.Typeface;
 import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
+import android.view.TextureView;
 
 import com.zlm.hp.lyrics.LyricsReader;
 import com.zlm.hp.lyrics.model.LyricsInfo;
@@ -32,10 +31,8 @@ import java.util.TreeMap;
  * @author: zhangliangming
  * @date: 2018-04-21 9:06
  */
-public abstract class AbstractLrcView extends SurfaceView implements SurfaceHolder.Callback {
+public abstract class AbstractLrcView extends TextureView implements TextureView.SurfaceTextureListener {
 
-    // SurfaceHolder
-    private SurfaceHolder mSurfaceHolder;
     /**
      * 画布
      */
@@ -396,12 +393,6 @@ public abstract class AbstractLrcView extends SurfaceView implements SurfaceHold
      * @date: 2018-04-21 9:08
      */
     private void init(Context context) {
-        mSurfaceHolder = getHolder();
-        mSurfaceHolder.addCallback(this);
-
-        //背景透明
-        setZOrderOnTop(true);
-        mSurfaceHolder.setFormat(PixelFormat.TRANSLUCENT);
 
         //初始默认数据
         mDefText = context.getString(R.string.def_text);
@@ -460,17 +451,22 @@ public abstract class AbstractLrcView extends SurfaceView implements SurfaceHold
         mGotoSearchRectPaint.setAntiAlias(true);
         mGotoSearchRectPaint.setStrokeWidth(2);
         mGotoSearchRectPaint.setTextSize(mFontSize);
+
+        //设置背景透明
+        setOpaque(false);
+        setSurfaceTextureListener(this);
     }
 
+    //surface 创建成功
     @Override
-    public void surfaceCreated(SurfaceHolder holder) {
+    public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
         onDrawView();
     }
 
     @Override
-    public void surfaceDestroyed(SurfaceHolder holder) {
+    public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
+        return false;
     }
-
 
     /**
      * @throws
@@ -481,7 +477,7 @@ public abstract class AbstractLrcView extends SurfaceView implements SurfaceHold
      * @date: 2018-04-21 9:19
      */
     private void onDrawView() {
-        mCanvas = mSurfaceHolder.lockCanvas();
+        mCanvas = lockCanvas();
         if (mCanvas != null) {
             try {
                 //清屏
@@ -492,7 +488,7 @@ public abstract class AbstractLrcView extends SurfaceView implements SurfaceHold
                 e.printStackTrace();
             } finally {
                 if (mCanvas != null) {
-                    mSurfaceHolder.unlockCanvasAndPost(mCanvas);
+                    unlockCanvasAndPost(mCanvas);
                 }
             }
         }

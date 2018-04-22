@@ -5,12 +5,22 @@
 
 - 1.x版本，只要是使用自定义view来实现，每次都使用handler去刷新view，但是如果handler队列中有很多任务执行，那就无法保证歌词每次都在100ms内刷新一次。
 - 2.x版本，主要是使用surfaceview来实现，每次刷新时间为40ms，歌词渐变相对会流畅。
+- 3.x版本，主要是使用TextureView来实现，每次刷新时间修改为50ms，TextureView支持view的相关动画属性
 
 # 2.x版本使用注意 #
 - 主题：我主要是使用Theme.AppCompat.Light.NoActionBar的主题，我试过其它的主题，会导致surfaceview背景为黑色，并且不能透明的问题。
-- 
+- surfaceview存在的问题，没有view相关的旋转，位移等动画，所以我乐乐音乐的旋转界面会出现问题，如果有相关动画需求的，慎用。
+
+# 3.x版本使用注意 #
+- 设置硬件加速：android:hardwareAccelerated="true" 
+- android4.0以上
 
 # 日志 #
+
+## v3.0 ##
+- 2018-04-22
+- surfaceview替换成TextureView
+
 ## v2.6 ##
 - 2018-04-22
 - 修复后台回到前台时，歌词视图内容为空的问题

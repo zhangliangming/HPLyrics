@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.SurfaceTexture;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.view.SurfaceHolder;
@@ -554,7 +555,6 @@ public class FloatLyricsView extends LinearLayout {
     }
 
     /**
-     *
      * @return
      */
     public LyricsReader getLyricsReader() {
@@ -631,6 +631,7 @@ public class FloatLyricsView extends LinearLayout {
      **/
     private class FloatAbstractLrcView extends AbstractLrcView {
 
+
         public FloatAbstractLrcView(Context context) {
             super(context);
         }
@@ -650,7 +651,12 @@ public class FloatLyricsView extends LinearLayout {
         }
 
         @Override
-        public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+        public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
+
+        }
+
+        @Override
+        public void onSurfaceTextureUpdated(SurfaceTexture surface) {
 
         }
     }
