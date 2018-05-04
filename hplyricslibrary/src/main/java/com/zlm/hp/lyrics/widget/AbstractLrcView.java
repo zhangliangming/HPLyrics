@@ -342,9 +342,9 @@ public abstract class AbstractLrcView extends TextureView implements TextureView
      */
     private long mCurPlayingTime = 0;
     /**
-     * 刷新时间
+     * 刷新延时时间
      */
-    private int mDelayMs = 50;
+    private long mRefreshTime = 20;
 
     /**
      * 歌词刷新
@@ -365,7 +365,7 @@ public abstract class AbstractLrcView extends TextureView implements TextureView
                     long endTime = System.currentTimeMillis();
                     long updateTime = (endTime - mPlayerStartTime) - mPlayerSpendTime;
                     mPlayerSpendTime = (endTime - mPlayerStartTime);
-                    long delayMs = mDelayMs - updateTime;
+                    long delayMs = mRefreshTime - updateTime;
                     Log.e("AbstractLrcView", "oldDelayMs = " + delayMs + " , newDelayMs = " + Math.max(0, delayMs));
                     mLrcPlayerHandler.postDelayed(mLrcPlayerRunnable, Math.max(0, delayMs));
                 }
@@ -1219,6 +1219,10 @@ public abstract class AbstractLrcView extends TextureView implements TextureView
 
     ///////////////////////////////////////////////
 
+
+    public void setRefreshTime(long refreshTime) {
+        this.mRefreshTime = refreshTime;
+    }
 
     public void setTextMaxWidth(float mTextMaxWidth) {
         this.mTextMaxWidth = mTextMaxWidth;

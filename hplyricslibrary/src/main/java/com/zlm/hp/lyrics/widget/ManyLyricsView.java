@@ -1399,6 +1399,16 @@ public class ManyLyricsView extends LinearLayout {
     }
 
     /**
+     * 刷新时间
+     *
+     * @param refreshTime
+     */
+    public void setRefreshTime(long refreshTime) {
+        mAbstractLrcView.setRefreshTime(refreshTime);
+    }
+
+
+    /**
      * 设置歌词点击事件
      *
      * @param onLrcClickListener

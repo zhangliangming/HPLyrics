@@ -611,6 +611,15 @@ public class FloatLyricsView extends LinearLayout {
     }
 
     /**
+     * 刷新时间
+     *
+     * @param refreshTime
+     */
+    public void setRefreshTime(long refreshTime) {
+        mAbstractLrcView.setRefreshTime(refreshTime);
+    }
+
+    /**
      * 设置额外字体大小
      *
      * @param extraLrcFontSize
