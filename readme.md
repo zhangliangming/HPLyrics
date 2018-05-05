@@ -16,8 +16,9 @@
 - android4.0以上
 
 # 日志 #
-## v3.1 ##
+## v3.2 ##
 - 2018-05-05
+- 添加混淆
 - 添加刷新时间
 
 ## v3.0 ##
@@ -134,7 +135,7 @@
 2.app build.gradle
 
 `dependencies {
-	         compile 'com.github.zhangliangming:HPLyrics:v3.0'
+	         compile 'com.github.zhangliangming:HPLyrics:v3.2'
 	}`
 
 # 调用Demo #
