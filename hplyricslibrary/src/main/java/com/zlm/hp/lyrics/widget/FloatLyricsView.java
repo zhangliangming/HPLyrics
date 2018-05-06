@@ -3,14 +3,10 @@ package com.zlm.hp.lyrics.widget;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.SurfaceTexture;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
-import android.view.SurfaceHolder;
 import android.view.ViewTreeObserver;
-import android.widget.LinearLayout;
 
 import com.zlm.hp.lyrics.LyricsReader;
 import com.zlm.hp.lyrics.model.LyricsInfo;
@@ -25,21 +21,16 @@ import java.util.TreeMap;
  * @author: zhangliangming
  * @date: 2018-04-21 11:43
  **/
-public class FloatLyricsView extends LinearLayout {
-    /**
-     *
-     */
-    private FloatAbstractLrcView mAbstractLrcView;
+public class FloatLyricsView extends AbstractLrcView {
+
 
     public FloatLyricsView(Context context) {
         super(context);
-        mAbstractLrcView = new FloatAbstractLrcView(context);
         init(context);
     }
 
     public FloatLyricsView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        mAbstractLrcView = new FloatAbstractLrcView(context, attrs);
         init(context);
     }
 
@@ -53,13 +44,6 @@ public class FloatLyricsView extends LinearLayout {
      */
     private void init(Context context) {
 
-        //添加歌词视图
-        setOrientation(LinearLayout.VERTICAL);
-        setBackgroundColor(Color.TRANSPARENT);
-        LayoutParams layoutParams = new LayoutParams(LayoutParams.MATCH_PARENT,
-                LayoutParams.MATCH_PARENT);
-        addView(mAbstractLrcView, 0, layoutParams);
-
         //加载完成后回调
         getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
@@ -70,6 +54,16 @@ public class FloatLyricsView extends LinearLayout {
         });
     }
 
+    @Override
+    protected void onDrawLrcView(Canvas canvas) {
+        drawFloatLrcView(canvas);
+    }
+
+    @Override
+    protected void updateView(long playProgress) {
+        updateFloatLrcView(playProgress);
+    }
+
     /**
      * view加载完成
      */
@@ -77,7 +71,7 @@ public class FloatLyricsView extends LinearLayout {
 
         //设置歌词的最大宽度
         int textMaxWidth = getWidth() / 3 * 2;
-        mAbstractLrcView.setTextMaxWidth(textMaxWidth);
+        setTextMaxWidth(textMaxWidth);
 
         //字体大小
         float fontSize = getHeight() / 4;
@@ -103,7 +97,7 @@ public class FloatLyricsView extends LinearLayout {
      * @param canvas
      */
     private void drawFloatLrcView(Canvas canvas) {
-        int extraLrcStatus = mAbstractLrcView.getExtraLrcStatus();
+        int extraLrcStatus = getExtraLrcStatus();
         //绘画歌词
         if (extraLrcStatus == AbstractLrcView.EXTRALRCSTATUS_NOSHOWEXTRALRC) {
             //只显示默认歌词
@@ -122,19 +116,19 @@ public class FloatLyricsView extends LinearLayout {
      */
     private void drawDynamicLyrics(Canvas canvas) {
         //获取数据
-        LyricsReader lyricsReader = mAbstractLrcView.getLyricsReader();
-        TreeMap<Integer, LyricsLineInfo> lrcLineInfos = mAbstractLrcView.getLrcLineInfos();
-        int lyricsLineNum = mAbstractLrcView.getLyricsLineNum();
-        int splitLyricsLineNum = mAbstractLrcView.getSplitLyricsLineNum();
-        int splitLyricsWordIndex = mAbstractLrcView.getSplitLyricsWordIndex();
-        float lyricsWordHLTime = mAbstractLrcView.getLyricsWordHLTime();
-        Paint paint = mAbstractLrcView.getPaint();
-        Paint paintHL = mAbstractLrcView.getPaintHL();
-        Paint paintOutline = mAbstractLrcView.getPaintOutline();
-        int[] paintColors = mAbstractLrcView.getPaintColors();
-        int[] paintHLColors = mAbstractLrcView.getPaintHLColors();
-        float spaceLineHeight = mAbstractLrcView.getSpaceLineHeight();
-        float paddingLeftOrRight = mAbstractLrcView.getPaddingLeftOrRight();
+        LyricsReader lyricsReader = getLyricsReader();
+        TreeMap<Integer, LyricsLineInfo> lrcLineInfos = getLrcLineInfos();
+        int lyricsLineNum = getLyricsLineNum();
+        int splitLyricsLineNum = getSplitLyricsLineNum();
+        int splitLyricsWordIndex = getSplitLyricsWordIndex();
+        float lyricsWordHLTime = getLyricsWordHLTime();
+        Paint paint = getPaint();
+        Paint paintHL = getPaintHL();
+        Paint paintOutline = getPaintOutline();
+        int[] paintColors = getPaintColors();
+        int[] paintHLColors = getPaintHLColors();
+        float spaceLineHeight = getSpaceLineHeight();
+        float paddingLeftOrRight = getPaddingLeftOrRight();
 
 
         // 先设置当前歌词，之后再根据索引判断是否放在左边还是右边
@@ -221,27 +215,27 @@ public class FloatLyricsView extends LinearLayout {
      */
     private void drawDynamiAndExtraLyrics(Canvas canvas) {
         //获取数据
-        LyricsReader lyricsReader = mAbstractLrcView.getLyricsReader();
-        Paint paint = mAbstractLrcView.getPaint();
-        Paint paintHL = mAbstractLrcView.getPaintHL();
-        Paint paintOutline = mAbstractLrcView.getPaintOutline();
-        Paint extraLrcPaint = mAbstractLrcView.getExtraLrcPaint();
-        Paint extraLrcPaintHL = mAbstractLrcView.getExtraLrcPaintHL();
-        Paint extraLrcPaintOutline = mAbstractLrcView.getExtraLrcPaintOutline();
-        int[] paintColors = mAbstractLrcView.getPaintColors();
-        int[] paintHLColors = mAbstractLrcView.getPaintHLColors();
-        int extraLrcStatus = mAbstractLrcView.getExtraLrcStatus();
-        TreeMap<Integer, LyricsLineInfo> lrcLineInfos = mAbstractLrcView.getLrcLineInfos();
-        int lyricsLineNum = mAbstractLrcView.getLyricsLineNum();
-        int lyricsWordIndex = mAbstractLrcView.getLyricsWordIndex();
-        int extraLyricsWordIndex = mAbstractLrcView.getExtraLyricsWordIndex();
-        float lyricsWordHLTime = mAbstractLrcView.getLyricsWordHLTime();
-        float translateLyricsWordHLTime = mAbstractLrcView.getTranslateLyricsWordHLTime();
-        float extraLrcSpaceLineHeight = mAbstractLrcView.getExtraLrcSpaceLineHeight();
-        float paddingLeftOrRight = mAbstractLrcView.getPaddingLeftOrRight();
-        int translateDrawType = mAbstractLrcView.getTranslateDrawType();
-        List<LyricsLineInfo> translateLrcLineInfos = mAbstractLrcView.getTranslateLrcLineInfos();
-        List<LyricsLineInfo> transliterationLrcLineInfos = mAbstractLrcView.getTransliterationLrcLineInfos();
+        LyricsReader lyricsReader = getLyricsReader();
+        Paint paint = getPaint();
+        Paint paintHL = getPaintHL();
+        Paint paintOutline = getPaintOutline();
+        Paint extraLrcPaint = getExtraLrcPaint();
+        Paint extraLrcPaintHL = getExtraLrcPaintHL();
+        Paint extraLrcPaintOutline = getExtraLrcPaintOutline();
+        int[] paintColors = getPaintColors();
+        int[] paintHLColors = getPaintHLColors();
+        int extraLrcStatus = getExtraLrcStatus();
+        TreeMap<Integer, LyricsLineInfo> lrcLineInfos = getLrcLineInfos();
+        int lyricsLineNum = getLyricsLineNum();
+        int lyricsWordIndex = getLyricsWordIndex();
+        int extraLyricsWordIndex = getExtraLyricsWordIndex();
+        float lyricsWordHLTime = getLyricsWordHLTime();
+        float translateLyricsWordHLTime = getTranslateLyricsWordHLTime();
+        float extraLrcSpaceLineHeight = getExtraLrcSpaceLineHeight();
+        float paddingLeftOrRight = getPaddingLeftOrRight();
+        int translateDrawType = getTranslateDrawType();
+        List<LyricsLineInfo> translateLrcLineInfos = getTranslateLrcLineInfos();
+        List<LyricsLineInfo> transliterationLrcLineInfos = getTransliterationLrcLineInfos();
 
         //
         float topPadding = (getHeight() - extraLrcSpaceLineHeight - LyricsUtils.getTextHeight(paint) - LyricsUtils.getTextHeight(extraLrcPaint)) / 2;
@@ -282,55 +276,13 @@ public class FloatLyricsView extends LinearLayout {
      */
     private void updateFloatLrcView(long playProgress) {
 
-        LyricsReader lyricsReader = mAbstractLrcView.getLyricsReader();
-        TreeMap<Integer, LyricsLineInfo> lrcLineInfos = mAbstractLrcView.getLrcLineInfos();
+        LyricsReader lyricsReader = getLyricsReader();
+        TreeMap<Integer, LyricsLineInfo> lrcLineInfos = getLrcLineInfos();
         int lyricsLineNum = LyricsUtils.getLineNumber(lyricsReader.getLyricsType(), lrcLineInfos, playProgress, lyricsReader.getPlayOffset());
-        mAbstractLrcView.setLyricsLineNum(lyricsLineNum);
-        mAbstractLrcView.updateSplitData(playProgress);
+        setLyricsLineNum(lyricsLineNum);
+        updateSplitData(playProgress);
     }
 
-    /**
-     * 获取额外歌词类型
-     *
-     * @return
-     */
-    public int getExtraLrcType() {
-        return mAbstractLrcView.getExtraLrcType();
-    }
-
-    /**
-     * 获取额外歌词的显示状态
-     *
-     * @return
-     */
-    public int getExtraLrcStatus() {
-        return mAbstractLrcView.getExtraLrcStatus();
-    }
-
-    /**
-     * 获取歌词状态
-     *
-     * @return
-     */
-    public int getLrcStatus() {
-        return mAbstractLrcView.getLrcStatus();
-    }
-
-    /**
-     * 初始歌词数据
-     */
-    public void initLrcData() {
-        mAbstractLrcView.initLrcData();
-    }
-
-    /**
-     * 设置歌词状态
-     *
-     * @param lrcStatus
-     */
-    public void setLrcStatus(int lrcStatus) {
-        mAbstractLrcView.setLrcStatus(lrcStatus);
-    }
 
     /**
      * 设置默认颜色
@@ -339,16 +291,6 @@ public class FloatLyricsView extends LinearLayout {
      */
     public void setPaintColor(int[] paintColor) {
         setPaintColor(paintColor, false);
-    }
-
-    /**
-     * 设置默认颜色
-     *
-     * @param paintColor       至少两种颜色
-     * @param isInvalidateView 是否更新视图
-     */
-    public void setPaintColor(int[] paintColor, boolean isInvalidateView) {
-        mAbstractLrcView.setPaintColor(paintColor, isInvalidateView);
     }
 
 
@@ -361,15 +303,6 @@ public class FloatLyricsView extends LinearLayout {
         setPaintHLColor(paintHLColor, false);
     }
 
-    /**
-     * 设置高亮颜色
-     *
-     * @param paintHLColor     至少两种颜色
-     * @param isInvalidateView 是否更新视图
-     */
-    public void setPaintHLColor(int[] paintHLColor, boolean isInvalidateView) {
-        mAbstractLrcView.setPaintHLColor(paintHLColor, isInvalidateView);
-    }
 
     /**
      * 设置字体文件
@@ -381,115 +314,6 @@ public class FloatLyricsView extends LinearLayout {
     }
 
     /**
-     * 设置字体文件
-     *
-     * @param typeFace
-     * @param isInvalidateView 是否更新视图
-     */
-    public void setTypeFace(Typeface typeFace, boolean isInvalidateView) {
-        mAbstractLrcView.setTypeFace(typeFace, isInvalidateView);
-    }
-
-    /**
-     * 设置额外歌词事件
-     *
-     * @param extraLyricsListener
-     */
-    public void setExtraLyricsListener(AbstractLrcView.ExtraLyricsListener extraLyricsListener) {
-        mAbstractLrcView.setExtraLyricsListener(extraLyricsListener);
-    }
-
-    /**
-     * 设置搜索歌词事件
-     *
-     * @param searchLyricsListener
-     */
-    public void setSearchLyricsListener(AbstractLrcView.SearchLyricsListener searchLyricsListener) {
-        mAbstractLrcView.setSearchLyricsListener(searchLyricsListener);
-    }
-
-    /**
-     * 歌词播放
-     *
-     * @param playProgress
-     */
-    public void play(int playProgress) {
-        mAbstractLrcView.play(playProgress);
-    }
-
-    /**
-     * 歌词暂停
-     */
-    public void pause() {
-        mAbstractLrcView.pause();
-    }
-
-    /**
-     * 快进
-     *
-     * @param playProgress
-     */
-    public void seekto(int playProgress) {
-        mAbstractLrcView.seekto(playProgress);
-    }
-
-    /**
-     * 唤醒
-     */
-    public void resume() {
-        mAbstractLrcView.resume();
-    }
-
-    /**
-     * 获取歌词播放器状态
-     *
-     * @return
-     */
-    public int getLrcPlayerStatus() {
-        return mAbstractLrcView.getLrcPlayerStatus();
-    }
-
-    /**
-     * 获取分隔歌词的开始时间
-     *
-     * @param playProgress
-     * @return
-     */
-    public int getSplitLineLrcStartTime(int playProgress) {
-        return mAbstractLrcView.getSplitLineLrcStartTime(playProgress);
-    }
-
-    /**
-     * 获取行歌词的开始时间
-     *
-     * @param playProgress
-     * @return
-     */
-    public int getLineLrcStartTime(int playProgress) {
-        return mAbstractLrcView.getLineLrcStartTime(playProgress);
-    }
-
-    /**
-     * 获取分隔行的歌词内容
-     *
-     * @param playProgress
-     * @return
-     */
-    public String getSplitLineLrc(int playProgress) {
-        return mAbstractLrcView.getSplitLineLrc(playProgress);
-    }
-
-    /**
-     * 获取行的歌词内容
-     *
-     * @param playProgress
-     * @return
-     */
-    public String getLineLrc(int playProgress) {
-        return mAbstractLrcView.getLineLrc(playProgress);
-    }
-
-    /**
      * 设置空行高度
      *
      * @param spaceLineHeight
@@ -498,15 +322,6 @@ public class FloatLyricsView extends LinearLayout {
         setSpaceLineHeight(spaceLineHeight, false);
     }
 
-    /**
-     * 设置空行高度
-     *
-     * @param spaceLineHeight
-     * @param isInvalidateView 是否更新视图
-     */
-    public void setSpaceLineHeight(float spaceLineHeight, boolean isInvalidateView) {
-        mAbstractLrcView.setSpaceLineHeight(spaceLineHeight, isInvalidateView);
-    }
 
     /**
      * 设置额外空行高度
@@ -517,24 +332,6 @@ public class FloatLyricsView extends LinearLayout {
         setExtraLrcSpaceLineHeight(extraLrcSpaceLineHeight, false);
     }
 
-    /**
-     * 设置额外空行高度
-     *
-     * @param extraLrcSpaceLineHeight
-     * @param isInvalidateView        是否更新视图
-     */
-    public void setExtraLrcSpaceLineHeight(float extraLrcSpaceLineHeight, boolean isInvalidateView) {
-        mAbstractLrcView.setExtraLrcSpaceLineHeight(extraLrcSpaceLineHeight, isInvalidateView);
-    }
-
-    /**
-     * 设置额外歌词的显示状态
-     *
-     * @param extraLrcStatus
-     */
-    public void setExtraLrcStatus(int extraLrcStatus) {
-        mAbstractLrcView.setExtraLrcStatus(extraLrcStatus);
-    }
 
     /**
      * 设置歌词解析器
@@ -542,23 +339,16 @@ public class FloatLyricsView extends LinearLayout {
      * @param lyricsReader
      */
     public void setLyricsReader(LyricsReader lyricsReader) {
-        mAbstractLrcView.setLyricsReader(lyricsReader);
+        super.setLyricsReader(lyricsReader);
         if (lyricsReader != null && lyricsReader.getLyricsType() == LyricsInfo.DYNAMIC) {
-            int extraLrcType = mAbstractLrcView.getExtraLrcType();
+            int extraLrcType = getExtraLrcType();
             //翻译歌词以动感歌词形式显示
             if (extraLrcType == AbstractLrcView.EXTRALRCTYPE_BOTH || extraLrcType == AbstractLrcView.EXTRALRCTYPE_TRANSLATELRC) {
-                mAbstractLrcView.setTranslateDrawType(AbstractLrcView.TRANSLATE_DRAW_TYPE_DYNAMIC);
+                setTranslateDrawType(AbstractLrcView.TRANSLATE_DRAW_TYPE_DYNAMIC);
             }
         } else {
-            mAbstractLrcView.setLrcStatus(AbstractLrcView.LRCSTATUS_NONSUPPORT);
+            setLrcStatus(AbstractLrcView.LRCSTATUS_NONSUPPORT);
         }
-    }
-
-    /**
-     * @return
-     */
-    public LyricsReader getLyricsReader() {
-        return mAbstractLrcView.getLyricsReader();
     }
 
     /**
@@ -575,31 +365,11 @@ public class FloatLyricsView extends LinearLayout {
      * 设置字体大小
      *
      * @param fontSize
-     * @param extraFontSize 额外歌词字体
-     * @param isReloadData  是否重新加载数据及刷新界面
-     */
-    public void setSize(int fontSize, int extraFontSize, boolean isReloadData) {
-        mAbstractLrcView.setSize(fontSize, extraFontSize, isReloadData);
-    }
-
-    /**
-     * 设置字体大小
-     *
-     * @param fontSize
      */
     public void setFontSize(float fontSize) {
         setFontSize(fontSize, false);
     }
 
-    /**
-     * 设置字体大小
-     *
-     * @param fontSize
-     * @param isReloadData 是否重新加载数据及刷新界面
-     */
-    public void setFontSize(float fontSize, boolean isReloadData) {
-        mAbstractLrcView.setFontSize(fontSize, isReloadData);
-    }
 
     /**
      * 设置额外字体大小
@@ -608,66 +378,6 @@ public class FloatLyricsView extends LinearLayout {
      */
     public void setExtraLrcFontSize(float extraLrcFontSize) {
         setExtraLrcFontSize(extraLrcFontSize, false);
-    }
-
-    /**
-     * 刷新时间
-     *
-     * @param refreshTime
-     */
-    public void setRefreshTime(long refreshTime) {
-        mAbstractLrcView.setRefreshTime(refreshTime);
-    }
-
-    /**
-     * 设置额外字体大小
-     *
-     * @param extraLrcFontSize
-     * @param isReloadData     是否重新加载数据及刷新界面
-     */
-    public void setExtraLrcFontSize(float extraLrcFontSize, boolean isReloadData) {
-        mAbstractLrcView.setExtraLrcFontSize(extraLrcFontSize, isReloadData);
-    }
-
-    public FloatAbstractLrcView getmAbstractLrcView() {
-        return mAbstractLrcView;
-    }
-
-    /**
-     * @Description: 双行歌词抽象类
-     * @author: zhangliangming
-     * @date: 2018-04-21 11:46
-     **/
-    private class FloatAbstractLrcView extends AbstractLrcView {
-
-
-        public FloatAbstractLrcView(Context context) {
-            super(context);
-        }
-
-        public FloatAbstractLrcView(Context context, AttributeSet attrs) {
-            super(context, attrs);
-        }
-
-        @Override
-        protected void onDrawLrcView(Canvas canvas) {
-            drawFloatLrcView(canvas);
-        }
-
-        @Override
-        protected void updateView(long playProgress) {
-            updateFloatLrcView(playProgress);
-        }
-
-        @Override
-        public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
-
-        }
-
-        @Override
-        public void onSurfaceTextureUpdated(SurfaceTexture surface) {
-
-        }
     }
 
 }

@@ -4,14 +4,14 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.PorterDuff;
 import android.graphics.RectF;
-import android.graphics.SurfaceTexture;
 import android.graphics.Typeface;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.TextureView;
+import android.view.View;
+
 
 import com.zlm.hp.lyrics.LyricsReader;
 import com.zlm.hp.lyrics.model.LyricsInfo;
@@ -31,12 +31,7 @@ import java.util.TreeMap;
  * @author: zhangliangming
  * @date: 2018-04-21 9:06
  */
-public abstract class AbstractLrcView extends TextureView implements TextureView.SurfaceTextureListener {
-
-    /**
-     * 画布
-     */
-    private Canvas mCanvas;
+public abstract class AbstractLrcView extends View {
 
     /**
      * 初始
@@ -452,46 +447,11 @@ public abstract class AbstractLrcView extends TextureView implements TextureView
         mGotoSearchRectPaint.setStrokeWidth(2);
         mGotoSearchRectPaint.setTextSize(mFontSize);
 
-        //设置背景透明
-        setOpaque(false);
-        setSurfaceTextureListener(this);
-    }
-
-    //surface 创建成功
-    @Override
-    public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-        onDrawView();
     }
 
     @Override
-    public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-        return false;
-    }
-
-    /**
-     * @throws
-     * @Description: 绘画
-     * @param:
-     * @return:
-     * @author: zhangliangming
-     * @date: 2018-04-21 9:19
-     */
-    private void onDrawView() {
-        mCanvas = lockCanvas();
-        if (mCanvas != null) {
-            try {
-                //清屏
-                mCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
-
-                onDrawView(mCanvas);
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                if (mCanvas != null) {
-                    unlockCanvasAndPost(mCanvas);
-                }
-            }
-        }
+    protected void onDraw(Canvas canvas) {
+        onDrawView(canvas);
     }
 
     /**
@@ -588,7 +548,13 @@ public abstract class AbstractLrcView extends TextureView implements TextureView
      * @date: 2018-04-21 9:24
      */
     public synchronized void invalidateView() {
-        onDrawView();
+        if (Looper.getMainLooper() == Looper.myLooper()) {
+            //  当前线程是主UI线程，直接刷新。
+            invalidate();
+        } else {
+            //  当前线程是非UI线程，post刷新。
+            postInvalidate();
+        }
     }
 
     /**

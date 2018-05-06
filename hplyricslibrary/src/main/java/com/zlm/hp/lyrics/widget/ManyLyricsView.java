@@ -9,19 +9,15 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.Shader;
-import android.graphics.SurfaceTexture;
 import android.graphics.Typeface;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
-import android.view.SurfaceHolder;
 import android.view.VelocityTracker;
 import android.view.ViewConfiguration;
 import android.view.ViewTreeObserver;
 import android.view.animation.LinearInterpolator;
-import android.widget.LinearLayout;
 import android.widget.Scroller;
 
 import com.zlm.hp.lyrics.LyricsReader;
@@ -43,9 +39,7 @@ import java.util.TreeMap;
  * @author: zhangliangming
  * @date: 2018-04-21 20:28
  */
-public class ManyLyricsView extends LinearLayout {
-
-    private ManyAbstractLrcView mAbstractLrcView;
+public class ManyLyricsView extends AbstractLrcView {
 
     /**
      * 初始
@@ -181,7 +175,7 @@ public class ManyLyricsView extends LinearLayout {
                         //
                         mTouchIntercept = false;
                         mTouchEventStatus = TOUCHEVENTSTATUS_INIT;
-                        int lyricsLineNum = mAbstractLrcView.getLyricsLineNum();
+                        int lyricsLineNum = getLyricsLineNum();
                         int deltaY = getLineAtHeightY(lyricsLineNum) - mScroller.getFinalY();
                         mScroller.startScroll(0, mScroller.getFinalY(), 0, deltaY, mDuration);
                         invalidateView();
@@ -198,13 +192,12 @@ public class ManyLyricsView extends LinearLayout {
 
     public ManyLyricsView(Context context) {
         super(context);
-        mAbstractLrcView = new ManyAbstractLrcView(context);
         init(context);
     }
 
     public ManyLyricsView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        mAbstractLrcView = new ManyAbstractLrcView(context, attrs);
+
         init(context);
     }
 
@@ -217,13 +210,6 @@ public class ManyLyricsView extends LinearLayout {
      * @date: 2018-04-21 9:08
      */
     private void init(Context context) {
-
-        //添加歌词视图
-        setOrientation(LinearLayout.VERTICAL);
-        setBackgroundColor(Color.TRANSPARENT);
-        LayoutParams layoutParams = new LayoutParams(LayoutParams.MATCH_PARENT,
-                LayoutParams.MATCH_PARENT);
-        addView(mAbstractLrcView, 0, layoutParams);
 
         //初始化
         mScroller = new Scroller(context, new LinearInterpolator());
@@ -252,8 +238,8 @@ public class ManyLyricsView extends LinearLayout {
         mPaintPlay.setStrokeWidth(2);
 
 
-        mAbstractLrcView.setGotoSearchTextColor(Color.WHITE);
-        mAbstractLrcView.setGotoSearchTextPressedColor(ColorUtils.parserColor("#0288d1"));
+        setGotoSearchTextColor(Color.WHITE);
+        setGotoSearchTextPressedColor(ColorUtils.parserColor("#0288d1"));
 
 
         //加载完成后回调
@@ -278,7 +264,17 @@ public class ManyLyricsView extends LinearLayout {
         mShadeHeight = getHeight() / 4;
         //设置歌词的最大宽度
         int textMaxWidth = getWidth() / 3 * 2;
-        mAbstractLrcView.setTextMaxWidth(textMaxWidth);
+        setTextMaxWidth(textMaxWidth);
+    }
+
+    @Override
+    protected void onDrawLrcView(Canvas canvas) {
+        drawManyLrcView(canvas);
+    }
+
+    @Override
+    protected void updateView(long playProgress) {
+        updateManyLrcView(playProgress);
     }
 
     /**
@@ -288,20 +284,20 @@ public class ManyLyricsView extends LinearLayout {
      */
     private void drawManyLrcView(Canvas canvas) {
         //获取数据
-        TreeMap<Integer, LyricsLineInfo> lrcLineInfos = mAbstractLrcView.getLrcLineInfos();
-        Paint paint = mAbstractLrcView.getPaint();
-        Paint paintHL = mAbstractLrcView.getPaintHL();
-        Paint extraLrcPaint = mAbstractLrcView.getExtraLrcPaint();
-        Paint extraLrcPaintHL = mAbstractLrcView.getExtraLrcPaintHL();
-        int lyricsLineNum = mAbstractLrcView.getLyricsLineNum();
-        int splitLyricsLineNum = mAbstractLrcView.getSplitLyricsLineNum();
-        int splitLyricsWordIndex = mAbstractLrcView.getSplitLyricsWordIndex();
-        int extraSplitLyricsLineNum = mAbstractLrcView.getExtraSplitLyricsLineNum();
-        int extraSplitLyricsWordIndex = mAbstractLrcView.getExtraSplitLyricsWordIndex();
-        float spaceLineHeight = mAbstractLrcView.getSpaceLineHeight();
-        float extraLrcSpaceLineHeight = mAbstractLrcView.getExtraLrcSpaceLineHeight();
-        float lyricsWordHLTime = mAbstractLrcView.getLyricsWordHLTime();
-        float translateLyricsWordHLTime = mAbstractLrcView.getTranslateLyricsWordHLTime();
+        TreeMap<Integer, LyricsLineInfo> lrcLineInfos = getLrcLineInfos();
+        Paint paint = getPaint();
+        Paint paintHL = getPaintHL();
+        Paint extraLrcPaint = getExtraLrcPaint();
+        Paint extraLrcPaintHL = getExtraLrcPaintHL();
+        int lyricsLineNum = getLyricsLineNum();
+        int splitLyricsLineNum = getSplitLyricsLineNum();
+        int splitLyricsWordIndex = getSplitLyricsWordIndex();
+        int extraSplitLyricsLineNum = getExtraSplitLyricsLineNum();
+        int extraSplitLyricsWordIndex = getExtraSplitLyricsWordIndex();
+        float spaceLineHeight = getSpaceLineHeight();
+        float extraLrcSpaceLineHeight = getExtraLrcSpaceLineHeight();
+        float lyricsWordHLTime = getLyricsWordHLTime();
+        float translateLyricsWordHLTime = getTranslateLyricsWordHLTime();
 
 
         //获取中间位置
@@ -363,9 +359,9 @@ public class ManyLyricsView extends LinearLayout {
      */
     private float drawDownLyrics(Canvas canvas, Paint paint, Paint paintHL, List<LyricsLineInfo> splitLyricsLineInfos, int splitLyricsLineNum, int splitLyricsWordIndex, float spaceLineHeight, float lyricsWordHLTime, float fristLineTextY) {
         //获取数据
-        LyricsReader lyricsReader = mAbstractLrcView.getLyricsReader();
-        int[] paintColors = mAbstractLrcView.getPaintColors();
-        int[] paintHLColors = mAbstractLrcView.getPaintHLColors();
+        LyricsReader lyricsReader = getLyricsReader();
+        int[] paintColors = getPaintColors();
+        int[] paintHLColors = getPaintHLColors();
 
         //
         float lineBottomY = 0;
@@ -447,12 +443,12 @@ public class ManyLyricsView extends LinearLayout {
      */
     private float drawDownExtraLyrics(Canvas canvas, Paint paint, Paint paintHL, int lyricsLineNum, int extraSplitLyricsLineNum, int extraSplitLyricsWordIndex, float extraLrcSpaceLineHeight, float lyricsWordHLTime, float translateLyricsWordHLTime, float lineBottomY) {
         //获取数据
-        LyricsReader lyricsReader = mAbstractLrcView.getLyricsReader();
-        int extraLrcStatus = mAbstractLrcView.getExtraLrcStatus();
-        float spaceLineHeight = mAbstractLrcView.getSpaceLineHeight();
-        int translateDrawType = mAbstractLrcView.getTranslateDrawType();
-        List<LyricsLineInfo> translateLrcLineInfos = mAbstractLrcView.getTranslateLrcLineInfos();
-        List<LyricsLineInfo> transliterationLrcLineInfos = mAbstractLrcView.getTransliterationLrcLineInfos();
+        LyricsReader lyricsReader = getLyricsReader();
+        int extraLrcStatus = getExtraLrcStatus();
+        float spaceLineHeight = getSpaceLineHeight();
+        int translateDrawType = getTranslateDrawType();
+        List<LyricsLineInfo> translateLrcLineInfos = getTranslateLrcLineInfos();
+        List<LyricsLineInfo> transliterationLrcLineInfos = getTransliterationLrcLineInfos();
 
         //
         if (extraLrcStatus == AbstractLrcView.EXTRALRCSTATUS_SHOWTRANSLATELRC) {
@@ -494,10 +490,10 @@ public class ManyLyricsView extends LinearLayout {
      */
     private float drawUpExtraLyrics(Canvas canvas, Paint paint, List<LyricsLineInfo> splitLyricsLineInfos, int lyricsLineNum, float extraLrcSpaceLineHeight, float lineTopY) {
         //获取数据
-        int extraLrcStatus = mAbstractLrcView.getExtraLrcStatus();
-        float spaceLineHeight = mAbstractLrcView.getSpaceLineHeight();
-        List<LyricsLineInfo> translateLrcLineInfos = mAbstractLrcView.getTranslateLrcLineInfos();
-        List<LyricsLineInfo> transliterationLrcLineInfos = mAbstractLrcView.getTransliterationLrcLineInfos();
+        int extraLrcStatus = getExtraLrcStatus();
+        float spaceLineHeight = getSpaceLineHeight();
+        List<LyricsLineInfo> translateLrcLineInfos = getTranslateLrcLineInfos();
+        List<LyricsLineInfo> transliterationLrcLineInfos = getTransliterationLrcLineInfos();
 
         //
         if (extraLrcStatus == AbstractLrcView.EXTRALRCSTATUS_SHOWTRANSLATELRC) {
@@ -542,7 +538,7 @@ public class ManyLyricsView extends LinearLayout {
      * @return
      */
     private float drawUpLyrics(Canvas canvas, Paint paint, List<LyricsLineInfo> splitLyricsLineInfos, float spaceLineHeight, float fristLineTextY) {
-        int[] paintColors = mAbstractLrcView.getPaintColors();
+        int[] paintColors = getPaintColors();
 
 
         float lineTopY = fristLineTextY;
@@ -600,7 +596,7 @@ public class ManyLyricsView extends LinearLayout {
      */
     private void drawIndicator(Canvas canvas) {
         //获取数据
-        TreeMap<Integer, LyricsLineInfo> lrcLineInfos = mAbstractLrcView.getLrcLineInfos();
+        TreeMap<Integer, LyricsLineInfo> lrcLineInfos = getLrcLineInfos();
 
         //画当前时间
         int scrollLrcLineNum = getScrollLrcLineNum(mOffsetY);
@@ -667,9 +663,9 @@ public class ManyLyricsView extends LinearLayout {
      */
     private void updateManyLrcView(long playProgress) {
         //获取数据
-        LyricsReader lyricsReader = mAbstractLrcView.getLyricsReader();
-        TreeMap<Integer, LyricsLineInfo> lrcLineInfos = mAbstractLrcView.getLrcLineInfos();
-        int lyricsLineNum = mAbstractLrcView.getLyricsLineNum();
+        LyricsReader lyricsReader = getLyricsReader();
+        TreeMap<Integer, LyricsLineInfo> lrcLineInfos = getLrcLineInfos();
+        int lyricsLineNum = getLyricsLineNum();
 
         //
         int newLyricsLineNum = LyricsUtils.getLineNumber(lyricsReader.getLyricsType(), lrcLineInfos, playProgress, lyricsReader.getPlayOffset());
@@ -682,7 +678,7 @@ public class ManyLyricsView extends LinearLayout {
                 invalidateView();
             }
             lyricsLineNum = newLyricsLineNum;
-            mAbstractLrcView.setLyricsLineNum(lyricsLineNum);
+            setLyricsLineNum(lyricsLineNum);
         }
         //
         if (isChangeScrollerFinalY) {
@@ -692,17 +688,12 @@ public class ManyLyricsView extends LinearLayout {
             mScroller.setFinalY((int) mOffsetY);
             isChangeScrollerFinalY = false;
         }
-        mAbstractLrcView.updateSplitData(playProgress);
-    }
-
-    @Override
-    public boolean onInterceptTouchEvent(MotionEvent ev) {
-        return true;
+        updateSplitData(playProgress);
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        int lrcStatus = mAbstractLrcView.getLrcStatus();
+        int lrcStatus = getLrcStatus();
         if (!mTouchAble || lrcStatus != AbstractLrcView.LRCSTATUS_LRC)
             return true;
         obtainVelocityTracker(event);
@@ -771,7 +762,7 @@ public class ManyLyricsView extends LinearLayout {
                     int maxX = 0;
 
                     //
-                    TreeMap<Integer, LyricsLineInfo> lrcLineInfos = mAbstractLrcView.getLrcLineInfos();
+                    TreeMap<Integer, LyricsLineInfo> lrcLineInfos = getLrcLineInfos();
                     int lrcSumHeight = getLineAtHeightY(lrcLineInfos.size());
                     int minY = -getHeight() / 4;
                     int maxY = lrcSumHeight + getHeight() / 4;
@@ -804,7 +795,7 @@ public class ManyLyricsView extends LinearLayout {
 
                         //获取当前滑动到的歌词播放行
                         int scrollLrcLineNum = getScrollLrcLineNum(mOffsetY);
-                        TreeMap<Integer, LyricsLineInfo> lrcLineInfos = mAbstractLrcView.getLrcLineInfos();
+                        TreeMap<Integer, LyricsLineInfo> lrcLineInfos = getLrcLineInfos();
                         int startTime = lrcLineInfos.get(scrollLrcLineNum).getStartTime();
                         mOnLrcClickListener.onLrcPlayClicked(startTime);
 
@@ -849,10 +840,10 @@ public class ManyLyricsView extends LinearLayout {
      */
     private int getLineSizeNum(int lyricsLineNum) {
         //获取数据
-        TreeMap<Integer, LyricsLineInfo> lrcLineInfos = mAbstractLrcView.getLrcLineInfos();
-        int extraLrcStatus = mAbstractLrcView.getExtraLrcStatus();
-        List<LyricsLineInfo> translateLrcLineInfos = mAbstractLrcView.getTranslateLrcLineInfos();
-        List<LyricsLineInfo> transliterationLrcLineInfos = mAbstractLrcView.getTransliterationLrcLineInfos();
+        TreeMap<Integer, LyricsLineInfo> lrcLineInfos = getLrcLineInfos();
+        int extraLrcStatus = getExtraLrcStatus();
+        List<LyricsLineInfo> translateLrcLineInfos = getTranslateLrcLineInfos();
+        List<LyricsLineInfo> transliterationLrcLineInfos = getTransliterationLrcLineInfos();
 
 
         //
@@ -888,14 +879,14 @@ public class ManyLyricsView extends LinearLayout {
      */
     private int getLineAtHeightY(int lyricsLineNum) {
         //获取数据
-        TreeMap<Integer, LyricsLineInfo> lrcLineInfos = mAbstractLrcView.getLrcLineInfos();
-        Paint paint = mAbstractLrcView.getPaint();
-        Paint extraLrcPaint = mAbstractLrcView.getExtraLrcPaint();
-        float spaceLineHeight = mAbstractLrcView.getSpaceLineHeight();
-        float extraLrcSpaceLineHeight = mAbstractLrcView.getExtraLrcSpaceLineHeight();
-        int extraLrcStatus = mAbstractLrcView.getExtraLrcStatus();
-        List<LyricsLineInfo> translateLrcLineInfos = mAbstractLrcView.getTranslateLrcLineInfos();
-        List<LyricsLineInfo> transliterationLrcLineInfos = mAbstractLrcView.getTransliterationLrcLineInfos();
+        TreeMap<Integer, LyricsLineInfo> lrcLineInfos = getLrcLineInfos();
+        Paint paint = getPaint();
+        Paint extraLrcPaint = getExtraLrcPaint();
+        float spaceLineHeight = getSpaceLineHeight();
+        float extraLrcSpaceLineHeight = getExtraLrcSpaceLineHeight();
+        int extraLrcStatus = getExtraLrcStatus();
+        List<LyricsLineInfo> translateLrcLineInfos = getTranslateLrcLineInfos();
+        List<LyricsLineInfo> transliterationLrcLineInfos = getTransliterationLrcLineInfos();
 
         //
         int lineAtHeightY = 0;
@@ -929,14 +920,14 @@ public class ManyLyricsView extends LinearLayout {
      */
     private int getScrollLrcLineNum(float offsetY) {
         //获取数据
-        TreeMap<Integer, LyricsLineInfo> lrcLineInfos = mAbstractLrcView.getLrcLineInfos();
-        Paint paint = mAbstractLrcView.getPaint();
-        Paint extraLrcPaint = mAbstractLrcView.getExtraLrcPaint();
-        float spaceLineHeight = mAbstractLrcView.getSpaceLineHeight();
-        float extraLrcSpaceLineHeight = mAbstractLrcView.getExtraLrcSpaceLineHeight();
-        int extraLrcStatus = mAbstractLrcView.getExtraLrcStatus();
-        List<LyricsLineInfo> translateLrcLineInfos = mAbstractLrcView.getTranslateLrcLineInfos();
-        List<LyricsLineInfo> transliterationLrcLineInfos = mAbstractLrcView.getTransliterationLrcLineInfos();
+        TreeMap<Integer, LyricsLineInfo> lrcLineInfos = getLrcLineInfos();
+        Paint paint = getPaint();
+        Paint extraLrcPaint = getExtraLrcPaint();
+        float spaceLineHeight = getSpaceLineHeight();
+        float extraLrcSpaceLineHeight = getExtraLrcSpaceLineHeight();
+        int extraLrcStatus = getExtraLrcStatus();
+        List<LyricsLineInfo> translateLrcLineInfos = getTranslateLrcLineInfos();
+        List<LyricsLineInfo> transliterationLrcLineInfos = getTransliterationLrcLineInfos();
 
 
         //
@@ -1031,7 +1022,7 @@ public class ManyLyricsView extends LinearLayout {
             mScroller.startScroll(0, mScroller.getFinalY(), 0, deltaY, mDuration);
             invalidateView();
         } else if (mOffsetY > getBottomOverScrollHeightY()) {
-            TreeMap<Integer, LyricsLineInfo> lrcLineInfos = mAbstractLrcView.getLrcLineInfos();
+            TreeMap<Integer, LyricsLineInfo> lrcLineInfos = getLrcLineInfos();
 
             int deltaY = getLineAtHeightY(lrcLineInfos.size() - 1) - mScroller.getFinalY();
             mScroller.startScroll(0, mScroller.getFinalY(), 0, deltaY, mDuration);
@@ -1046,7 +1037,7 @@ public class ManyLyricsView extends LinearLayout {
      * @return
      */
     private float getBottomOverScrollHeightY() {
-        TreeMap<Integer, LyricsLineInfo> lrcLineInfos = mAbstractLrcView.getLrcLineInfos();
+        TreeMap<Integer, LyricsLineInfo> lrcLineInfos = getLrcLineInfos();
         if (lrcLineInfos == null) return 0;
         return getLineAtHeightY(lrcLineInfos.size());
     }
@@ -1060,29 +1051,6 @@ public class ManyLyricsView extends LinearLayout {
         return 0;
     }
 
-    /**
-     * 刷新View
-     */
-    private void invalidateView() {
-        if (Looper.getMainLooper() == Looper.myLooper()) {
-            //  当前线程是主UI线程，直接刷新。
-            invalidate();
-        } else {
-            //  当前线程是非UI线程，post刷新。
-            postInvalidate();
-        }
-        //需要刷新surfaceview的视图
-        mAbstractLrcView.invalidateView();
-    }
-
-    /**
-     * 设置歌词宽度
-     *
-     * @param mTextMaxWidth
-     */
-    public void setTextMaxWidth(float mTextMaxWidth) {
-        mAbstractLrcView.setTextMaxWidth(mTextMaxWidth);
-    }
 
     /**
      * 指示线颜色
@@ -1097,32 +1065,6 @@ public class ManyLyricsView extends LinearLayout {
         this.mTouchAble = mTouchAble;
     }
 
-    /**
-     * 获取额外歌词类型
-     *
-     * @return
-     */
-    public int getExtraLrcType() {
-        return mAbstractLrcView.getExtraLrcType();
-    }
-
-    /**
-     * 获取额外歌词的显示状态
-     *
-     * @return
-     */
-    public int getExtraLrcStatus() {
-        return mAbstractLrcView.getExtraLrcStatus();
-    }
-
-    /**
-     * 获取歌词状态
-     *
-     * @return
-     */
-    public int getLrcStatus() {
-        return mAbstractLrcView.getLrcStatus();
-    }
 
     /**
      * 初始歌词数据
@@ -1132,17 +1074,9 @@ public class ManyLyricsView extends LinearLayout {
         mOffsetY = 0;
         mCentreY = 0;
         mTouchEventStatus = TOUCHEVENTSTATUS_INIT;
-        mAbstractLrcView.initLrcData();
+        super.initLrcData();
     }
 
-    /**
-     * 设置歌词状态
-     *
-     * @param lrcStatus
-     */
-    public void setLrcStatus(int lrcStatus) {
-        mAbstractLrcView.setLrcStatus(lrcStatus);
-    }
 
     /**
      * 设置默认颜色
@@ -1153,15 +1087,6 @@ public class ManyLyricsView extends LinearLayout {
         setPaintColor(paintColor, false);
     }
 
-    /**
-     * 设置默认颜色
-     *
-     * @param paintColor       至少两种颜色
-     * @param isInvalidateView 是否更新视图
-     */
-    public void setPaintColor(int[] paintColor, boolean isInvalidateView) {
-        mAbstractLrcView.setPaintColor(paintColor, isInvalidateView);
-    }
 
     /**
      * 设置高亮颜色
@@ -1181,7 +1106,7 @@ public class ManyLyricsView extends LinearLayout {
     public void setPaintHLColor(int[] paintHLColor, boolean isInvalidateView) {
         mPaintIndicator.setColor(paintHLColor[0]);
         mPaintPlay.setColor(paintHLColor[0]);
-        mAbstractLrcView.setPaintHLColor(paintHLColor, isInvalidateView);
+        super.setPaintHLColor(paintHLColor, isInvalidateView);
     }
 
     /**
@@ -1203,67 +1128,9 @@ public class ManyLyricsView extends LinearLayout {
         if (isInvalidateView) {
             isChangeScrollerFinalY = true;
         }
-        mAbstractLrcView.setTypeFace(typeFace, isInvalidateView);
+        super.setTypeFace(typeFace, isInvalidateView);
     }
 
-    /**
-     * 设置额外歌词事件
-     *
-     * @param extraLyricsListener
-     */
-    public void setExtraLyricsListener(AbstractLrcView.ExtraLyricsListener extraLyricsListener) {
-        mAbstractLrcView.setExtraLyricsListener(extraLyricsListener);
-    }
-
-    /**
-     * 设置搜索歌词事件
-     *
-     * @param searchLyricsListener
-     */
-    public void setSearchLyricsListener(AbstractLrcView.SearchLyricsListener searchLyricsListener) {
-        mAbstractLrcView.setSearchLyricsListener(searchLyricsListener);
-    }
-
-    /**
-     * 歌词播放
-     *
-     * @param playProgress
-     */
-    public void play(int playProgress) {
-        mAbstractLrcView.play(playProgress);
-    }
-
-    /**
-     * 歌词暂停
-     */
-    public void pause() {
-        mAbstractLrcView.pause();
-    }
-
-    /**
-     * 快进
-     *
-     * @param playProgress
-     */
-    public void seekto(int playProgress) {
-        mAbstractLrcView.seekto(playProgress);
-    }
-
-    /**
-     * 唤醒
-     */
-    public void resume() {
-        mAbstractLrcView.resume();
-    }
-
-    /**
-     * 获取歌词播放器状态
-     *
-     * @return
-     */
-    public int getLrcPlayerStatus() {
-        return mAbstractLrcView.getLrcPlayerStatus();
-    }
 
     /**
      * 设置空行高度
@@ -1272,16 +1139,6 @@ public class ManyLyricsView extends LinearLayout {
      */
     public void setSpaceLineHeight(float spaceLineHeight) {
         setSpaceLineHeight(spaceLineHeight, false);
-    }
-
-    /**
-     * 设置空行高度
-     *
-     * @param spaceLineHeight
-     * @param isInvalidateView 是否更新视图
-     */
-    public void setSpaceLineHeight(float spaceLineHeight, boolean isInvalidateView) {
-        mAbstractLrcView.setSpaceLineHeight(spaceLineHeight, isInvalidateView);
     }
 
     /**
@@ -1294,23 +1151,13 @@ public class ManyLyricsView extends LinearLayout {
     }
 
     /**
-     * 设置额外空行高度
-     *
-     * @param extraLrcSpaceLineHeight
-     * @param isInvalidateView        是否更新视图
-     */
-    public void setExtraLrcSpaceLineHeight(float extraLrcSpaceLineHeight, boolean isInvalidateView) {
-        mAbstractLrcView.setExtraLrcSpaceLineHeight(extraLrcSpaceLineHeight, isInvalidateView);
-    }
-
-    /**
      * 设置额外歌词的显示状态
      *
      * @param extraLrcStatus
      */
     public void setExtraLrcStatus(int extraLrcStatus) {
         isChangeScrollerFinalY = true;
-        mAbstractLrcView.setExtraLrcStatus(extraLrcStatus);
+        super.setExtraLrcStatus(extraLrcStatus);
     }
 
     /**
@@ -1330,7 +1177,7 @@ public class ManyLyricsView extends LinearLayout {
      */
     public void setFontSize(float fontSize, boolean isReloadData) {
         isChangeScrollerFinalY = true;
-        mAbstractLrcView.setFontSize(fontSize, isReloadData);
+        super.setFontSize(fontSize, isReloadData);
     }
 
     /**
@@ -1350,7 +1197,7 @@ public class ManyLyricsView extends LinearLayout {
      */
     public void setExtraLrcFontSize(float extraLrcFontSize, boolean isReloadData) {
         isChangeScrollerFinalY = true;
-        mAbstractLrcView.setExtraLrcFontSize(extraLrcFontSize, isReloadData);
+        super.setExtraLrcFontSize(extraLrcFontSize, isReloadData);
     }
 
     /**
@@ -1359,21 +1206,14 @@ public class ManyLyricsView extends LinearLayout {
      * @param lyricsReader
      */
     public void setLyricsReader(LyricsReader lyricsReader) {
-        mAbstractLrcView.setLyricsReader(lyricsReader);
+        super.setLyricsReader(lyricsReader);
         if (lyricsReader != null && lyricsReader.getLyricsType() == LyricsInfo.DYNAMIC) {
-            int extraLrcType = mAbstractLrcView.getExtraLrcType();
+            int extraLrcType = getExtraLrcType();
             //翻译歌词以动感歌词形式显示
             if (extraLrcType == AbstractLrcView.EXTRALRCTYPE_BOTH || extraLrcType == AbstractLrcView.EXTRALRCTYPE_TRANSLATELRC) {
-                mAbstractLrcView.setTranslateDrawType(AbstractLrcView.TRANSLATE_DRAW_TYPE_DYNAMIC);
+                super.setTranslateDrawType(AbstractLrcView.TRANSLATE_DRAW_TYPE_DYNAMIC);
             }
         }
-    }
-
-    /**
-     * @return
-     */
-    public LyricsReader getLyricsReader() {
-        return mAbstractLrcView.getLyricsReader();
     }
 
     /**
@@ -1395,16 +1235,7 @@ public class ManyLyricsView extends LinearLayout {
      */
     public void setSize(int fontSize, int extraFontSize, boolean isReloadData) {
         isChangeScrollerFinalY = true;
-        mAbstractLrcView.setSize(fontSize, extraFontSize, isReloadData);
-    }
-
-    /**
-     * 刷新时间
-     *
-     * @param refreshTime
-     */
-    public void setRefreshTime(long refreshTime) {
-        mAbstractLrcView.setRefreshTime(refreshTime);
+        super.setSize(fontSize, extraFontSize, isReloadData);
     }
 
 
@@ -1417,46 +1248,6 @@ public class ManyLyricsView extends LinearLayout {
         this.mOnLrcClickListener = onLrcClickListener;
     }
 
-    public ManyAbstractLrcView getAbstractLrcView() {
-        return mAbstractLrcView;
-    }
-
-    /**
-     * @Description: 多行歌词抽象类
-     * @author: zhangliangming
-     * @date: 2018-04-21 11:46
-     **/
-    private class ManyAbstractLrcView extends AbstractLrcView {
-
-
-        public ManyAbstractLrcView(Context context) {
-            super(context);
-        }
-
-        public ManyAbstractLrcView(Context context, AttributeSet attrs) {
-            super(context, attrs);
-        }
-
-        @Override
-        protected void onDrawLrcView(Canvas canvas) {
-            drawManyLrcView(canvas);
-        }
-
-        @Override
-        protected void updateView(long playProgress) {
-            updateManyLrcView(playProgress);
-        }
-
-        @Override
-        public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
-
-        }
-
-        @Override
-        public void onSurfaceTextureUpdated(SurfaceTexture surface) {
-
-        }
-    }
 
     /**
      * 歌词事件
