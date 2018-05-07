@@ -650,7 +650,7 @@ public class ManyLyricsView extends AbstractLrcView {
         float lineY = (getHeight() - lineH) / 2;
         float lineLeft = textX + textWidth + linePadding;
         float lineR = rectL - linePadding;
-        LinearGradient linearGradientHL = new LinearGradient(lineLeft, lineY + lineH, lineR, lineY + lineH, new int[]{ColorUtils.parserColor(mPaintLineColor, 200), ColorUtils.parserColor(mPaintLineColor, 10), ColorUtils.parserColor(mPaintLineColor, 200)}, new float[]{0f, 0.5f, 1f}, Shader.TileMode.CLAMP);
+        LinearGradient linearGradientHL = new LinearGradient(lineLeft, lineY + lineH, lineR, lineY + lineH, new int[]{ColorUtils.parserColor(mPaintLineColor, 255), ColorUtils.parserColor(mPaintLineColor, 0), ColorUtils.parserColor(mPaintLineColor, 0), ColorUtils.parserColor(mPaintLineColor, 255)}, new float[]{0f, 0.2f, 0.8f,1f}, Shader.TileMode.CLAMP);
         mPaintLine.setShader(linearGradientHL);
         canvas.drawRect(lineLeft, lineY, lineR, lineY + lineH, mPaintLine);
 
@@ -745,47 +745,6 @@ public class ManyLyricsView extends AbstractLrcView {
                 break;
             case MotionEvent.ACTION_CANCEL:
             case MotionEvent.ACTION_UP:
-
-                final VelocityTracker velocityTracker = mVelocityTracker;
-                velocityTracker.computeCurrentVelocity(1000, mMaximumVelocity);
-
-                int yVelocity = (int) velocityTracker.getYVelocity();
-                int xVelocity = (int) velocityTracker.getXVelocity();
-
-                if (Math.abs(yVelocity) > mMinimumVelocity) {
-
-                    int startX = 0;
-                    int startY = mScroller.getFinalY();
-                    int velocityX = -xVelocity;
-                    int velocityY = -yVelocity;
-                    int minX = 0;
-                    int maxX = 0;
-
-                    //
-                    TreeMap<Integer, LyricsLineInfo> lrcLineInfos = getLrcLineInfos();
-                    int lrcSumHeight = getLineAtHeightY(lrcLineInfos.size());
-                    int minY = -getHeight() / 4;
-                    int maxY = lrcSumHeight + getHeight() / 4;
-                    mScroller.fling(startX, startY, velocityX, velocityY, minX, maxX, minY, maxY);
-                    invalidateView();
-
-                    mTouchEventStatus = TOUCHEVENTSTATUS_FLINGSCROLL;
-
-                    //发送还原
-                    mHandler.sendEmptyMessageDelayed(RESETLRCVIEW, mResetDuration);
-                } else {
-
-                    if (mTouchEventStatus == TOUCHEVENTSTATUS_OVERSCROLL) {
-                        resetLrcView();
-                    } else {
-                        //发送还原
-                        mHandler.sendEmptyMessageDelayed(RESETLRCVIEW, mResetDuration);
-
-                    }
-                }
-                releaseVelocityTracker();
-
-
                 //判断是否在滑动和是否点击了播放按钮
                 if (isInPlayBtnRect) {
 
@@ -803,10 +762,49 @@ public class ManyLyricsView extends AbstractLrcView {
 
                     mTouchEventStatus = TOUCHEVENTSTATUS_INIT;
                     mTouchIntercept = false;
+                    isInPlayBtnRect = false;
+                    invalidateView();
+                } else {
+                    final VelocityTracker velocityTracker = mVelocityTracker;
+                    velocityTracker.computeCurrentVelocity(1000, mMaximumVelocity);
 
+                    int yVelocity = (int) velocityTracker.getYVelocity();
+                    int xVelocity = (int) velocityTracker.getXVelocity();
+
+                    if (Math.abs(yVelocity) > mMinimumVelocity) {
+
+                        int startX = 0;
+                        int startY = mScroller.getFinalY();
+                        int velocityX = -xVelocity;
+                        int velocityY = -yVelocity;
+                        int minX = 0;
+                        int maxX = 0;
+
+                        //
+                        TreeMap<Integer, LyricsLineInfo> lrcLineInfos = getLrcLineInfos();
+                        int lrcSumHeight = getLineAtHeightY(lrcLineInfos.size());
+                        int minY = -getHeight() / 4;
+                        int maxY = lrcSumHeight + getHeight() / 4;
+                        mScroller.fling(startX, startY, velocityX, velocityY, minX, maxX, minY, maxY);
+                        invalidateView();
+
+                        mTouchEventStatus = TOUCHEVENTSTATUS_FLINGSCROLL;
+
+                        //发送还原
+                        mHandler.sendEmptyMessageDelayed(RESETLRCVIEW, mResetDuration);
+                    } else {
+
+                        if (mTouchEventStatus == TOUCHEVENTSTATUS_OVERSCROLL) {
+                            resetLrcView();
+                        } else {
+                            //发送还原
+                            mHandler.sendEmptyMessageDelayed(RESETLRCVIEW, mResetDuration);
+
+                        }
+                    }
                 }
-                isInPlayBtnRect = false;
-                invalidateView();
+                releaseVelocityTracker();
+
                 mLastY = 0;
                 mInterceptX = 0;
                 mInterceptY = 0;

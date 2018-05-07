@@ -35,7 +35,9 @@
 - 自定义view替换成surfaceview
 - 添加获取歌词参数方法
 
-## v1.4 ##
+## v1.34 ##
+- 2018-05-07
+- 修复歌词快进点击按钮事件
 - 2018-05-06
 - 修复自定义view歌词
 
@@ -139,7 +141,7 @@
 2.app build.gradle
 
 `dependencies {
-	         compile 'com.github.zhangliangming:HPLyrics:v1.33'
+	         compile 'com.github.zhangliangming:HPLyrics:v1.34'
 	}`
 
 # 调用Demo #
