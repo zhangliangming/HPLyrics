@@ -36,6 +36,10 @@ public class FloatLyricsView extends AbstractLrcView {
      */
     private int mOrientation = ORIENTATION_LEFT;
 
+    /**
+     * 手动设置字体大小
+     */
+    private boolean isHandToSetFontSize = false;
 
     public FloatLyricsView(Context context) {
         super(context);
@@ -86,22 +90,23 @@ public class FloatLyricsView extends AbstractLrcView {
         int textMaxWidth = getWidth() / 3 * 2;
         setTextMaxWidth(textMaxWidth);
 
-        //字体大小
-        float fontSize = getHeight() / 4;
-        float spaceLineHeight = fontSize / 2;
+        //非手动设置字体大小
+        if (!isHandToSetFontSize) {
+            //字体大小
+            float fontSize = getHeight() / 4;
+            float spaceLineHeight = fontSize / 2;
 
-        //设置额外歌词字体大小和空行高度
-        float extraLrcFontSize = fontSize;
-        float extraLrcSpaceLineHeight = spaceLineHeight;
+            //设置额外歌词字体大小和空行高度
+            float extraLrcFontSize = fontSize;
+            float extraLrcSpaceLineHeight = spaceLineHeight;
 
-        //设置额外歌词字体大小和空行高度
-        setFontSize(fontSize);
-        setSpaceLineHeight(spaceLineHeight);
+            //设置额外歌词字体大小和空行高度
+            setFontSize(fontSize);
+            setSpaceLineHeight(spaceLineHeight);
 
-        setExtraLrcFontSize(extraLrcFontSize);
-        setExtraLrcSpaceLineHeight(extraLrcSpaceLineHeight);
-
-
+            setExtraLrcFontSize(extraLrcFontSize);
+            setExtraLrcSpaceLineHeight(extraLrcSpaceLineHeight);
+        }
     }
 
     /**
@@ -430,5 +435,9 @@ public class FloatLyricsView extends AbstractLrcView {
 
     public void setOrientation(int orientation) {
         this.mOrientation = orientation;
+    }
+
+    public void setHandToSetFontSize(boolean handToSetFontSize) {
+        isHandToSetFontSize = handToSetFontSize;
     }
 }
