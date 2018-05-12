@@ -23,6 +23,19 @@ import java.util.TreeMap;
  **/
 public class FloatLyricsView extends AbstractLrcView {
 
+    /**
+     * 歌词居左
+     */
+    public static final int ORIENTATION_LEFT = 0;
+    /**
+     * 歌词居中
+     */
+    public static final int ORIENTATION_CENTER = 1;
+    /**
+     *
+     */
+    private int mOrientation = ORIENTATION_LEFT;
+
 
     public FloatLyricsView(Context context) {
         super(context);
@@ -146,8 +159,11 @@ public class FloatLyricsView extends AbstractLrcView {
         int splitLyricsRealLineNum = LyricsUtils.getSplitLyricsRealLineNum(lrcLineInfos, lyricsLineNum, splitLyricsLineNum);
         float topPadding = (getHeight() - spaceLineHeight - 2 * LyricsUtils.getTextHeight(paint)) / 2;
         if (splitLyricsRealLineNum % 2 == 0) {
-
-            textX = paddingLeftOrRight;
+            if (mOrientation == ORIENTATION_LEFT) {
+                textX = paddingLeftOrRight;
+            } else {
+                textX = (getWidth() - curLrcTextWidth) / 2;
+            }
             textY = topPadding + LyricsUtils.getTextHeight(paint);
             float nextLrcTextY = textY + spaceLineHeight + LyricsUtils.getTextHeight(paint);
 
@@ -156,7 +172,13 @@ public class FloatLyricsView extends AbstractLrcView {
                 String lrcRightText = splitLyricsLineInfos.get(
                         splitLyricsLineNum + 1).getLineLyrics();
                 float lrcRightTextWidth = LyricsUtils.getTextWidth(paint, lrcRightText);
-                float textRightX = getWidth() - lrcRightTextWidth - paddingLeftOrRight;
+                float textRightX = 0;
+
+                if (mOrientation == ORIENTATION_LEFT) {
+                    textRightX = getWidth() - lrcRightTextWidth - paddingLeftOrRight;
+                } else {
+                    textRightX = (getWidth() - lrcRightTextWidth) / 2;
+                }
 
                 LyricsUtils.drawOutline(canvas, paintOutline, lrcRightText, textRightX, nextLrcTextY);
 
@@ -168,7 +190,13 @@ public class FloatLyricsView extends AbstractLrcView {
                 List<LyricsLineInfo> nextSplitLyricsLineInfos = lrcLineInfos.get(lyricsLineNum + 1).getSplitLyricsLineInfos();
                 String lrcRightText = nextSplitLyricsLineInfos.get(0).getLineLyrics();
                 float lrcRightTextWidth = LyricsUtils.getTextWidth(paint, lrcRightText);
-                float textRightX = getWidth() - lrcRightTextWidth - paddingLeftOrRight;
+                float textRightX = 0;
+
+                if (mOrientation == ORIENTATION_LEFT) {
+                    textRightX = getWidth() - lrcRightTextWidth - paddingLeftOrRight;
+                } else {
+                    textRightX = (getWidth() - lrcRightTextWidth) / 2;
+                }
 
                 LyricsUtils.drawOutline(canvas, paintOutline, lrcRightText, textRightX,
                         nextLrcTextY);
@@ -177,8 +205,11 @@ public class FloatLyricsView extends AbstractLrcView {
             }
 
         } else {
-
-            textX = getWidth() - curLrcTextWidth - paddingLeftOrRight;
+            if (mOrientation == ORIENTATION_LEFT) {
+                textX = getWidth() - curLrcTextWidth - paddingLeftOrRight;
+            } else {
+                textX = (getWidth() - curLrcTextWidth) / 2;
+            }
             float preLrcTextY = topPadding + LyricsUtils.getTextHeight(paint);
             textY = preLrcTextY + spaceLineHeight + LyricsUtils.getTextHeight(paint);
 
@@ -186,19 +217,36 @@ public class FloatLyricsView extends AbstractLrcView {
             if (splitLyricsLineNum + 1 < splitLyricsLineInfos.size()) {
                 String lrcLeftText = splitLyricsLineInfos.get(
                         splitLyricsLineNum + 1).getLineLyrics();
+                float lrcLeftTextWidth = LyricsUtils.getTextWidth(paint, lrcLeftText);
 
-                LyricsUtils.drawOutline(canvas, paintOutline, lrcLeftText, paddingLeftOrRight,
+                float textLeftX = 0;
+                if (mOrientation == ORIENTATION_LEFT) {
+                    textLeftX = paddingLeftOrRight;
+                } else {
+                    textLeftX = (getWidth() - lrcLeftTextWidth) / 2;
+                }
+
+                LyricsUtils.drawOutline(canvas, paintOutline, lrcLeftText, textLeftX,
                         preLrcTextY);
-                LyricsUtils.drawText(canvas, paint, paintColors, lrcLeftText, paddingLeftOrRight,
+                LyricsUtils.drawText(canvas, paint, paintColors, lrcLeftText, textLeftX,
                         preLrcTextY);
 
             } else if (lyricsLineNum + 1 < lrcLineInfos.size()) {
                 // 画下一句的歌词，该下一句不在该行分割歌词里面，需要从原始下一行的歌词里面找
                 List<LyricsLineInfo> nextSplitLyricsLineInfos = lrcLineInfos.get(lyricsLineNum + 1).getSplitLyricsLineInfos();
                 String lrcLeftText = nextSplitLyricsLineInfos.get(0).getLineLyrics();
-                LyricsUtils.drawOutline(canvas, paintOutline, lrcLeftText, paddingLeftOrRight,
+                float lrcLeftTextWidth = LyricsUtils.getTextWidth(paint, lrcLeftText);
+
+                float textLeftX = 0;
+                if (mOrientation == ORIENTATION_LEFT) {
+                    textLeftX = paddingLeftOrRight;
+                } else {
+                    textLeftX = (getWidth() - lrcLeftTextWidth) / 2;
+                }
+
+                LyricsUtils.drawOutline(canvas, paintOutline, lrcLeftText, textLeftX,
                         preLrcTextY);
-                LyricsUtils.drawText(canvas, paint, paintColors, lrcLeftText, paddingLeftOrRight,
+                LyricsUtils.drawText(canvas, paint, paintColors, lrcLeftText, textLeftX,
                         preLrcTextY);
             }
         }
@@ -380,4 +428,7 @@ public class FloatLyricsView extends AbstractLrcView {
         setExtraLrcFontSize(extraLrcFontSize, false);
     }
 
+    public void setOrientation(int orientation) {
+        this.mOrientation = orientation;
+    }
 }
