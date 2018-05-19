@@ -149,6 +149,10 @@
 	         compile 'com.github.zhangliangming:HPLyrics:v1.36'
 	}`
 
+
+# 混淆注意 #
+-keep class com.zlm.hp.lyrics.** { *; }
+
 # 调用Demo #
 
 链接: [https://pan.baidu.com/s/1eA5pcs0pUnr9gXhosek9Bw](https://pan.baidu.com/s/1eA5pcs0pUnr9gXhosek9Bw "https://pan.baidu.com/s/1eA5pcs0pUnr9gXhosek9Bw") 密码: awcf
