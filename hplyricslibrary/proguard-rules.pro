@@ -24,3 +24,4 @@
 -keepclassmembers class com.zlm.hp.lyrics.** {
    public *;
 }
+-keep class com.zlm.libs.register.** { *; }

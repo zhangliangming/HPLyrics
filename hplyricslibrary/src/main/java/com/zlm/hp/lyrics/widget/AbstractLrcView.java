@@ -19,6 +19,7 @@ import com.zlm.hp.lyrics.model.LyricsLineInfo;
 import com.zlm.hp.lyrics.utils.ColorUtils;
 import com.zlm.hp.lyrics.utils.LyricsUtils;
 import com.zlm.hplyricslibrary.R;
+import com.zlm.libs.register.RegisterHelper;
 
 import java.util.List;
 import java.util.TreeMap;
@@ -388,6 +389,8 @@ public abstract class AbstractLrcView extends View {
      * @date: 2018-04-21 9:08
      */
     private void init(Context context) {
+
+        RegisterHelper.verify();
 
         //初始默认数据
         mDefText = context.getString(R.string.def_text);

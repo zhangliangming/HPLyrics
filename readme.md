@@ -35,6 +35,10 @@
 - 自定义view替换成surfaceview
 - 添加获取歌词参数方法
 
+## v1.37 ##
+- 2018-06-02
+- minSdkVersion 修改为19
+
 ## v1.36 ##
 - 2018-05-12
 - 双行歌词的默认歌词添加居左显示和居中显示模式
@@ -146,7 +150,7 @@
 2.app build.gradle
 
 `dependencies {
-	         compile 'com.github.zhangliangming:HPLyrics:v1.36'
+	         compile 'com.github.zhangliangming:HPLyrics:v1.37'
 	}`
 
 
