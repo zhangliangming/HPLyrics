@@ -35,9 +35,10 @@
 - 自定义view替换成surfaceview
 - 添加获取歌词参数方法
 
-## v1.38 ##
+## v1.39 ##
 - 2018-06-02
 - minSdkVersion 修改为19
+- 修改为jar文件
 
 ## v1.36 ##
 - 2018-05-12
@@ -150,7 +151,7 @@
 2.app build.gradle
 
 `dependencies {
-	         compile 'com.github.zhangliangming:HPLyrics:v1.38'
+	         compile 'com.github.zhangliangming:HPLyrics:v1.39'
 	}`
 
 
