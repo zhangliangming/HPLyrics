@@ -28,5 +28,5 @@ android {
 }
 
 dependencies {
-    compile files('libs/register-v1.0.jar')
+    implementation 'com.github.zhangliangming:Register:v1.0'
 }
