@@ -361,7 +361,7 @@ public abstract class AbstractLrcView extends View {
             Context context = mActivityWR.get();
             if (context != null) {
                 synchronized (lock) {
-                    if (mLrcPlayerStatus == LRCPLAYERSTATUS_PLAY) {
+                    if (mLrcPlayerStatus == LRCPLAYERSTATUS_PLAY && mLyricsReader != null) {
                         invalidateView();
                         long endTime = System.currentTimeMillis();
                         long updateTime = (endTime - mPlayerStartTime) - mPlayerSpendTime;
@@ -469,7 +469,7 @@ public abstract class AbstractLrcView extends View {
             public boolean handleMessage(Message msg) {
                 Context context = mActivityWR.get();
                 if (context != null) {
-                    if (mLrcPlayerStatus == LRCPLAYERSTATUS_PLAY) {
+                    if (mLrcPlayerStatus == LRCPLAYERSTATUS_PLAY && mLyricsReader != null) {
                         updateView(mCurPlayingTime + mPlayerSpendTime);
                         mUIHandler.sendEmptyMessage(0);
                     }
@@ -867,7 +867,7 @@ public abstract class AbstractLrcView extends View {
             this.mCurPlayingTime = playProgress;
             mPlayerStartTime = System.currentTimeMillis();
             mPlayerSpendTime = 0;
-            mWorkerHandler.sendEmptyMessageDelayed(0,0);
+            mWorkerHandler.sendEmptyMessageDelayed(0, 0);
         }
     }
 
@@ -907,7 +907,7 @@ public abstract class AbstractLrcView extends View {
             mLrcPlayerStatus = LRCPLAYERSTATUS_PLAY;
             mPlayerStartTime = System.currentTimeMillis();
             mPlayerSpendTime = 0;
-            mWorkerHandler.sendEmptyMessageDelayed(0,0);
+            mWorkerHandler.sendEmptyMessageDelayed(0, 0);
         }
     }
 
@@ -1013,7 +1013,17 @@ public abstract class AbstractLrcView extends View {
     /**
      * 重置数据
      */
-    public void resetData() {
+    private void resetData() {
+        //
+        mLrcPlayerStatus = LRCPLAYERSTATUS_INIT;
+        removeCallbacksAndMessages();
+
+        //player
+        mCurPlayingTime = 0;
+        mPlayerStartTime = 0;
+        mPlayerSpendTime = 0;
+
+
         isHandToChangeExtraLrcStatus = false;
         mExtraLrcStatus = EXTRALRCSTATUS_NOSHOWEXTRALRC;
         mLyricsLineNum = 0;
@@ -1030,14 +1040,6 @@ public abstract class AbstractLrcView extends View {
         mExtraLyricsWordIndex = -1;
         mExtraSplitLyricsWordIndex = -1;
         mTranslateLyricsWordHLTime = 0;
-        //
-        mLrcPlayerStatus = LRCPLAYERSTATUS_INIT;
-        removeCallbacksAndMessages();
-
-        //player
-        mCurPlayingTime = 0;
-        mPlayerStartTime = 0;
-        mPlayerSpendTime = 0;
 
         //无额外歌词回调
         if (mExtraLyricsListener != null) {
@@ -1202,7 +1204,7 @@ public abstract class AbstractLrcView extends View {
     /**
      *
      */
-    private void removeCallbacksAndMessages(){
+    private void removeCallbacksAndMessages() {
         //移除队列任务
         if (mUIHandler != null) {
             mUIHandler.removeCallbacksAndMessages(null);
