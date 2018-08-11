@@ -7,7 +7,10 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.Looper;
+import android.os.Message;
+import android.os.Process;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -21,6 +24,7 @@ import com.zlm.hp.lyrics.utils.LyricsUtils;
 import com.zlm.hplyricslibrary.R;
 import com.zlm.libs.register.RegisterHelper;
 
+import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -340,34 +344,37 @@ public abstract class AbstractLrcView extends View {
     /**
      * 刷新延时时间
      */
-    private long mRefreshTime = 20;
+    private long mRefreshTime = 30;
 
     /**
-     * 歌词刷新
+     * 子线程用于执行耗时任务
      */
-    private Handler mLrcPlayerHandler = new Handler();
+    private Handler mWorkerHandler;
+    //创建异步HandlerThread
+    private HandlerThread mHandlerThread;
     /**
-     * 歌词刷新线程
+     * 处理ui任务
      */
-    private Runnable mLrcPlayerRunnable = new Runnable() {
+    private Handler mUIHandler = new Handler() {
         @Override
-        public void run() {
-            synchronized (lock) {
-                if (mLrcPlayerStatus == LRCPLAYERSTATUS_PLAY) {
-                    //
-                    updateView(mCurPlayingTime + mPlayerSpendTime);
-                    invalidateView();
-                    //
-                    long endTime = System.currentTimeMillis();
-                    long updateTime = (endTime - mPlayerStartTime) - mPlayerSpendTime;
-                    mPlayerSpendTime = (endTime - mPlayerStartTime);
-                    long delayMs = mRefreshTime - updateTime;
-                    Log.e("AbstractLrcView", "oldDelayMs = " + delayMs + " , newDelayMs = " + Math.max(0, delayMs));
-                    mLrcPlayerHandler.postDelayed(mLrcPlayerRunnable, Math.max(0, delayMs));
+        public void handleMessage(Message msg) {
+            Context context = mActivityWR.get();
+            if (context != null) {
+                synchronized (lock) {
+                    if (mLrcPlayerStatus == LRCPLAYERSTATUS_PLAY) {
+                        invalidateView();
+                        long endTime = System.currentTimeMillis();
+                        long updateTime = (endTime - mPlayerStartTime) - mPlayerSpendTime;
+                        mPlayerSpendTime = (endTime - mPlayerStartTime);
+                        long delayMs = mRefreshTime - updateTime;
+                        mWorkerHandler.sendEmptyMessageDelayed(0, Math.max(0, delayMs));
+                    }
                 }
             }
         }
     };
+
+    private WeakReference<Context> mActivityWR;
 
 
     public AbstractLrcView(Context context) {
@@ -450,6 +457,26 @@ public abstract class AbstractLrcView extends View {
         mGotoSearchRectPaint.setStrokeWidth(2);
         mGotoSearchRectPaint.setTextSize(mFontSize);
 
+        //
+        mActivityWR = new WeakReference<Context>(context);
+        //创建异步HandlerThread
+        mHandlerThread = new HandlerThread("updateLrcData", Process.THREAD_PRIORITY_BACKGROUND);
+        //必须先开启线程
+        mHandlerThread.start();
+        //子线程Handler
+        mWorkerHandler = new Handler(mHandlerThread.getLooper(), new Handler.Callback() {
+            @Override
+            public boolean handleMessage(Message msg) {
+                Context context = mActivityWR.get();
+                if (context != null) {
+                    if (mLrcPlayerStatus == LRCPLAYERSTATUS_PLAY) {
+                        updateView(mCurPlayingTime + mPlayerSpendTime);
+                        mUIHandler.sendEmptyMessage(0);
+                    }
+                }
+                return false;
+            }
+        });
     }
 
     @Override
@@ -833,11 +860,14 @@ public abstract class AbstractLrcView extends View {
      */
     public void play(int playProgress) {
         synchronized (lock) {
-            this.mCurPlayingTime = playProgress;
+            if (mLrcPlayerStatus == LRCPLAYERSTATUS_PLAY) {
+                removeCallbacksAndMessages();
+            }
             mLrcPlayerStatus = LRCPLAYERSTATUS_PLAY;
+            this.mCurPlayingTime = playProgress;
             mPlayerStartTime = System.currentTimeMillis();
             mPlayerSpendTime = 0;
-            mLrcPlayerHandler.postDelayed(mLrcPlayerRunnable, 0);
+            mWorkerHandler.sendEmptyMessageDelayed(0,0);
         }
     }
 
@@ -848,7 +878,7 @@ public abstract class AbstractLrcView extends View {
         synchronized (lock) {
             if (mLrcPlayerStatus == LRCPLAYERSTATUS_PLAY) {
                 mLrcPlayerStatus = LRCPLAYERSTATUS_INIT;
-                mLrcPlayerHandler.removeCallbacks(mLrcPlayerRunnable);
+                removeCallbacksAndMessages();
             }
             mCurPlayingTime += mPlayerSpendTime;
             mPlayerSpendTime = 0;
@@ -863,16 +893,9 @@ public abstract class AbstractLrcView extends View {
     public void seekto(int playProgress) {
         synchronized (lock) {
             if (mLrcPlayerStatus == LRCPLAYERSTATUS_PLAY) {
-                mLrcPlayerStatus = LRCPLAYERSTATUS_INIT;
-                mLrcPlayerHandler.removeCallbacks(mLrcPlayerRunnable);
-
-                play(playProgress);
-            } else {
-                this.mCurPlayingTime = playProgress;
-                mPlayerSpendTime = 0;
-                updateView(playProgress);
-                invalidateView();
+                removeCallbacksAndMessages();
             }
+            play(playProgress);
         }
     }
 
@@ -884,7 +907,7 @@ public abstract class AbstractLrcView extends View {
             mLrcPlayerStatus = LRCPLAYERSTATUS_PLAY;
             mPlayerStartTime = System.currentTimeMillis();
             mPlayerSpendTime = 0;
-            mLrcPlayerHandler.postDelayed(mLrcPlayerRunnable, 0);
+            mWorkerHandler.sendEmptyMessageDelayed(0,0);
         }
     }
 
@@ -1009,7 +1032,7 @@ public abstract class AbstractLrcView extends View {
         mTranslateLyricsWordHLTime = 0;
         //
         mLrcPlayerStatus = LRCPLAYERSTATUS_INIT;
-        mLrcPlayerHandler.removeCallbacks(mLrcPlayerRunnable);
+        removeCallbacksAndMessages();
 
         //player
         mCurPlayingTime = 0;
@@ -1164,6 +1187,32 @@ public abstract class AbstractLrcView extends View {
      */
     public void setTranslateDrawType(int translateDrawType) {
         this.mTranslateDrawType = translateDrawType;
+    }
+
+    /**
+     * 释放
+     */
+    public void release() {
+        removeCallbacksAndMessages();
+        //关闭线程
+        if (mHandlerThread != null)
+            mHandlerThread.quit();
+    }
+
+    /**
+     *
+     */
+    private void removeCallbacksAndMessages(){
+        //移除队列任务
+        if (mUIHandler != null) {
+            mUIHandler.removeCallbacksAndMessages(null);
+        }
+
+        //移除队列任务
+        if (mWorkerHandler != null) {
+            mWorkerHandler.removeCallbacksAndMessages(null);
+        }
+
     }
 
     /**
