@@ -469,9 +469,11 @@ public abstract class AbstractLrcView extends View {
             public boolean handleMessage(Message msg) {
                 Context context = mActivityWR.get();
                 if (context != null) {
-                    if (mLrcPlayerStatus == LRCPLAYERSTATUS_PLAY && mLyricsReader != null) {
-                        updateView(mCurPlayingTime + mPlayerSpendTime);
-                        mUIHandler.sendEmptyMessage(0);
+                    synchronized (lock) {
+                        if (mLrcPlayerStatus == LRCPLAYERSTATUS_PLAY && mLyricsReader != null) {
+                            updateView(mCurPlayingTime + mPlayerSpendTime);
+                            mUIHandler.sendEmptyMessage(0);
+                        }
                     }
                 }
                 return false;
@@ -1055,18 +1057,20 @@ public abstract class AbstractLrcView extends View {
      * @param isReloadData  是否重新加载数据及刷新界面
      */
     public void setSize(int fontSize, int extraFontSize, boolean isReloadData) {
-        if (isReloadData) {
-            setFontSize(fontSize, false);
-            setExtraLrcFontSize(extraFontSize, false);
+        synchronized (lock) {
             if (isReloadData) {
-                if (hasLrcLineInfos()) {
-                    updateView(mCurPlayingTime + mPlayerSpendTime);
+                setFontSize(fontSize, false);
+                setExtraLrcFontSize(extraFontSize, false);
+                if (isReloadData) {
+                    if (hasLrcLineInfos()) {
+                        updateView(mCurPlayingTime + mPlayerSpendTime);
+                    }
+                    invalidateView();
                 }
-                invalidateView();
+            } else {
+                setFontSize(fontSize, false);
+                setExtraLrcFontSize(extraFontSize, false);
             }
-        } else {
-            setFontSize(fontSize, false);
-            setExtraLrcFontSize(extraFontSize, false);
         }
     }
 

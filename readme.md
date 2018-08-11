@@ -35,7 +35,7 @@
 - 自定义view替换成surfaceview
 - 添加获取歌词参数方法
 
-## v1.42 ##
+## v1.43 ##
 - 2018-08-11
 - 添加HandlerThread
 - 修复
@@ -155,7 +155,7 @@
 2.app build.gradle
 
 `dependencies {
-	         compile 'com.github.zhangliangming:HPLyrics:v1.42'
+	         compile 'com.github.zhangliangming:HPLyrics:v1.43'
 	}`
 
 
