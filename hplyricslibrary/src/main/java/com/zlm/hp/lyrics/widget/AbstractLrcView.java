@@ -847,11 +847,15 @@ public abstract class AbstractLrcView extends View {
      */
     public void setExtraLrcStatus(int extraLrcStatus) {
         synchronized (lock) {
+            removeCallbacksAndMessages();
             isHandToChangeExtraLrcStatus = true;
             this.mExtraLrcStatus = extraLrcStatus;
             //更新行和索引等数据
             updateView(mCurPlayingTime + mPlayerSpendTime);
             invalidateView();
+            if (mLrcPlayerStatus == LRCPLAYERSTATUS_PLAY) {
+                mWorkerHandler.sendEmptyMessageDelayed(0, mRefreshTime);
+            }
         }
     }
 
