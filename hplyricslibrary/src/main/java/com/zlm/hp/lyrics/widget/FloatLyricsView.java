@@ -6,7 +6,6 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
-import android.view.ViewTreeObserver;
 
 import com.zlm.hp.lyrics.LyricsReader;
 import com.zlm.hp.lyrics.model.LyricsInfo;
@@ -61,14 +60,13 @@ public class FloatLyricsView extends AbstractLrcView {
      */
     private void init(Context context) {
 
-        //加载完成后回调
-        getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+        this.post(new Runnable() {
             @Override
-            public void onGlobalLayout() {
-                getViewTreeObserver().removeOnGlobalLayoutListener(this);
+            public void run() {
                 viewLoadFinish();
             }
         });
+
     }
 
     @Override

@@ -1,8 +1,8 @@
 package com.zlm.hp.lyrics.formats.ksc;
 
 import com.zlm.hp.lyrics.formats.LyricsFileReader;
-import com.zlm.hp.lyrics.model.LyricsLineInfo;
 import com.zlm.hp.lyrics.model.LyricsInfo;
+import com.zlm.hp.lyrics.model.LyricsLineInfo;
 import com.zlm.hp.lyrics.model.LyricsTag;
 import com.zlm.hp.lyrics.utils.CharUtils;
 import com.zlm.hp.lyrics.utils.StringUtils;

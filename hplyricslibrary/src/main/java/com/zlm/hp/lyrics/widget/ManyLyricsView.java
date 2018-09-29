@@ -16,7 +16,6 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.ViewConfiguration;
-import android.view.ViewTreeObserver;
 import android.view.animation.LinearInterpolator;
 import android.widget.Scroller;
 
@@ -241,15 +240,13 @@ public class ManyLyricsView extends AbstractLrcView {
         setGotoSearchTextColor(Color.WHITE);
         setGotoSearchTextPressedColor(ColorUtils.parserColor("#0288d1"));
 
-
-        //加载完成后回调
-        getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+        this.post(new Runnable() {
             @Override
-            public void onGlobalLayout() {
-                getViewTreeObserver().removeOnGlobalLayoutListener(this);
+            public void run() {
                 viewLoadFinish();
             }
         });
+
     }
 
     /**

@@ -1,8 +1,8 @@
 package com.zlm.hp.lyrics.formats.ksc;
 
 import com.zlm.hp.lyrics.formats.LyricsFileWriter;
-import com.zlm.hp.lyrics.model.LyricsLineInfo;
 import com.zlm.hp.lyrics.model.LyricsInfo;
+import com.zlm.hp.lyrics.model.LyricsLineInfo;
 import com.zlm.hp.lyrics.model.LyricsTag;
 import com.zlm.hp.lyrics.utils.TimeUtils;
 

@@ -3,8 +3,8 @@ package com.zlm.hp.lyrics.formats.hrc;
 import android.util.Base64;
 
 import com.zlm.hp.lyrics.formats.LyricsFileWriter;
-import com.zlm.hp.lyrics.model.LyricsLineInfo;
 import com.zlm.hp.lyrics.model.LyricsInfo;
+import com.zlm.hp.lyrics.model.LyricsLineInfo;
 import com.zlm.hp.lyrics.model.LyricsTag;
 import com.zlm.hp.lyrics.model.TranslateLrcLineInfo;
 import com.zlm.hp.lyrics.utils.StringCompressUtils;

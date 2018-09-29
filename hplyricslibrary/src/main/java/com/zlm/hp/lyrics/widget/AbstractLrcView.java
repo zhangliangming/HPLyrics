@@ -12,9 +12,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.Process;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
-
 
 import com.zlm.hp.lyrics.LyricsReader;
 import com.zlm.hp.lyrics.model.LyricsInfo;

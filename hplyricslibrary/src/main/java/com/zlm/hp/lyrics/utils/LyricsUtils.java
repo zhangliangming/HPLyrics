@@ -187,7 +187,7 @@ public class LyricsUtils {
             drawText(canvas, paintHL, paintHLColor, curLyrics, textX, textY);
         }
         // 保存绘图
-        canvas.save(Canvas.ALL_SAVE_FLAG);
+        canvas.save();
         canvas.restore();
         return result;
     }
@@ -283,7 +283,7 @@ public class LyricsUtils {
             drawDynamiLyrics(canvas, lyricsType, paint, paintHL, paintOutline, transliterationLineInfo, transliterationLyricsLineHLWidth, viewWidth, extraLyricsWordIndex, transliterationLyricsLineHLWidth, textY, paddingLeftOrRight, paintColor, paintHLColor);
         }
         // 保存绘图
-        canvas.save(Canvas.ALL_SAVE_FLAG);
+        canvas.save();
         canvas.restore();
         return result;
     }
