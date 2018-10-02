@@ -13,9 +13,12 @@ import android.graphics.Typeface;
 import android.os.Handler;
 import android.os.Message;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.ViewConfiguration;
+import android.view.WindowManager;
 import android.view.animation.LinearInterpolator;
 import android.widget.Scroller;
 
@@ -136,7 +139,7 @@ public class ManyLyricsView extends AbstractLrcView {
     /**
      * 是否直接拦截
      */
-    private boolean mTouchIntercept = false;
+    private boolean mIsTouchIntercept = false;
 
     /**
      * 是否允许触摸
@@ -144,15 +147,11 @@ public class ManyLyricsView extends AbstractLrcView {
     private boolean mTouchAble = true;
 
     //////////////////////////////////////////////////////
-    /**
-     * 是否修改scroller的y
-     */
-    private boolean isChangeScrollerFinalY = false;
 
     /**
      * 还原歌词视图
      */
-    private int RESETLRCVIEW = 1;
+    private final int RESETLRCVIEW = 1;
     /**
      *
      */
@@ -166,13 +165,13 @@ public class ManyLyricsView extends AbstractLrcView {
         public void handleMessage(Message msg) {
 
             switch (msg.what) {
-                case 1:
+                case RESETLRCVIEW:
                     if (mScroller.computeScrollOffset()) {
                         //发送还原
                         mHandler.sendEmptyMessageDelayed(RESETLRCVIEW, mResetDuration);
                     } else {
-                        //
-                        mTouchIntercept = false;
+
+                        mIsTouchIntercept = false;
                         mTouchEventStatus = TOUCHEVENTSTATUS_INIT;
                         int lyricsLineNum = getLyricsLineNum();
                         int deltaY = getLineAtHeightY(lyricsLineNum) - mScroller.getFinalY();
@@ -240,32 +239,28 @@ public class ManyLyricsView extends AbstractLrcView {
         setGotoSearchTextColor(Color.WHITE);
         setGotoSearchTextPressedColor(ColorUtils.parserColor("#0288d1"));
 
-        this.post(new Runnable() {
-            @Override
-            public void run() {
-                viewLoadFinish();
-            }
-        });
+        //获取屏幕宽度
+        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        Display display = wm.getDefaultDisplay();
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        display.getMetrics(displayMetrics);
+        int screensWidth = displayMetrics.widthPixels;
 
-    }
+        //设置歌词的最大宽度
+        int textMaxWidth = screensWidth / 3 * 2;
+        setTextMaxWidth(textMaxWidth);
 
-    /**
-     * view加载完成
-     */
-    private void viewLoadFinish() {
         //设置画笔大小
         mPaintIndicator.setTextSize(mPlayRectSize);
         mPaintLine.setTextSize(mPlayRectSize);
         mPaintPlay.setTextSize(mPlayRectSize);
-
-        mShadeHeight = getHeight() / 4;
-        //设置歌词的最大宽度
-        int textMaxWidth = getWidth() / 3 * 2;
-        setTextMaxWidth(textMaxWidth);
     }
 
     @Override
     protected void onDrawLrcView(Canvas canvas) {
+        if (mShadeHeight == 0) {
+            mShadeHeight = getHeight() / 4;
+        }
         drawManyLrcView(canvas);
     }
 
@@ -334,7 +329,7 @@ public class ManyLyricsView extends AbstractLrcView {
         }
 
         //绘画时间、播放按钮等
-        if (mTouchIntercept || mTouchEventStatus != TOUCHEVENTSTATUS_INIT) {
+        if (mIsTouchIntercept || mTouchEventStatus != TOUCHEVENTSTATUS_INIT) {
             drawIndicator(canvas);
         }
 
@@ -647,7 +642,7 @@ public class ManyLyricsView extends AbstractLrcView {
         float lineY = (getHeight() - lineH) / 2;
         float lineLeft = textX + textWidth + linePadding;
         float lineR = rectL - linePadding;
-        LinearGradient linearGradientHL = new LinearGradient(lineLeft, lineY + lineH, lineR, lineY + lineH, new int[]{ColorUtils.parserColor(mPaintLineColor, 255), ColorUtils.parserColor(mPaintLineColor, 0), ColorUtils.parserColor(mPaintLineColor, 0), ColorUtils.parserColor(mPaintLineColor, 255)}, new float[]{0f, 0.2f, 0.8f,1f}, Shader.TileMode.CLAMP);
+        LinearGradient linearGradientHL = new LinearGradient(lineLeft, lineY + lineH, lineR, lineY + lineH, new int[]{ColorUtils.parserColor(mPaintLineColor, 255), ColorUtils.parserColor(mPaintLineColor, 0), ColorUtils.parserColor(mPaintLineColor, 0), ColorUtils.parserColor(mPaintLineColor, 255)}, new float[]{0f, 0.2f, 0.8f, 1f}, Shader.TileMode.CLAMP);
         mPaintLine.setShader(linearGradientHL);
         canvas.drawRect(lineLeft, lineY, lineR, lineY + lineH, mPaintLine);
 
@@ -667,7 +662,7 @@ public class ManyLyricsView extends AbstractLrcView {
         //
         int newLyricsLineNum = LyricsUtils.getLineNumber(lyricsReader.getLyricsType(), lrcLineInfos, playProgress, lyricsReader.getPlayOffset());
         if (newLyricsLineNum != lyricsLineNum) {
-            if (mTouchEventStatus == TOUCHEVENTSTATUS_INIT && !isChangeScrollerFinalY && !mTouchIntercept) {
+            if (mTouchEventStatus == TOUCHEVENTSTATUS_INIT && !mIsTouchIntercept) {
                 //初始状态
                 int duration = mDuration * getLineSizeNum(lyricsLineNum);
                 int deltaY = getLineAtHeightY(newLyricsLineNum) - mScroller.getFinalY();
@@ -677,14 +672,7 @@ public class ManyLyricsView extends AbstractLrcView {
             lyricsLineNum = newLyricsLineNum;
             setLyricsLineNum(lyricsLineNum);
         }
-        //
-        if (isChangeScrollerFinalY) {
 
-            //字体大小、额外歌词显示或者空行大小改变，则对歌词的位置进行修改
-            mOffsetY = getLineAtHeightY(newLyricsLineNum);
-            mScroller.setFinalY((int) mOffsetY);
-            isChangeScrollerFinalY = false;
-        }
         updateSplitData(playProgress);
     }
 
@@ -718,8 +706,8 @@ public class ManyLyricsView extends AbstractLrcView {
                 int deltaX = (int) (mInterceptX - curX);
                 int deltaY = (int) (mInterceptY - curY);
 
-                if (mTouchIntercept || (Math.abs(deltaY) > mTouchSlop && Math.abs(deltaX) < mTouchSlop)) {
-                    mTouchIntercept = true;
+                if (mIsTouchIntercept || (Math.abs(deltaY) > mTouchSlop && Math.abs(deltaX) < mTouchSlop)) {
+                    mIsTouchIntercept = true;
 
                     int dy = mLastY - curY;
 
@@ -756,9 +744,8 @@ public class ManyLyricsView extends AbstractLrcView {
                         mOnLrcClickListener.onLrcPlayClicked(startTime);
 
                     }
-
+                    mIsTouchIntercept = false;
                     mTouchEventStatus = TOUCHEVENTSTATUS_INIT;
-                    mTouchIntercept = false;
                     isInPlayBtnRect = false;
                     invalidateView();
                 } else {
@@ -1019,7 +1006,8 @@ public class ManyLyricsView extends AbstractLrcView {
         } else if (mOffsetY > getBottomOverScrollHeightY()) {
             TreeMap<Integer, LyricsLineInfo> lrcLineInfos = getLrcLineInfos();
 
-            int deltaY = getLineAtHeightY(lrcLineInfos.size() - 1) - mScroller.getFinalY();
+            int deltaY = getLineAtHeightY(lrcLineInfos.size
+                    () - 1) - mScroller.getFinalY();
             mScroller.startScroll(0, mScroller.getFinalY(), 0, deltaY, mDuration);
             invalidateView();
 
@@ -1121,9 +1109,21 @@ public class ManyLyricsView extends AbstractLrcView {
      */
     public void setTypeFace(Typeface typeFace, boolean isInvalidateView) {
         if (isInvalidateView) {
-            isChangeScrollerFinalY = true;
+            setTypeFace(typeFace, false);
+            resetScrollerFinalY();
         }
         super.setTypeFace(typeFace, isInvalidateView);
+    }
+
+    /**
+     * //字体大小、额外歌词显示或者空行大小改变，则对歌词的位置进行修改
+     * 重置scroller的finaly
+     */
+    private void resetScrollerFinalY() {
+        int lyricsLineNum = getLyricsLineNum();
+        //字体大小、额外歌词显示或者空行大小改变，则对歌词的位置进行修改
+        mOffsetY = getLineAtHeightY(lyricsLineNum);
+        mScroller.setFinalY((int) mOffsetY);
     }
 
 
@@ -1151,8 +1151,9 @@ public class ManyLyricsView extends AbstractLrcView {
      * @param extraLrcStatus
      */
     public void setExtraLrcStatus(int extraLrcStatus) {
-        isChangeScrollerFinalY = true;
         super.setExtraLrcStatus(extraLrcStatus);
+        resetScrollerFinalY();
+        super.setExtraLrcStatus(extraLrcStatus, true);
     }
 
     /**
@@ -1171,7 +1172,11 @@ public class ManyLyricsView extends AbstractLrcView {
      * @param isReloadData 是否重新加载数据及刷新界面
      */
     public void setFontSize(float fontSize, boolean isReloadData) {
-        isChangeScrollerFinalY = true;
+        if (isReloadData) {
+            super.setFontSize(fontSize, false);
+            resetScrollerFinalY();
+        }
+
         super.setFontSize(fontSize, isReloadData);
     }
 
@@ -1191,7 +1196,10 @@ public class ManyLyricsView extends AbstractLrcView {
      * @param isReloadData     是否重新加载数据及刷新界面
      */
     public void setExtraLrcFontSize(float extraLrcFontSize, boolean isReloadData) {
-        isChangeScrollerFinalY = true;
+        if (isReloadData) {
+            super.setExtraLrcFontSize(extraLrcFontSize, false);
+            resetScrollerFinalY();
+        }
         super.setExtraLrcFontSize(extraLrcFontSize, isReloadData);
     }
 
@@ -1229,10 +1237,26 @@ public class ManyLyricsView extends AbstractLrcView {
      * @param isReloadData  是否重新加载数据及刷新界面
      */
     public void setSize(int fontSize, int extraFontSize, boolean isReloadData) {
-        isChangeScrollerFinalY = true;
+        if (isReloadData) {
+            super.setSize(fontSize, extraFontSize, false);
+            resetScrollerFinalY();
+        }
         super.setSize(fontSize, extraFontSize, isReloadData);
     }
 
+    /**
+     * 设置指示器字体大小
+     *
+     * @param fontSize
+     */
+    public void setIndicatorFontSize(int fontSize) {
+        mPlayBtnRect = null;
+        this.mPlayRectSize = fontSize;
+        mPaintIndicator.setTextSize(mPlayRectSize);
+        mPaintLine.setTextSize(mPlayRectSize);
+        mPaintPlay.setTextSize(mPlayRectSize);
+        invalidateView();
+    }
 
     /**
      * 设置歌词点击事件

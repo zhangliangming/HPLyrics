@@ -206,10 +206,6 @@ public abstract class AbstractLrcView extends View {
      * 默认只显示默认歌词
      */
     public int mExtraLrcStatus = EXTRALRCSTATUS_NOSHOWEXTRALRC;
-    /**
-     * 是否是手动去设置显示的歌词类型
-     */
-    private boolean isHandToChangeExtraLrcStatus = false;
 
     /**
      * 空行高度
@@ -843,18 +839,28 @@ public abstract class AbstractLrcView extends View {
      *
      * @param extraLrcStatus
      */
-    public void setExtraLrcStatus(int extraLrcStatus) {
-        synchronized (lock) {
-            removeCallbacksAndMessages();
-            isHandToChangeExtraLrcStatus = true;
-            this.mExtraLrcStatus = extraLrcStatus;
-            //更新行和索引等数据
-            updateView(mCurPlayingTime + mPlayerSpendTime);
-            invalidateView();
-            if (mLrcPlayerStatus == LRCPLAYERSTATUS_PLAY) {
-                mWorkerHandler.sendEmptyMessageDelayed(0, mRefreshTime);
+    public void setExtraLrcStatus(int extraLrcStatus, boolean isReloadData) {
+        this.mExtraLrcStatus = extraLrcStatus;
+        if (isReloadData) {
+            synchronized (lock) {
+                removeCallbacksAndMessages();
+                //更新行和索引等数据
+                updateView(mCurPlayingTime + mPlayerSpendTime);
+                invalidateView();
+                if (mLrcPlayerStatus == LRCPLAYERSTATUS_PLAY) {
+                    mWorkerHandler.sendEmptyMessageDelayed(0, mRefreshTime);
+                }
             }
         }
+    }
+
+    /**
+     * 设置额外歌词的显示状态
+     *
+     * @param extraLrcStatus
+     */
+    public void setExtraLrcStatus(int extraLrcStatus) {
+        setExtraLrcStatus(extraLrcStatus, false);
     }
 
     /**
@@ -1003,11 +1009,6 @@ public abstract class AbstractLrcView extends View {
         } else {
             //无翻译歌词和音译歌词
             mExtraLrcType = EXTRALRCTYPE_NOLRC;
-            isHandToChangeExtraLrcStatus = false;
-        }
-        if (!isHandToChangeExtraLrcStatus) {
-            mExtraLrcStatus = extraLrcStatus;
-            isHandToChangeExtraLrcStatus = false;
         }
         if (mExtraLyricsListener != null) {
             mExtraLyricsListener.extraLrcCallback();
@@ -1028,7 +1029,6 @@ public abstract class AbstractLrcView extends View {
         mPlayerSpendTime = 0;
 
 
-        isHandToChangeExtraLrcStatus = false;
         mExtraLrcStatus = EXTRALRCSTATUS_NOSHOWEXTRALRC;
         mLyricsLineNum = 0;
         mSplitLyricsLineNum = 0;
@@ -1096,21 +1096,7 @@ public abstract class AbstractLrcView extends View {
             if (mSearchLyricsListener != null) {
                 mGotoSearchRectPaint.setTextSize(mFontSize);
                 mGotoSearchTextPaint.setTextSize(mFontSize);
-
-                //初始化搜索
-                if (mGotoSearchBtnRect != null) {
-
-                    int textY = (getHeight() + LyricsUtils.getTextHeight(mGotoSearchTextPaint)) / 2;
-                    int textWidth = (int) LyricsUtils.getTextWidth(mGotoSearchTextPaint, getGotoSearchText());
-                    int textX = (getWidth() - textWidth) / 2;
-
-                    int padding = LyricsUtils.getRealTextHeight(mGotoSearchTextPaint) / 2;
-                    int rectTop = textY - LyricsUtils.getTextHeight(mGotoSearchTextPaint) - padding;
-                    int rectLeft = textX - padding;
-                    int rectRight = rectLeft + textWidth + padding * 2;
-                    int rectBottom = textY + padding;
-                    mGotoSearchBtnRect = new RectF(rectLeft, rectTop, rectRight, rectBottom);
-                }
+                mGotoSearchBtnRect = null;
             }
 
             if (isReloadData) {

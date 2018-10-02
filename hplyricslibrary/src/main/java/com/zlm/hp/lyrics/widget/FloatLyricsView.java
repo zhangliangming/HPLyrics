@@ -6,6 +6,9 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
+import android.view.Display;
+import android.view.WindowManager;
 
 import com.zlm.hp.lyrics.LyricsReader;
 import com.zlm.hp.lyrics.model.LyricsInfo;
@@ -35,11 +38,6 @@ public class FloatLyricsView extends AbstractLrcView {
      */
     private int mOrientation = ORIENTATION_LEFT;
 
-    /**
-     * 手动设置字体大小
-     */
-    private boolean isHandToSetFontSize = false;
-
     public FloatLyricsView(Context context) {
         super(context);
         init(context);
@@ -60,12 +58,16 @@ public class FloatLyricsView extends AbstractLrcView {
      */
     private void init(Context context) {
 
-        this.post(new Runnable() {
-            @Override
-            public void run() {
-                viewLoadFinish();
-            }
-        });
+        //获取屏幕宽度
+        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        Display display = wm.getDefaultDisplay();
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        display.getMetrics(displayMetrics);
+        int screensWidth = displayMetrics.widthPixels;
+
+        //设置歌词的最大宽度
+        int textMaxWidth = screensWidth / 3 * 2;
+        setTextMaxWidth(textMaxWidth);
 
     }
 
@@ -79,33 +81,6 @@ public class FloatLyricsView extends AbstractLrcView {
         updateFloatLrcView(playProgress);
     }
 
-    /**
-     * view加载完成
-     */
-    private void viewLoadFinish() {
-
-        //设置歌词的最大宽度
-        int textMaxWidth = getWidth() / 3 * 2;
-        setTextMaxWidth(textMaxWidth);
-
-        //非手动设置字体大小
-        if (!isHandToSetFontSize) {
-            //字体大小
-            float fontSize = getHeight() / 4;
-            float spaceLineHeight = fontSize / 2;
-
-            //设置额外歌词字体大小和空行高度
-            float extraLrcFontSize = fontSize;
-            float extraLrcSpaceLineHeight = spaceLineHeight;
-
-            //设置额外歌词字体大小和空行高度
-            setFontSize(fontSize);
-            setSpaceLineHeight(spaceLineHeight);
-
-            setExtraLrcFontSize(extraLrcFontSize);
-            setExtraLrcSpaceLineHeight(extraLrcSpaceLineHeight);
-        }
-    }
 
     /**
      * 绘画歌词
@@ -435,7 +410,4 @@ public class FloatLyricsView extends AbstractLrcView {
         this.mOrientation = orientation;
     }
 
-    public void setHandToSetFontSize(boolean handToSetFontSize) {
-        isHandToSetFontSize = handToSetFontSize;
-    }
 }

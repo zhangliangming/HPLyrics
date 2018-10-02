@@ -35,6 +35,11 @@
 - 自定义view替换成surfaceview
 - 添加获取歌词参数方法
 
+## v1.46 ##
+- 2018-10-02
+- 获取歌词最大的宽度默认为获取屏幕的大小的2/3。
+- 考虑到在设置歌词数据时，视图并没有显示，导致歌词的最大宽度获取为0，所以分隔歌词时出现了问题，最终出现竖直歌词的问题。
+
 ## v1.44 ##
 - 2018-08-11
 - 添加HandlerThread
@@ -155,7 +160,7 @@
 2.app build.gradle
 
 `dependencies {
-	         compile 'com.github.zhangliangming:HPLyrics:v1.45'
+	         compile 'com.github.zhangliangming:HPLyrics:v1.46'
 	}`
 
 
