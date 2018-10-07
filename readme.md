@@ -160,7 +160,7 @@
 2.app build.gradle
 
 `dependencies {
-	         compile 'com.github.zhangliangming:HPLyrics:v1.46'
+	         compile 'com.github.zhangliangming:HPLyrics:v1.47'
 	}`
 
 

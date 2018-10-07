@@ -24,5 +24,5 @@ android {
 }
 
 dependencies {
-    implementation 'com.github.zhangliangming:Register:v1.0'
+    implementation 'com.github.zhangliangming:Register:v1.1'
 }
