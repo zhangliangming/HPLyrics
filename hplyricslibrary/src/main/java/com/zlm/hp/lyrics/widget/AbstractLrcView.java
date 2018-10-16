@@ -93,6 +93,11 @@ public abstract class AbstractLrcView extends View {
      */
     public static final int LRCPLAYERSTATUS_PLAY = 1;
 
+    /**
+     * seekto
+     */
+    public static final int LRCPLAYERSTATUS_SEEKTO = 2;
+
 
     /**
      * 默认歌词画笔
@@ -464,9 +469,13 @@ public abstract class AbstractLrcView extends View {
                 Context context = mActivityWR.get();
                 if (context != null) {
                     synchronized (lock) {
-                        if (mLrcPlayerStatus == LRCPLAYERSTATUS_PLAY && mLyricsReader != null) {
+                        if (mLyricsReader != null) {
                             updateView(mCurPlayingTime + mPlayerSpendTime);
-                            mUIHandler.sendEmptyMessage(0);
+                            if (mLrcPlayerStatus == LRCPLAYERSTATUS_PLAY) {
+                                mUIHandler.sendEmptyMessage(0);
+                            } else if (mLrcPlayerStatus == LRCPLAYERSTATUS_SEEKTO) {
+                                invalidateView();
+                            }
                         }
                     }
                 }
@@ -903,9 +912,15 @@ public abstract class AbstractLrcView extends View {
     public void seekto(int playProgress) {
         synchronized (lock) {
             if (mLrcPlayerStatus == LRCPLAYERSTATUS_PLAY) {
-                removeCallbacksAndMessages();
+                play(playProgress);
+            } else {
+                mLrcPlayerStatus = LRCPLAYERSTATUS_SEEKTO;
+
+                this.mCurPlayingTime = playProgress;
+                mPlayerStartTime = System.currentTimeMillis();
+                mPlayerSpendTime = 0;
+                mWorkerHandler.sendEmptyMessageDelayed(0, 0);
             }
-            play(playProgress);
         }
     }
 
