@@ -70,15 +70,12 @@ public class LyricsReader {
      *
      * @param lyricsFile
      */
-    public void loadLrc(File lyricsFile) {
+    public void loadLrc(File lyricsFile) throws Exception {
+
         this.mLrcFilePath = lyricsFile.getPath();
         LyricsFileReader lyricsFileReader = LyricsIOUtils.getLyricsFileReader(lyricsFile);
-        try {
-            LyricsInfo lyricsInfo = lyricsFileReader.readFile(lyricsFile);
-            parser(lyricsInfo);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        LyricsInfo lyricsInfo = lyricsFileReader.readFile(lyricsFile);
+        parser(lyricsInfo);
     }
 
     /**
@@ -86,7 +83,7 @@ public class LyricsReader {
      * @param saveLrcFile             要保存的的lrc文件
      * @param fileName                含后缀名的文件名称
      */
-    public void loadLrc(String base64FileContentString, File saveLrcFile, String fileName) {
+    public void loadLrc(String base64FileContentString, File saveLrcFile, String fileName) throws Exception {
         loadLrc(Base64.decode(base64FileContentString, Base64.NO_WRAP), saveLrcFile, fileName);
     }
 
@@ -95,16 +92,13 @@ public class LyricsReader {
      * @param saveLrcFile
      * @param fileName
      */
-    public void loadLrc(byte[] base64ByteArray, File saveLrcFile, String fileName) {
+    public void loadLrc(byte[] base64ByteArray, File saveLrcFile, String fileName) throws Exception {
         if (saveLrcFile != null)
             mLrcFilePath = saveLrcFile.getPath();
         LyricsFileReader lyricsFileReader = LyricsIOUtils.getLyricsFileReader(fileName);
-        try {
-            LyricsInfo lyricsInfo = lyricsFileReader.readLrcText(base64ByteArray, saveLrcFile);
-            parser(lyricsInfo);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        LyricsInfo lyricsInfo = lyricsFileReader.readLrcText(base64ByteArray, saveLrcFile);
+        parser(lyricsInfo);
+
     }
 
 
