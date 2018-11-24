@@ -146,6 +146,11 @@ public class ManyLyricsView extends AbstractLrcView {
      */
     private boolean mTouchAble = true;
 
+    /**
+     * 是否绘画时间线
+     */
+    private boolean mIsDrawIndicator = true;
+
     //////////////////////////////////////////////////////
 
     /**
@@ -329,7 +334,7 @@ public class ManyLyricsView extends AbstractLrcView {
         }
 
         //绘画时间、播放按钮等
-        if (mIsTouchIntercept || mTouchEventStatus != TOUCHEVENTSTATUS_INIT) {
+        if ((mIsTouchIntercept || mTouchEventStatus != TOUCHEVENTSTATUS_INIT) && mIsDrawIndicator) {
             drawIndicator(canvas);
         }
 
@@ -1242,6 +1247,14 @@ public class ManyLyricsView extends AbstractLrcView {
             resetScrollerFinalY();
         }
         super.setSize(fontSize, extraFontSize, isReloadData);
+    }
+
+    /**
+     * 是否绘画时间指示器
+     * @param isDrawIndicator
+     */
+    public void setIsDrawIndicator(boolean isDrawIndicator) {
+        this.mIsDrawIndicator = isDrawIndicator;
     }
 
     /**
