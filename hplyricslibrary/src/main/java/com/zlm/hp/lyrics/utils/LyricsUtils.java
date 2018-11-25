@@ -689,9 +689,11 @@ public class LyricsUtils {
                         //清空
                         temp.delete(0, temp.length());
                     }
-                    String tw = lrcStack.pop();
-                    if (tw != null) {
-                        lrcStack.push(tw + String.valueOf(c));
+                    if (!lrcStack.isEmpty()) {
+                        String tw = lrcStack.pop();
+                        if (tw != null) {
+                            lrcStack.push(tw + String.valueOf(c));
+                        }
                     }
                 } else {
                     temp.append(c);
