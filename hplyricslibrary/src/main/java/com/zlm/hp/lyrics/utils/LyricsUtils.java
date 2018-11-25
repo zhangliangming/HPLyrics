@@ -596,6 +596,7 @@ public class LyricsUtils {
      * @return
      */
     private static int[] getWordsDisInterval(LyricsLineInfo defLyricsLineInfo, String[] newLyricsWords) {
+        if (newLyricsWords.length == 0) return null;
         int[] wordsDisInterval = new int[newLyricsWords.length];
         int sumTime = 0;
         for (int i = 0; i < defLyricsLineInfo.getWordsDisInterval().length; i++) {
