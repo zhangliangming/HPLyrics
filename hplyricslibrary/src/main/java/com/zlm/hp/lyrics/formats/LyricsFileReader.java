@@ -61,6 +61,29 @@ public abstract class LyricsFileReader {
     }
 
     /**
+     * @param lrcContent      lrc歌词内容
+     * @param extraLrcContent 额外歌词内容（翻译歌词、音译歌词）
+     * @param lyricsFilePath 歌词文件保存路径
+     * @return
+     * @throws Exception
+     */
+    public LyricsInfo readLrcText(String lrcContent, String extraLrcContent, String lyricsFilePath) throws Exception {
+        return null;
+    }
+
+    /**
+     * @param dynamicContent  动感歌词内容
+     * @param lrcContent      lrc歌词内容
+     * @param extraLrcContent 额外歌词内容（翻译歌词、音译歌词）
+     * @param lyricsFilePath 歌词文件保存路径
+     * @return
+     * @throws Exception
+     */
+    public LyricsInfo readLrcText(String dynamicContent, String lrcContent, String extraLrcContent, String lyricsFilePath) throws Exception {
+        return null;
+    }
+
+    /**
      * 读取歌词文本内容
      *
      * @param base64ByteArray base64内容数组

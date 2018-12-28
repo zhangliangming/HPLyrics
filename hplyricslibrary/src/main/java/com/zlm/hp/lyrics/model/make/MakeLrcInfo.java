@@ -1,4 +1,6 @@
-package com.zlm.hp.lyrics.model;
+package com.zlm.hp.lyrics.model.make;
+
+import com.zlm.hp.lyrics.model.LyricsLineInfo;
 
 /**
  * 制作歌词信息
@@ -11,15 +13,11 @@ public class MakeLrcInfo {
      * 初始
      */
     public static final int STATUS_NONE = 0;
-    /**
-     * 选中
-     */
-    public static final int STATUS_SELECTED = 1;
 
     /**
      * 完成
      */
-    public static final int STATUS_FINISH = 2;
+    public static final int STATUS_FINISH = 1;
     /**
      * 状态
      */

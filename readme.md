@@ -15,7 +15,16 @@
 - 设置硬件加速：android:hardwareAccelerated="true" 
 - android4.0以上
 
+# 网易云API歌词调用方式 #
+![](https://i.imgur.com/LIGQRmJ.png)
+注：该歌词只适用于通过api获取歌词，文件保存格式为：lrcwy。其中动感歌词和lrc歌词只能先其中一种，支持翻译歌词
+
 # 日志 #
+
+## 2018-12-29 ##
+- 添加制作歌词功能
+- 添加网易云API歌词支持
+
 ## v3.2 ##
 - 2018-05-05
 - 添加混淆
@@ -106,6 +115,9 @@
 
 # 预览图 #
 
+## 制作歌词界面 ##
+![](https://i.imgur.com/7cU1njA.png)
+
 ## 主界面 ##
 
 ![](https://i.imgur.com/QJnz3sV.png)
@@ -194,13 +206,14 @@
 
 # 声明 #
 由于该项目涉及到酷狗的动感歌词的版权问题，所以该项目的代码和内容仅用于学习用途
+
 # 捐赠 #
 如果该项目对您有所帮助，欢迎您的赞赏
 
 - 微信
 
-![](https://i.imgur.com/e3hERHh.png)
+![](https://i.imgur.com/hOs6tPn.png)
 
 - 支付宝
 
-![](https://i.imgur.com/29AcEPA.png)
+![](https://i.imgur.com/DGB9Lq0.png)

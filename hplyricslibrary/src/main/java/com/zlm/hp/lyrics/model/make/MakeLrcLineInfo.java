@@ -1,4 +1,6 @@
-package com.zlm.hp.lyrics.model;
+package com.zlm.hp.lyrics.model.make;
+
+import com.zlm.hp.lyrics.model.LyricsLineInfo;
 
 import java.util.TreeMap;
 
@@ -14,14 +16,16 @@ public class MakeLrcLineInfo extends MakeLrcInfo {
      */
     private TreeMap<Integer, WordDisInterval> mWordDisIntervals = new TreeMap<Integer, WordDisInterval>();
 
+    private byte[] lock = new byte[0];
+
     /**
      * 设置当前歌曲索引
      *
      * @param curPlayingTime
      */
     public boolean play(long curPlayingTime) {
-        //选中
-        if (getStatus() == STATUS_SELECTED) {
+        synchronized (lock) {
+
             int lrcIndex = getLrcIndex();
             lrcIndex++;
             setLrcIndex(lrcIndex);
@@ -38,6 +42,11 @@ public class MakeLrcLineInfo extends MakeLrcInfo {
             if (lrcIndex == lyricsLineInfo.getLyricsWords().length) {
 
                 lrcIndex = lyricsLineInfo.getLyricsWords().length - 1;
+
+                //设置结束时间
+                WordDisInterval wordDisInterval = mWordDisIntervals.get(lrcIndex);
+                lyricsLineInfo.setEndTime(wordDisInterval.getEndTime());
+
                 setStatus(STATUS_FINISH);
                 setLrcIndex(lrcIndex);
 
@@ -49,17 +58,50 @@ public class MakeLrcLineInfo extends MakeLrcInfo {
             wordDisInterval.setStartTime((int) curPlayingTime);
             mWordDisIntervals.put(lrcIndex, wordDisInterval);
 
-
+            return false;
         }
-        return false;
+    }
+
+
+    /**
+     * 行设置
+     *
+     * @param preLineEndTime 上一行结束时间
+     * @param curPlayingTime 当前播放时间
+     */
+    public void playLine(long preLineEndTime, long curPlayingTime) {
+        synchronized (lock) {
+            mWordDisIntervals.clear();
+            LyricsLineInfo lyricsLineInfo = getLyricsLineInfo();
+            lyricsLineInfo.setStartTime((int) preLineEndTime);
+            lyricsLineInfo.setEndTime((int) curPlayingTime);
+            long dTime = 0;
+            if (preLineEndTime < curPlayingTime) {
+                dTime = curPlayingTime - preLineEndTime;
+            }
+            String[] lyricsWords = lyricsLineInfo.getLyricsWords();
+            if (lyricsWords != null && lyricsWords.length > 0) {
+                long aveTime = dTime / lyricsWords.length;
+                for (int i = 0; i < lyricsWords.length; i++) {
+                    //设置当前字的开始时间/结束时间
+                    long startTime = lyricsLineInfo.getStartTime() + i * aveTime;
+                    WordDisInterval wordDisInterval = new WordDisInterval();
+                    wordDisInterval.setStartTime((int) startTime);
+                    wordDisInterval.setEndTime((int) (startTime + aveTime));
+                    mWordDisIntervals.put(i, wordDisInterval);
+                }
+                setStatus(STATUS_FINISH);
+                setLrcIndex(lyricsWords.length - 1);
+            }
+        }
     }
 
     /**
      * 设置回滚
      */
     public void back() {
-        //选中
-        if (getStatus() == STATUS_SELECTED) {
+        synchronized (lock) {
+
             int lrcIndex = getLrcIndex();
             lrcIndex--;
             if (lrcIndex < -1) {
@@ -82,8 +124,10 @@ public class MakeLrcLineInfo extends MakeLrcInfo {
 
     @Override
     public void reset() {
-        super.reset();
-        mWordDisIntervals.clear();
+        synchronized (lock) {
+            super.reset();
+            mWordDisIntervals.clear();
+        }
     }
 
     /**
@@ -92,30 +136,32 @@ public class MakeLrcLineInfo extends MakeLrcInfo {
      * @return
      */
     public LyricsLineInfo getFinishLrcLineInfo() {
-        if (getStatus() == STATUS_FINISH) {
-            int startTime = 0;
-            int endTime = 0;
-            int[] wDisIntervals = new int[mWordDisIntervals.size()];
-            for (int j = 0; j < mWordDisIntervals.size(); j++) {
-                WordDisInterval wordDisInterval = mWordDisIntervals.get(j);
-                if (j == 0) {
-                    startTime = wordDisInterval.getStartTime();
-                }
-                if (j == mWordDisIntervals.size() - 1) {
-                    endTime = wordDisInterval.getEndTime();
+        synchronized (lock) {
+            if (getStatus() == STATUS_FINISH) {
+                int startTime = 0;
+                int endTime = 0;
+                int[] wDisIntervals = new int[mWordDisIntervals.size()];
+                for (int j = 0; j < mWordDisIntervals.size(); j++) {
+                    WordDisInterval wordDisInterval = mWordDisIntervals.get(j);
+                    if (j == 0) {
+                        startTime = wordDisInterval.getStartTime();
+                    }
+                    if (j == mWordDisIntervals.size() - 1) {
+                        endTime = wordDisInterval.getEndTime();
 
+                    }
+                    int time = wordDisInterval.getEndTime()
+                            - wordDisInterval.getStartTime();
+                    wDisIntervals[j] = time;
                 }
-                int time = wordDisInterval.getEndTime()
-                        - wordDisInterval.getStartTime();
-                wDisIntervals[j] = time;
+                LyricsLineInfo lyricsLineInfo = getLyricsLineInfo();
+                lyricsLineInfo.setStartTime(startTime);
+                lyricsLineInfo.setEndTime(endTime);
+                lyricsLineInfo.setWordsDisInterval(wDisIntervals);
+                return lyricsLineInfo;
             }
-            LyricsLineInfo lyricsLineInfo = getLyricsLineInfo();
-            lyricsLineInfo.setStartTime(startTime);
-            lyricsLineInfo.setEndTime(endTime);
-            lyricsLineInfo.setWordsDisInterval(wDisIntervals);
-            return lyricsLineInfo;
+            return null;
         }
-        return null;
     }
 
 

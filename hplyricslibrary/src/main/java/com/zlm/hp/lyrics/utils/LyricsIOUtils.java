@@ -11,6 +11,7 @@ import com.zlm.hp.lyrics.formats.ksc.KscLyricsFileReader;
 import com.zlm.hp.lyrics.formats.ksc.KscLyricsFileWriter;
 import com.zlm.hp.lyrics.formats.lrc.LrcLyricsFileReader;
 import com.zlm.hp.lyrics.formats.lrc.LrcLyricsFileWriter;
+import com.zlm.hp.lyrics.formats.lrcwy.WYLyricsFileReader;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -31,13 +32,14 @@ public class LyricsIOUtils {
 		readers.add(new KscLyricsFileReader());
 		readers.add(new KrcLyricsFileReader());
 		readers.add(new LrcLyricsFileReader());
-
+		readers.add(new WYLyricsFileReader());
 		//
 		writers = new ArrayList<LyricsFileWriter>();
 		writers.add(new HrcLyricsFileWriter());
 		writers.add(new KscLyricsFileWriter());
 		writers.add(new KrcLyricsFileWriter());
 		writers.add(new LrcLyricsFileWriter());
+		readers.add(new WYLyricsFileReader());
 	}
 
 	/**

@@ -65,7 +65,7 @@ public class LrcLyricsFileReader extends LyricsFileReader {
             while ((lineInfo = br.readLine()) != null) {
 
                 // 解析歌词
-                parserLineInfos(lyricsIfno, lyricsLineInfosTemp,
+                parserLineInfos(lyricsLineInfosTemp,
                         lyricsTags, lineInfo);
 
             }
@@ -91,13 +91,12 @@ public class LrcLyricsFileReader extends LyricsFileReader {
     /**
      * 解析行歌词
      *
-     * @param lyricsIfno          歌词实体
      * @param lyricsLineInfosTemp 排序集合
      * @param lyricsTags          歌曲标签
      * @param lineInfo            行歌词内容
      * @throws Exception
      */
-    private void parserLineInfos(LyricsInfo lyricsIfno, SortedMap<Integer, LyricsLineInfo> lyricsLineInfosTemp, Map<String, Object> lyricsTags, String lineInfo) throws Exception {
+    private void parserLineInfos(SortedMap<Integer, LyricsLineInfo> lyricsLineInfosTemp, Map<String, Object> lyricsTags, String lineInfo) throws Exception {
         LyricsLineInfo lyricsLineInfo = null;
         if (lineInfo.startsWith(LEGAL_SONGNAME_PREFIX)) {
             int startIndex = LEGAL_SONGNAME_PREFIX.length();

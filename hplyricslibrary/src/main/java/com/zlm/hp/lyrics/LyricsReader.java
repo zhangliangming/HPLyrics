@@ -196,8 +196,11 @@ public class LyricsReader {
         this.mTransliterationLrcLineInfos = mTransliterationLrcLineInfos;
     }
 
-    public void setLyricsInfo(LyricsInfo mLyricsInfo) {
-        this.mLyricsInfo = mLyricsInfo;
+    public void setLyricsInfo(LyricsInfo lyricsInfo) {
+        /**
+         * 重新解析歌词
+         */
+        parser(lyricsInfo);
     }
 
     ////////////////////////////////////////////////////////////////////////////////

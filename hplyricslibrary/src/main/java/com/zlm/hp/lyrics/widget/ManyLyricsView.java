@@ -14,6 +14,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
@@ -597,6 +598,9 @@ public class ManyLyricsView extends AbstractLrcView {
 
         //画当前时间
         int scrollLrcLineNum = getScrollLrcLineNum(mOffsetY);
+
+       //Log.d("ManyLyricsView", "drawIndicator scrollLrcLineNum = " + scrollLrcLineNum);
+
         int startTime = lrcLineInfos.get(scrollLrcLineNum).getStartTime();
         String timeString = TimeUtils.parseMMSSString(startTime);
         int textHeight = LyricsUtils.getTextHeight(mPaintIndicator);
@@ -744,9 +748,13 @@ public class ManyLyricsView extends AbstractLrcView {
 
                         //获取当前滑动到的歌词播放行
                         int scrollLrcLineNum = getScrollLrcLineNum(mOffsetY);
+
+                        //Log.d("ManyLyricsView", "click scrollLrcLineNum = " + scrollLrcLineNum);
+
                         TreeMap<Integer, LyricsLineInfo> lrcLineInfos = getLrcLineInfos();
                         int startTime = lrcLineInfos.get(scrollLrcLineNum).getStartTime();
-                        mOnLrcClickListener.onLrcPlayClicked(startTime);
+                        //加多100ms，确保可以定位到当前行
+                        mOnLrcClickListener.onLrcPlayClicked(startTime + 100);
 
                     }
                     mIsTouchIntercept = false;
@@ -1251,6 +1259,7 @@ public class ManyLyricsView extends AbstractLrcView {
 
     /**
      * 是否绘画时间指示器
+     *
      * @param isDrawIndicator
      */
     public void setIsDrawIndicator(boolean isDrawIndicator) {

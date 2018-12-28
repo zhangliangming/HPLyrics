@@ -43,7 +43,7 @@ public class LyricsInfo {
     /**
      * 歌词标签
      */
-    private Map<String, Object> mLyricsTags;
+    private Map<String, Object> mLyricsTags = new HashMap<String, Object>();
 
     public Map<String, Object> getLyricsTags() {
         return mLyricsTags;
@@ -88,7 +88,7 @@ public class LyricsInfo {
 
     public void setTitle(String title) {
 
-        if (mLyricsTags != null) {
+        if (mLyricsTags == null) {
             mLyricsTags = new HashMap<String, Object>();
         }
         mLyricsTags.put(LyricsTag.TAG_TITLE, title);
@@ -107,7 +107,7 @@ public class LyricsInfo {
     }
 
     public void setArtist(String artist) {
-        if (mLyricsTags != null) {
+        if (mLyricsTags == null) {
             mLyricsTags = new HashMap<String, Object>();
         }
         mLyricsTags.put(LyricsTag.TAG_ARTIST, artist);
@@ -125,7 +125,7 @@ public class LyricsInfo {
     }
 
     public void setOffset(long offset) {
-        if (mLyricsTags != null) {
+        if (mLyricsTags == null) {
             mLyricsTags = new HashMap<String, Object>();
         }
         mLyricsTags.put(LyricsTag.TAG_OFFSET, offset);
@@ -148,7 +148,7 @@ public class LyricsInfo {
     }
 
     public void setBy(String by) {
-        if (mLyricsTags != null) {
+        if (mLyricsTags  == null) {
             mLyricsTags = new HashMap<String, Object>();
         }
         mLyricsTags.put(LyricsTag.TAG_BY, by);
@@ -166,7 +166,7 @@ public class LyricsInfo {
     }
 
     public void setTotal(long total) {
-        if (mLyricsTags != null) {
+        if (mLyricsTags == null) {
             mLyricsTags = new HashMap<String, Object>();
         }
         mLyricsTags.put(LyricsTag.TAG_TOTAL, total);
