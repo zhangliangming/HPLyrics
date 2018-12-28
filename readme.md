@@ -16,6 +16,7 @@
 - android4.0以上
 
 # 网易云API歌词调用方式 #
+
 ![](https://i.imgur.com/LIGQRmJ.png)
 注：该歌词只适用于通过api获取歌词，文件保存格式为：lrcwy。其中动感歌词和lrc歌词只能先其中一种，支持翻译歌词
 
@@ -181,7 +182,7 @@
 
 # 调用Demo #
 
-链接: [https://pan.baidu.com/s/1eA5pcs0pUnr9gXhosek9Bw](https://pan.baidu.com/s/1eA5pcs0pUnr9gXhosek9Bw "https://pan.baidu.com/s/1eA5pcs0pUnr9gXhosek9Bw") 密码: awcf
+链接: [https://pan.baidu.com/s/1UkQYrxWUsYRnDO5jpPuevg](https://pan.baidu.com/s/1UkQYrxWUsYRnDO5jpPuevg "https://pan.baidu.com/s/1UkQYrxWUsYRnDO5jpPuevg") 密码: b3wv
 
 # 调用用法 #
 
