@@ -25,6 +25,7 @@
 ## 2018-12-29 ##
 - 添加制作歌词功能
 - 添加网易云API歌词支持
+- 修复网易云API歌词支持、翻译歌词支持高亮显示
 
 ## v3.2 ##
 - 2018-05-05
@@ -182,7 +183,8 @@
 
 # 调用Demo #
 
-链接: https://pan.baidu.com/s/1j-4wbtiNIfRhypb4uEnX6g 提取码: t8dj 
+链接: [https://pan.baidu.com/s/1UkQYrxWUsYRnDO5jpPuevg](https://pan.baidu.com/s/1UkQYrxWUsYRnDO5jpPuevg "https://pan.baidu.com/s/1UkQYrxWUsYRnDO5jpPuevg") 密码: b3wv
+
 # 调用用法 #
 
 ![](https://i.imgur.com/eNPR7yy.png)
@@ -203,6 +205,8 @@
 - seekto：快进歌词
 - resume：唤醒
 - initLrcData：初始化歌词内容
+- setTranslateDrawLrcColorType：设置翻译歌词绘画颜色类型
+- setTranslateDrawType：设置翻译歌词绘画类型
 
 # 声明 #
 由于该项目涉及到酷狗的动感歌词的版权问题，所以该项目的代码和内容仅用于学习用途
