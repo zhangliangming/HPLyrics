@@ -25,7 +25,7 @@
 ## 2018-12-29 ##
 - 添加制作歌词功能
 - 添加网易云API歌词支持
-- 修复网易云API歌词支持、翻译歌词支持高亮显示
+- 修复网易云API歌词支持、翻译歌词支持高亮显示、修复歌词上滑动时有时不绘画的问题
 
 ## v3.2 ##
 - 2018-05-05
@@ -183,7 +183,7 @@
 
 # 调用Demo #
 
-链接: [https://pan.baidu.com/s/1UkQYrxWUsYRnDO5jpPuevg](https://pan.baidu.com/s/1UkQYrxWUsYRnDO5jpPuevg "https://pan.baidu.com/s/1UkQYrxWUsYRnDO5jpPuevg") 密码: b3wv
+链接: https://pan.baidu.com/s/1j-4wbtiNIfRhypb4uEnX6g 提取码: t8dj
 
 # 调用用法 #
 
