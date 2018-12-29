@@ -16,6 +16,7 @@
 - android4.0以上
 
 # 网易云API歌词调用方式 #
+
 ![](https://i.imgur.com/LIGQRmJ.png)
 注：该歌词只适用于通过api获取歌词，文件保存格式为：lrcwy。其中动感歌词和lrc歌词只能先其中一种，支持翻译歌词
 
@@ -24,6 +25,7 @@
 ## 2018-12-29 ##
 - 添加制作歌词功能
 - 添加网易云API歌词支持
+- 修复网易云API歌词支持、翻译歌词支持高亮显示、修复歌词上滑动时有时不绘画的问题
 
 ## v3.2 ##
 - 2018-05-05
@@ -181,7 +183,7 @@
 
 # 调用Demo #
 
-链接: [https://pan.baidu.com/s/1eA5pcs0pUnr9gXhosek9Bw](https://pan.baidu.com/s/1eA5pcs0pUnr9gXhosek9Bw "https://pan.baidu.com/s/1eA5pcs0pUnr9gXhosek9Bw") 密码: awcf
+链接: https://pan.baidu.com/s/1j-4wbtiNIfRhypb4uEnX6g 提取码: t8dj
 
 # 调用用法 #
 
@@ -203,6 +205,8 @@
 - seekto：快进歌词
 - resume：唤醒
 - initLrcData：初始化歌词内容
+- setTranslateDrawLrcColorType：设置翻译歌词绘画颜色类型
+- setTranslateDrawType：设置翻译歌词绘画类型
 
 # 声明 #
 由于该项目涉及到酷狗的动感歌词的版权问题，所以该项目的代码和内容仅用于学习用途
