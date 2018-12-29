@@ -160,6 +160,7 @@ public class WYLyricsFileReader extends LyricsFileReader {
 
     /**
      * 解析额外歌词
+     *
      * @param lyricsIfno
      * @param extraLrcContent
      */
@@ -171,10 +172,10 @@ public class WYLyricsFileReader extends LyricsFileReader {
         String lrcContents[] = extraLrcContent.split("\n");
         for (int i = 0; i < lrcContents.length; i++) {
             String lineInfo = lrcContents[i];
-                // 翻译行歌词
-                TranslateLrcLineInfo translateLrcLineInfo = new TranslateLrcLineInfo();
-                translateLrcLineInfo.setLineLyrics(lineInfo.trim());
-                translateLrcLineInfos.add(translateLrcLineInfo);
+            // 翻译行歌词
+            TranslateLrcLineInfo translateLrcLineInfo = new TranslateLrcLineInfo();
+            translateLrcLineInfo.setLineLyrics(lineInfo.trim());
+            translateLrcLineInfos.add(translateLrcLineInfo);
         }
         // 添加翻译歌词
         if (translateLrcLineInfos.size() > 0) {
@@ -191,6 +192,7 @@ public class WYLyricsFileReader extends LyricsFileReader {
     public LyricsInfo readLrcText(String dynamicContent, String lrcContent, String extraLrcContent, String lyricsFilePath) throws Exception {
         return parserLrc(dynamicContent, lrcContent, extraLrcContent, lyricsFilePath);
     }
+
 
     /**
      * 解析歌词，其中动感歌词和lrc歌词只能2个选1个
@@ -232,33 +234,33 @@ public class WYLyricsFileReader extends LyricsFileReader {
      * @param lyricsIfno
      * @param translateLrcContent
      */
-    private void parserTranslateLrc(LyricsInfo lyricsIfno, String translateLrcContent) throws Exception {
-
-        // 翻译歌词集合
-        List<TranslateLrcLineInfo> translateLrcLineInfos = new ArrayList<TranslateLrcLineInfo>();
-
-        // 获取歌词内容
+    private void parserTranslateLrc(LyricsInfo lyricsIfno, String translateLrcContent) {
+        // 这里面key为该行歌词的开始时间，方便后面排序
+        SortedMap<Integer, LyricsLineInfo> translateLrcInfosTemp = new TreeMap<Integer, LyricsLineInfo>();
+        Map<String, Object> lyricsTags = new HashMap<String, Object>();
         String lrcContents[] = translateLrcContent.split("\n");
         for (int i = 0; i < lrcContents.length; i++) {
             String lineInfo = lrcContents[i];
-            //时间标签
-            String timeRegex = "\\[\\d+:\\d+.\\d+\\]";
-            String timeRegexs = "(" + timeRegex + ")+";
-            // 如果含有时间标签，则是歌词行
-            Pattern pattern = Pattern.compile(timeRegexs);
-            Matcher matcher = pattern.matcher(lineInfo);
-            if (matcher.find()) {
-                //获取歌词内容
-                int timeEndIndex = matcher.end();
-                String lineLyrics = lineInfo.substring(timeEndIndex,
-                        lineInfo.length()).trim();
-                // 翻译行歌词
-                TranslateLrcLineInfo translateLrcLineInfo = new TranslateLrcLineInfo();
-                translateLrcLineInfo.setLineLyrics(lineLyrics);
+            // 解析lrc歌词行
+            parserLrcLineInfos(translateLrcInfosTemp,
+                    lyricsTags, lineInfo);
 
-                translateLrcLineInfos.add(translateLrcLineInfo);
-            }
         }
+        // 翻译歌词集合
+        List<TranslateLrcLineInfo> translateLrcLineInfos = new ArrayList<TranslateLrcLineInfo>();
+        TreeMap<Integer, LyricsLineInfo> lyricsLineInfos = lyricsIfno.getLyricsLineInfoTreeMap();
+        for (int i = 0; i < lyricsLineInfos.size(); i++) {
+            TranslateLrcLineInfo translateLrcLineInfo = new TranslateLrcLineInfo();
+            LyricsLineInfo lyricsLineInfo = lyricsLineInfos.get(i);
+            if (translateLrcInfosTemp.containsKey(lyricsLineInfo.getStartTime())) {
+                LyricsLineInfo temp = translateLrcInfosTemp.get(lyricsLineInfo.getStartTime());
+                translateLrcLineInfo.setLineLyrics(temp.getLineLyrics());
+            }else{
+                translateLrcLineInfo.setLineLyrics("");
+            }
+            translateLrcLineInfos.add(i, translateLrcLineInfo);
+        }
+
         // 添加翻译歌词
         if (translateLrcLineInfos.size() > 0) {
             lyricsIfno.setTranslateLrcLineInfos(translateLrcLineInfos);
@@ -397,7 +399,7 @@ public class WYLyricsFileReader extends LyricsFileReader {
      * @param lineLyricsTemp
      * @return
      */
-    private String[] getLyricsWords(String[] lineLyricsTemp) throws Exception {
+    private String[] getLyricsWords(String[] lineLyricsTemp) {
         String temp[] = null;
         if (lineLyricsTemp.length < 2) {
             return new String[lineLyricsTemp.length];
@@ -417,7 +419,7 @@ public class WYLyricsFileReader extends LyricsFileReader {
      * @param lyricsInfo
      * @param lrcContent
      */
-    private void parserLrcCom(LyricsInfo lyricsInfo, String lrcContent) throws Exception {
+    private void parserLrcCom(LyricsInfo lyricsInfo, String lrcContent) {
         // 这里面key为该行歌词的开始时间，方便后面排序
         SortedMap<Integer, LyricsLineInfo> lyricsLineInfosTemp = new TreeMap<Integer, LyricsLineInfo>();
         Map<String, Object> lyricsTags = new HashMap<String, Object>();
@@ -452,7 +454,7 @@ public class WYLyricsFileReader extends LyricsFileReader {
      * @param lineInfo            行歌词内容
      * @throws Exception
      */
-    private void parserLrcLineInfos(SortedMap<Integer, LyricsLineInfo> lyricsLineInfosTemp, Map<String, Object> lyricsTags, String lineInfo) throws Exception {
+    private void parserLrcLineInfos(SortedMap<Integer, LyricsLineInfo> lyricsLineInfosTemp, Map<String, Object> lyricsTags, String lineInfo) {
         LyricsLineInfo lyricsLineInfo = null;
         if (lineInfo.startsWith(LEGAL_SONGNAME_PREFIX)) {
             int startIndex = LEGAL_SONGNAME_PREFIX.length();

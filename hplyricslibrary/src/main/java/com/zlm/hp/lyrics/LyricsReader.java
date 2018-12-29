@@ -81,11 +81,29 @@ public class LyricsReader {
     /**
      * @param base64FileContentString 歌词base64文件
      * @param saveLrcFile             要保存的的lrc文件
+     */
+    public void loadLrc(String base64FileContentString, File saveLrcFile) throws Exception {
+        loadLrc(Base64.decode(base64FileContentString, Base64.NO_WRAP), saveLrcFile, saveLrcFile.getName());
+    }
+
+    /**
+     * @param base64FileContentString 歌词base64文件
+     * @param saveLrcFile             要保存的的lrc文件
      * @param fileName                含后缀名的文件名称
      */
     public void loadLrc(String base64FileContentString, File saveLrcFile, String fileName) throws Exception {
         loadLrc(Base64.decode(base64FileContentString, Base64.NO_WRAP), saveLrcFile, fileName);
     }
+
+
+    /**
+     * @param base64ByteArray 歌词base64数组
+     * @param saveLrcFile
+     */
+    public void loadLrc(byte[] base64ByteArray, File saveLrcFile) throws Exception {
+        loadLrc(base64ByteArray, saveLrcFile, saveLrcFile.getName());
+    }
+
 
     /**
      * @param base64ByteArray 歌词base64数组
@@ -99,6 +117,56 @@ public class LyricsReader {
         LyricsInfo lyricsInfo = lyricsFileReader.readLrcText(base64ByteArray, saveLrcFile);
         parser(lyricsInfo);
 
+    }
+
+    /**
+     * @param lrcContent      lrc歌词内容
+     * @param extraLrcContent 额外歌词内容（翻译歌词、音译歌词）
+     * @param saveLrcFile     歌词文件保存路径
+     * @return
+     * @throws Exception
+     */
+    public void readLrcText(String lrcContent, String extraLrcContent, File saveLrcFile) throws Exception {
+        readLrcText(lrcContent, extraLrcContent, saveLrcFile, saveLrcFile.getName());
+    }
+
+    /**
+     * @param lrcContent      lrc歌词内容
+     * @param extraLrcContent 额外歌词内容（翻译歌词、音译歌词）
+     * @param saveLrcFile     歌词文件保存路径
+     * @return
+     * @throws Exception
+     */
+    public void readLrcText(String lrcContent, String extraLrcContent, File saveLrcFile, String fileName) throws Exception {
+        readLrcText("", lrcContent, extraLrcContent, saveLrcFile, fileName);
+    }
+
+    /**
+     * @param dynamicContent  动感歌词内容
+     * @param lrcContent      lrc歌词内容
+     * @param extraLrcContent 额外歌词内容（翻译歌词、音译歌词）
+     * @param saveLrcFile     歌词文件保存路径
+     * @return
+     * @throws Exception
+     */
+    public void readLrcText(String dynamicContent, String lrcContent, String extraLrcContent, File saveLrcFile) throws Exception {
+        readLrcText(dynamicContent, lrcContent, extraLrcContent, saveLrcFile, saveLrcFile.getName());
+    }
+
+    /**
+     * @param dynamicContent  动感歌词内容
+     * @param lrcContent      lrc歌词内容
+     * @param extraLrcContent 额外歌词内容（翻译歌词、音译歌词）
+     * @param saveLrcFile     歌词文件保存路径
+     * @return
+     * @throws Exception
+     */
+    public void readLrcText(String dynamicContent, String lrcContent, String extraLrcContent, File saveLrcFile, String fileName) throws Exception {
+        if (saveLrcFile != null)
+            mLrcFilePath = saveLrcFile.getPath();
+        LyricsFileReader lyricsFileReader = LyricsIOUtils.getLyricsFileReader(fileName);
+        LyricsInfo lyricsInfo = lyricsFileReader.readLrcText(dynamicContent, lrcContent, extraLrcContent, saveLrcFile.getPath());
+        parser(lyricsInfo);
     }
 
 

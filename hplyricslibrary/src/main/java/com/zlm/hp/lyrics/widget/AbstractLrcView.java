@@ -295,6 +295,21 @@ public abstract class AbstractLrcView extends View {
     private int mTranslateDrawType = TRANSLATE_DRAW_TYPE_LRC;
 
     /**
+     * 翻译歌词绘画lrc歌词的颜色为高亮
+     */
+    public static final int TRANSLATE_DRAW_LRC_COLOR_HL = 0;
+    /**
+     * 翻译歌词绘画lrc歌词的颜色为默认
+     */
+    public static final int TRANSLATE_DRAW_LRC_COLOR_DEF = 1;
+
+    /**
+     * 翻译歌词绘画lrc歌词的颜色
+     */
+    private int mTranslateDrawLrcColorType = TRANSLATE_DRAW_LRC_COLOR_HL;
+
+
+    /**
      * 翻译歌词的高亮宽度
      */
     private float mTranslateLyricsWordHLTime = 0;
@@ -1379,6 +1394,7 @@ public abstract class AbstractLrcView extends View {
         return mPaintHL;
     }
 
+
     public int[] getPaintHLColors() {
         return mPaintHLColors;
     }
@@ -1397,5 +1413,13 @@ public abstract class AbstractLrcView extends View {
 
     public Paint getExtraLrcPaintOutline() {
         return mExtraLrcPaintOutline;
+    }
+
+    public int getTranslateDrawLrcColorType() {
+        return mTranslateDrawLrcColorType;
+    }
+
+    public void setTranslateDrawLrcColorType(int translateDrawLrcColorType) {
+        this.mTranslateDrawLrcColorType = translateDrawLrcColorType;
     }
 }

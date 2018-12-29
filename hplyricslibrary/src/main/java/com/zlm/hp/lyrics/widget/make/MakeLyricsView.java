@@ -441,8 +441,8 @@ public class MakeLyricsView extends View {
             case MotionEvent.ACTION_MOVE:
                 int curX = (int) event.getX();
                 int curY = (int) event.getY();
-                int deltaX = (int) (mInterceptX - curX);
-                int deltaY = (int) (mInterceptY - curY);
+                int deltaX = mInterceptX - curX;
+                int deltaY = mInterceptY - curY;
 
                 if (mIsTouchIntercept || (Math.abs(deltaY) > mTouchSlop && Math.abs(deltaX) < mTouchSlop)) {
                     mIsTouchIntercept = true;
@@ -588,46 +588,61 @@ public class MakeLyricsView extends View {
     @Override
     public void computeScroll() {
         super.computeScroll();
-        // 更新当前的X轴偏移量
-        if (mScroller.computeScrollOffset()) { // 返回true代表正在模拟数据，false 已经停止模拟数据
-            mOffsetY = mScroller.getCurrY();
-            if (mOnScrollListener != null) {
-                if (!isSelectScroll) {
-                    //获取滚动行
-                    mMakeLyricsLineNum = getScrollLrcLineNum(mOffsetY);
-                    if (mMakeLyricsLineNum != mLyricsLineNum || (mMakeLyricsLineNum == 0 && mLyricsLineNum == 0)) {
+        synchronized (lock) {
+            // 更新当前的X轴偏移量
+            if (mScroller.computeScrollOffset()) { // 返回true代表正在模拟数据，false 已经停止模拟数据
+                mOffsetY = mScroller.getCurrY();
+                if (mOnScrollListener != null) {
+                    if (!isSelectScroll) {
+                        //获取滚动行
+                        mMakeLyricsLineNum = getScrollLrcLineNum(mOffsetY);
+//                        if (mMakeLyricsLineNum != mLyricsLineNum || (mMakeLyricsLineNum == 0 && mLyricsLineNum == 0)) {
                         int curPlayTime = mOnScrollListener.getScrollStopPlayTime();
                         if (curPlayTime > 0) {
                             handleLinePlayTime(curPlayTime, mMakeLyricsLineNum);
                         }
+//                        }
                     }
                 }
-            }
-        } else {
-            if (isSelectScroll) {
-                if (mOnScrollListener != null) {
-                    //歌词滚动结束，如果当前已制作歌词行的开始时间比当前播放时间大，则需要清空已制作的数据
-                    if (mMakeLrcLineInfos != null && mMakeLrcLineInfos.size() > 0 && mMakeLyricsLineNum < mMakeLrcLineInfos.size()) {
-                        int curPlayProgress = mOnScrollListener.getCurPlayTime();
-                        int curMakeLyricsLineNum = mMakeLyricsLineNum - 1;
-                        if (curMakeLyricsLineNum >= 0 && curMakeLyricsLineNum < mMakeLrcLineInfos.size()) {
-                            MakeLrcLineInfo makeLrcLineInfo = mMakeLrcLineInfos.get(curMakeLyricsLineNum);
-                            int endTime = makeLrcLineInfo.getLyricsLineInfo().getEndTime();
-                            if (endTime > curPlayProgress && makeLrcLineInfo.getStatus() == MakeLrcLineInfo.STATUS_FINISH) {
-                                mOnScrollListener.seekTo(endTime);
+            } else {
+
+                if (isFlingScroll) {
+                    isFlingScroll = false;
+
+                    //处理多一次滑动数据
+                    //获取滚动行
+                    mMakeLyricsLineNum = getScrollLrcLineNum(mScroller.getFinalY());
+                    int curPlayTime = mOnScrollListener.getScrollStopPlayTime();
+                    if (curPlayTime > 0) {
+                        handleLinePlayTime(curPlayTime, mMakeLyricsLineNum);
+                    }
+
+                    //还原到制作歌词行
+                    scrollToMakeLine(mMakeLyricsLineNum);
+                }
+
+                if (isSelectScroll) {
+
+                    if (mOnScrollListener != null) {
+                        //歌词滚动结束，如果当前已制作歌词行的开始时间比当前播放时间大，则需要清空已制作的数据
+                        if (mMakeLrcLineInfos != null && mMakeLrcLineInfos.size() > 0 && mMakeLyricsLineNum < mMakeLrcLineInfos.size()) {
+                            int curPlayProgress = mOnScrollListener.getCurPlayTime();
+                            int curMakeLyricsLineNum = mMakeLyricsLineNum - 1;
+                            if (curMakeLyricsLineNum >= 0 && curMakeLyricsLineNum < mMakeLrcLineInfos.size()) {
+                                MakeLrcLineInfo makeLrcLineInfo = mMakeLrcLineInfos.get(curMakeLyricsLineNum);
+                                int endTime = makeLrcLineInfo.getLyricsLineInfo().getEndTime();
+                                if (endTime > curPlayProgress && makeLrcLineInfo.getStatus() == MakeLrcLineInfo.STATUS_FINISH) {
+                                    mOnScrollListener.seekTo(endTime);
+                                }
                             }
                         }
                     }
                 }
+                isSelectScroll = false;
+
             }
-            isSelectScroll = false;
-            if (isFlingScroll) {
-                isFlingScroll = false;
-                mMakeLyricsLineNum = getScrollLrcLineNum(mScroller.getFinalY());
-                scrollToMakeLine(mMakeLyricsLineNum);
-            }
+            invalidateView();
         }
-        invalidateView();
     }
 
     /**

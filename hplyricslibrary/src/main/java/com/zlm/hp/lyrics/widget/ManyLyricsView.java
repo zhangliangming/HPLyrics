@@ -14,7 +14,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
@@ -189,6 +188,7 @@ public class ManyLyricsView extends AbstractLrcView {
             }
         }
     };
+
     /**
      * 歌词快进事件
      */
@@ -459,7 +459,12 @@ public class ManyLyricsView extends AbstractLrcView {
                     lineBottomY = drawDownLyrics(canvas, paint, paintHL, translateSplitLyricsLineInfos, extraSplitLyricsLineNum, extraSplitLyricsWordIndex, extraLrcSpaceLineHeight, translateLyricsWordHLTime, lineBottomY);
                 } else {
                     //画lrc歌词
-                    lineBottomY = drawDownLyrics(canvas, paint, paintHL, translateSplitLyricsLineInfos, -1, -2, extraLrcSpaceLineHeight, -1, lineBottomY);
+                    int splitLyricsLineNum = -1;
+                    //高亮绘画lrc歌词
+                    if (getTranslateDrawLrcColorType() == AbstractLrcView.TRANSLATE_DRAW_LRC_COLOR_HL) {
+                        splitLyricsLineNum = extraSplitLyricsLineNum;
+                    }
+                    lineBottomY = drawDownLyrics(canvas, paint, paintHL, translateSplitLyricsLineInfos, splitLyricsLineNum, -2, extraLrcSpaceLineHeight, -1, lineBottomY);
                 }
                 lineBottomY += spaceLineHeight - extraLrcSpaceLineHeight;
             }
@@ -549,11 +554,11 @@ public class ManyLyricsView extends AbstractLrcView {
 
             //超出上视图
             if (lineTopY < lineHeight) {
-                continue;
+                break;
             }
             //超出下视图
             if (lineTopY + spaceLineHeight > getHeight()) {
-                break;
+                continue;
             }
 
             String text = splitLyricsLineInfos.get(i).getLineLyrics();
@@ -599,7 +604,7 @@ public class ManyLyricsView extends AbstractLrcView {
         //画当前时间
         int scrollLrcLineNum = getScrollLrcLineNum(mOffsetY);
 
-       //Log.d("ManyLyricsView", "drawIndicator scrollLrcLineNum = " + scrollLrcLineNum);
+        //Log.d("ManyLyricsView", "drawIndicator scrollLrcLineNum = " + scrollLrcLineNum);
 
         int startTime = lrcLineInfos.get(scrollLrcLineNum).getStartTime();
         String timeString = TimeUtils.parseMMSSString(startTime);
@@ -712,8 +717,8 @@ public class ManyLyricsView extends AbstractLrcView {
             case MotionEvent.ACTION_MOVE:
                 int curX = (int) event.getX();
                 int curY = (int) event.getY();
-                int deltaX = (int) (mInterceptX - curX);
-                int deltaY = (int) (mInterceptY - curY);
+                int deltaX = mInterceptX - curX;
+                int deltaY = mInterceptY - curY;
 
                 if (mIsTouchIntercept || (Math.abs(deltaY) > mTouchSlop && Math.abs(deltaX) < mTouchSlop)) {
                     mIsTouchIntercept = true;
