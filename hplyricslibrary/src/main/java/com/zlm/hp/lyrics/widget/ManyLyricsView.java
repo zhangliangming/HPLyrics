@@ -1306,6 +1306,13 @@ public class ManyLyricsView extends AbstractLrcView {
         this.mOnLrcClickListener = onLrcClickListener;
     }
 
+    /**
+     * 设置指示器监听事件
+     * @param onIndicatorListener
+     */
+    public void setOnIndicatorListener(OnIndicatorListener onIndicatorListener) {
+        this.mOnIndicatorListener = onIndicatorListener;
+    }
 
     /**
      * 歌词事件
