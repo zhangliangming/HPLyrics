@@ -193,6 +193,10 @@ public class ManyLyricsView extends AbstractLrcView {
      * 歌词快进事件
      */
     private OnLrcClickListener mOnLrcClickListener;
+    /**
+     * 指示器
+     */
+    private OnIndicatorListener mOnIndicatorListener;
 
     public ManyLyricsView(Context context) {
         super(context);
@@ -335,10 +339,27 @@ public class ManyLyricsView extends AbstractLrcView {
         }
 
         //绘画时间、播放按钮等
-        if ((mIsTouchIntercept || mTouchEventStatus != TOUCHEVENTSTATUS_INIT) && mIsDrawIndicator) {
-            drawIndicator(canvas);
-        }
+        if (mIsTouchIntercept || mTouchEventStatus != TOUCHEVENTSTATUS_INIT) {
 
+            //画当前时间
+            int scrollLrcLineNum = getScrollLrcLineNum(mOffsetY);
+            int startTime = lrcLineInfos.get(scrollLrcLineNum).getStartTime();
+
+            if (mIsDrawIndicator) {
+                drawIndicator(canvas, startTime);
+            }
+
+            //指示器回调
+            if (mOnIndicatorListener != null) {
+                mOnIndicatorListener.indicatorVisibleToUser(true, startTime);
+            }
+        } else {
+
+            //指示器回调
+            if (mOnIndicatorListener != null) {
+                mOnIndicatorListener.indicatorVisibleToUser(false, -1);
+            }
+        }
     }
 
     /**
@@ -597,16 +618,7 @@ public class ManyLyricsView extends AbstractLrcView {
      *
      * @param canvas
      */
-    private void drawIndicator(Canvas canvas) {
-        //获取数据
-        TreeMap<Integer, LyricsLineInfo> lrcLineInfos = getLrcLineInfos();
-
-        //画当前时间
-        int scrollLrcLineNum = getScrollLrcLineNum(mOffsetY);
-
-        //Log.d("ManyLyricsView", "drawIndicator scrollLrcLineNum = " + scrollLrcLineNum);
-
-        int startTime = lrcLineInfos.get(scrollLrcLineNum).getStartTime();
+    private void drawIndicator(Canvas canvas, int startTime) {
         String timeString = TimeUtils.parseMMSSString(startTime);
         int textHeight = LyricsUtils.getTextHeight(mPaintIndicator);
         float textWidth = LyricsUtils.getTextWidth(mPaintIndicator, timeString);
@@ -1305,6 +1317,20 @@ public class ManyLyricsView extends AbstractLrcView {
          * @param progress
          */
         void onLrcPlayClicked(int progress);
+
+    }
+
+    /**
+     * 指示器事件
+     */
+    public interface OnIndicatorListener {
+        /**
+         * 指示器是否可视
+         *
+         * @param isVisibleToUser   对用户是否可视
+         * @param scrollLrcProgress 滑动时的播放进度
+         */
+        void indicatorVisibleToUser(boolean isVisibleToUser, int scrollLrcProgress);
     }
 
 }

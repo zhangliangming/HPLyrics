@@ -523,11 +523,11 @@ public class MakeLyricsView extends View {
      */
     private void scrollToMakeLine(int makeLyricsLineNum) {
         synchronized (lock) {
+            isSelectScroll = true;
             mLyricsLineNum = makeLyricsLineNum;
             float lineHeight = LyricsUtils.getTextHeight(mPaint) + mSpaceLineHeight;
             float lineAtHeightY = lineHeight * mLyricsLineNum;
             int deltaYTemp = (int) (lineAtHeightY - mScroller.getFinalY());
-            isSelectScroll = true;
             mScroller.startScroll(0, mScroller.getFinalY(), 0, deltaYTemp, mDuration);
             invalidateView();
         }
@@ -616,6 +616,8 @@ public class MakeLyricsView extends View {
                     if (curPlayTime > 0) {
                         handleLinePlayTime(curPlayTime, mMakeLyricsLineNum);
                     }
+                    //及时刷新
+                    invalidateView();
 
                     //还原到制作歌词行
                     scrollToMakeLine(mMakeLyricsLineNum);
@@ -662,6 +664,9 @@ public class MakeLyricsView extends View {
                         makeLrcLineInfo.reset();
                     }
                 }
+                //及时刷新
+                invalidateView();
+
                 //界面跳转
                 if (makeLyricsLineNum != -1) {
                     mMakeLyricsLineNum = makeLyricsLineNum;
