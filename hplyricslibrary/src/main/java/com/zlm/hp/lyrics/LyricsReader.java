@@ -192,10 +192,10 @@ public class LyricsReader {
         //默认歌词行
         mLrcLineInfos = lyricsInfo.getLyricsLineInfoTreeMap();
         //翻译歌词集合
-        if (lyricsInfo.getTranslateLrcLineInfos() != null)
+        if (lyricsInfo.getTranslateLrcLineInfos() != null && lyricsInfo.getTranslateLrcLineInfos().size() > 0)
             mTranslateLrcLineInfos = LyricsUtils.getTranslateLrc(mLyricsType, mLrcLineInfos, lyricsInfo.getTranslateLrcLineInfos());
         //音译歌词集合
-        if (lyricsInfo.getTransliterationLrcLineInfos() != null)
+        if (lyricsInfo.getTransliterationLrcLineInfos() != null && lyricsInfo.getTransliterationLrcLineInfos().size() > 0)
             mTransliterationLrcLineInfos = LyricsUtils.getTransliterationLrc(mLyricsType, mLrcLineInfos, lyricsInfo.getTransliterationLrcLineInfos());
 
     }

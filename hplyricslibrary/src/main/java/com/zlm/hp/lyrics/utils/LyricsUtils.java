@@ -299,7 +299,8 @@ public class LyricsUtils {
      * @return
      */
     public static List<LyricsLineInfo> getTranslateLrc(int lyricsType, TreeMap<Integer, LyricsLineInfo> lrcLineInfos, List<TranslateLrcLineInfo> translateLrcLineInfos) {
-        if (lrcLineInfos == null) return null;
+        if (lrcLineInfos == null || lrcLineInfos.size() == 0 || translateLrcLineInfos == null || translateLrcLineInfos.size() == 0)
+            return null;
         List<LyricsLineInfo> newLyricsLineInfos = new ArrayList<LyricsLineInfo>();
         for (int i = 0; i < lrcLineInfos.size(); i++) {
             TranslateLrcLineInfo origLyricsLineInfo = translateLrcLineInfos
@@ -354,7 +355,8 @@ public class LyricsUtils {
      * @return
      */
     public static List<LyricsLineInfo> getTransliterationLrc(int lyricsType, TreeMap<Integer, LyricsLineInfo> lrcLineInfos, List<LyricsLineInfo> transliterationLrcLineInfos) {
-        if (lrcLineInfos == null || lyricsType == LyricsInfo.LRC) return null;
+        if (lrcLineInfos == null || lrcLineInfos.size() == 0 || lyricsType == LyricsInfo.LRC || transliterationLrcLineInfos == null || transliterationLrcLineInfos.size() == 0)
+            return null;
         List<LyricsLineInfo> newLyricsLineInfos = new ArrayList<LyricsLineInfo>();
         for (int i = 0; i < lrcLineInfos.size(); i++) {
             LyricsLineInfo origLyricsLineInfo = transliterationLrcLineInfos.get(i);
