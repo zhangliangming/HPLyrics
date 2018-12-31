@@ -792,8 +792,7 @@ public class MakeLyricsView extends View {
      */
     public void setMakeLrcComText(String lrcComText, boolean isInvalidateView) {
         synchronized (lock) {
-            if (mMakeLrcLineInfos != null) mMakeLrcLineInfos.clear();
-            else mMakeLrcLineInfos = new ArrayList<MakeLrcLineInfo>();
+            initLrcData(isInvalidateView);
             if (!TextUtils.isEmpty(lrcComText)) {
                 String lrcComTexts[] = lrcComText.split("\n");
                 for (int i = 0; i < lrcComTexts.length; i++) {
@@ -820,6 +819,23 @@ public class MakeLyricsView extends View {
             if (isInvalidateView) {
                 invalidateView();
             }
+        }
+    }
+
+    /**
+     * 重置数据
+     */
+    public void initLrcData(boolean isInvalidateView) {
+        if (mMakeLrcLineInfos != null) mMakeLrcLineInfos.clear();
+        else mMakeLrcLineInfos = new ArrayList<MakeLrcLineInfo>();
+        mLyricsLineNum = 0;
+        mMakeLyricsLineNum = 0;
+        mScroller.setFinalY(0);
+        mOffsetY = 0;
+        mCentreY = 0;
+        //刷新
+        if (isInvalidateView) {
+            invalidateView();
         }
     }
 
