@@ -172,6 +172,11 @@ public class MakeLyricsView extends View {
      */
     private OnScrollListener mOnScrollListener;
 
+    /**
+     * 左右间隔距离
+     */
+    private float mPaddingLeftOrRight = 15;
+
     public MakeLyricsView(Context context) {
         super(context);
         init(context);
@@ -364,7 +369,31 @@ public class MakeLyricsView extends View {
     private void drawUpAndDownLrc(Canvas canvas, Paint paint, int[] paintColors, float y, MakeLrcLineInfo makeLrcLineInfo) {
         String text = makeLrcLineInfo.getLyricsLineInfo().getLineLyrics();
         float textWidth = LyricsUtils.getTextWidth(paint, text);
-        float textX = (getWidth() - textWidth) * 0.5f;
+        // 当前歌词行的x坐标
+        float hlWidth = 0;
+        if (makeLrcLineInfo.getStatus() == MakeLrcLineInfo.STATUS_FINISH) {
+            hlWidth = textWidth;
+        }
+        float textX = 0;
+        float lrcTextMoveX = 0;
+        int viewWidth = getWidth();
+        if (textWidth > viewWidth) {
+            if (hlWidth >= viewWidth / 2) {
+                if ((textWidth - hlWidth) >= viewWidth / 2) {
+                    lrcTextMoveX = (viewWidth / 2 - hlWidth);
+                } else {
+                    lrcTextMoveX = viewWidth - textWidth - mPaddingLeftOrRight * 2;
+                }
+            } else {
+                lrcTextMoveX = mPaddingLeftOrRight;
+            }
+            // 如果歌词宽度大于view的宽，则需要动态设置歌词的起始x坐标，以实现水平滚动
+            textX = lrcTextMoveX;
+        } else {
+            // 如果歌词宽度小于view的宽
+            textX = (viewWidth - textWidth) / 2;
+        }
+
         LyricsUtils.drawText(canvas, paint, paintColors, text, textX, y);
     }
 
@@ -382,12 +411,9 @@ public class MakeLyricsView extends View {
     private void drawCurLrc(Canvas canvas, Paint paint, Paint paintHL, int[] paintColors, int[] paintHLColors, float y, MakeLrcLineInfo makeLrcLineInfo) {
         String text = makeLrcLineInfo.getLyricsLineInfo().getLineLyrics();
         float textWidth = LyricsUtils.getTextWidth(paint, text);
-        float textHeight = LyricsUtils.getTextHeight(paint);
-        float textX = (getWidth() - textWidth) * 0.5f;
 
         int rectLeft = -1;
         int rectWidth = 0;
-        //
         float hlWidth = 0;
         //获取制作歌词索引
         int index = makeLrcLineInfo.getLrcIndex();
@@ -407,16 +433,36 @@ public class MakeLyricsView extends View {
             rectLeft = (int) (hlWidth - rectWidth);
             rectWidth = (int) LyricsUtils.getTextWidth(paint, lyricsWords[index].trim());
         }
+
+        // 当前歌词行的x坐标
+        float textX = 0;
+        float lrcTextMoveX = 0;
+        int viewWidth = getWidth();
+        if (textWidth > viewWidth) {
+            if (hlWidth >= viewWidth / 2) {
+                if ((textWidth - hlWidth) >= viewWidth / 2) {
+                    lrcTextMoveX = (viewWidth / 2 - hlWidth);
+                } else {
+                    lrcTextMoveX = viewWidth - textWidth - mPaddingLeftOrRight * 2;
+                }
+            } else {
+                lrcTextMoveX = mPaddingLeftOrRight;
+            }
+            // 如果歌词宽度大于view的宽，则需要动态设置歌词的起始x坐标，以实现水平滚动
+            textX = lrcTextMoveX;
+        } else {
+            // 如果歌词宽度小于view的宽
+            textX = (viewWidth - textWidth) / 2;
+        }
+
         LyricsUtils.drawDynamicText(canvas, paint, paintHL, paintColors, paintHLColors, text, hlWidth, textX, y);
 
-        float spaceLineHeight = mSpaceLineHeight;
-        float lineHeight = LyricsUtils.getTextHeight(paint) + spaceLineHeight;
         //绘画制作歌词指示器
         if (rectLeft != -1) {
 
             Rect rect = new Rect();
-            rect.top = (int) y - (int) lineHeight / 2;
-            rect.bottom = (int) y + (int) textHeight;
+            rect.top = (int) y - LyricsUtils.getRealTextHeight(paint);
+            rect.bottom = (int) y + LyricsUtils.getRealTextHeight(paint) / 2;
             rect.left = (int) (textX + rectLeft);
             rect.right = rect.left + rectWidth;
 
