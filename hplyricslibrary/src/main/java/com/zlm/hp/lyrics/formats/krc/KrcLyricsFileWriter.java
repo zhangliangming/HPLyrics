@@ -61,7 +61,7 @@ public class KrcLyricsFileWriter extends LyricsFileWriter {
         File lyricsFile = new File(lyricsFilePath);
         if (lyricsFile != null) {
             //
-            if (lyricsFile.getParentFile().isDirectory() && !lyricsFile.getParentFile().exists()) {
+            if (!lyricsFile.getParentFile().exists()) {
                 lyricsFile.getParentFile().mkdirs();
             }
 

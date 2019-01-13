@@ -45,7 +45,7 @@ public abstract class LyricsFileWriter {
         File lyricsFile = new File(lyricsFilePath);
         if (lyricsFile != null) {
             //
-            if (lyricsFile.getParentFile().isDirectory() && !lyricsFile.getParentFile().exists()) {
+            if (!lyricsFile.getParentFile().exists()) {
                 lyricsFile.getParentFile().mkdirs();
             }
             OutputStreamWriter outstream = new OutputStreamWriter(
@@ -77,7 +77,7 @@ public abstract class LyricsFileWriter {
         File lyricsFile = new File(lyricsFilePath);
         if (lyricsFile != null) {
             //
-            if (lyricsFile.getParentFile().isDirectory() && !lyricsFile.getParentFile().exists()) {
+            if (!lyricsFile.getParentFile().exists()) {
                 lyricsFile.getParentFile().mkdirs();
             }
             FileOutputStream os = new FileOutputStream(lyricsFile);
