@@ -120,6 +120,16 @@ public class LyricsReader {
     }
 
     /**
+     * @param lrcContent  lrc歌词内容
+     * @param saveLrcFile 歌词文件保存路径
+     * @return
+     * @throws Exception
+     */
+    public void readLrcText(String lrcContent, File saveLrcFile) throws Exception {
+        readLrcText(lrcContent, null, saveLrcFile, saveLrcFile.getName());
+    }
+
+    /**
      * @param lrcContent      lrc歌词内容
      * @param extraLrcContent 额外歌词内容（翻译歌词、音译歌词）
      * @param saveLrcFile     歌词文件保存路径
@@ -138,7 +148,7 @@ public class LyricsReader {
      * @throws Exception
      */
     public void readLrcText(String lrcContent, String extraLrcContent, File saveLrcFile, String fileName) throws Exception {
-        readLrcText("", lrcContent, extraLrcContent, saveLrcFile, fileName);
+        readLrcText(null, lrcContent, extraLrcContent, saveLrcFile, fileName);
     }
 
     /**

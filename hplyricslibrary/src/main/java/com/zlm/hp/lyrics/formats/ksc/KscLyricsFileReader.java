@@ -1,5 +1,7 @@
 package com.zlm.hp.lyrics.formats.ksc;
 
+import android.text.TextUtils;
+
 import com.zlm.hp.lyrics.formats.LyricsFileReader;
 import com.zlm.hp.lyrics.model.LyricsInfo;
 import com.zlm.hp.lyrics.model.LyricsLineInfo;
@@ -81,6 +83,37 @@ public class KscLyricsFileReader extends LyricsFileReader {
             // 设置歌词的标签类
             lyricsIfno.setLyricsTags(lyricsTags);
             //
+            lyricsIfno.setLyricsLineInfoTreeMap(lyricsLineInfos);
+        }
+        return lyricsIfno;
+    }
+
+    @Override
+    public LyricsInfo readLrcText(String dynamicContent, String lrcContent, String extraLrcContent, String lyricsFilePath) throws Exception {
+        LyricsInfo lyricsIfno = new LyricsInfo();
+        lyricsIfno.setLyricsFileExt(getSupportFileExt());
+        if (!TextUtils.isEmpty(lrcContent)) {
+
+            TreeMap<Integer, LyricsLineInfo> lyricsLineInfos = new TreeMap<Integer, LyricsLineInfo>();
+            Map<String, Object> lyricsTags = new HashMap<String, Object>();
+            int index = 0;
+
+            // 获取歌词内容
+            String lrcContents[] = lrcContent.split("\n");
+            for (int i = 0; i < lrcContents.length; i++) {
+                String lineInfo = lrcContents[i];
+
+                // 行读取，并解析每行歌词的内容
+                LyricsLineInfo lyricsLineInfo = parserLineInfos(lyricsTags,
+                        lineInfo);
+                if (lyricsLineInfo != null) {
+                    lyricsLineInfos.put(index, lyricsLineInfo);
+                    index++;
+                }
+            }
+
+            // 设置歌词的标签类
+            lyricsIfno.setLyricsTags(lyricsTags);
             lyricsIfno.setLyricsLineInfoTreeMap(lyricsLineInfos);
         }
         return lyricsIfno;

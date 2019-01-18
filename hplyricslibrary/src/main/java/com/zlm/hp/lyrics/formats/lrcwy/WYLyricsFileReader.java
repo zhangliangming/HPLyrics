@@ -184,11 +184,6 @@ public class WYLyricsFileReader extends LyricsFileReader {
     }
 
     @Override
-    public LyricsInfo readLrcText(String lrcContent, String extraLrcContent, String lyricsFilePath) throws Exception {
-        return readLrcText(null, lrcContent, extraLrcContent, lyricsFilePath);
-    }
-
-    @Override
     public LyricsInfo readLrcText(String dynamicContent, String lrcContent, String extraLrcContent, String lyricsFilePath) throws Exception {
         return parserLrc(dynamicContent, lrcContent, extraLrcContent, lyricsFilePath);
     }

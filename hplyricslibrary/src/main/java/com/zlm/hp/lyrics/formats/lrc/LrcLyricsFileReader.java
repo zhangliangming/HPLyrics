@@ -1,5 +1,7 @@
 package com.zlm.hp.lyrics.formats.lrc;
 
+import android.text.TextUtils;
+
 import com.zlm.hp.lyrics.formats.LyricsFileReader;
 import com.zlm.hp.lyrics.model.LyricsInfo;
 import com.zlm.hp.lyrics.model.LyricsLineInfo;
@@ -86,6 +88,46 @@ public class LrcLyricsFileReader extends LyricsFileReader {
             lyricsIfno.setLyricsLineInfoTreeMap(lyricsLineInfos);
         }
         return lyricsIfno;
+    }
+
+    @Override
+    public LyricsInfo readLrcText(String dynamicContent, String lrcContent, String extraLrcContent, String lyricsFilePath) throws Exception {
+        LyricsInfo lyricsIfno = new LyricsInfo();
+        lyricsIfno.setLyricsFileExt(getSupportFileExt());
+        lyricsIfno.setLyricsType(LyricsInfo.LRC);
+
+        if (!TextUtils.isEmpty(lrcContent)) {
+
+            // 这里面key为该行歌词的开始时间，方便后面排序
+            SortedMap<Integer, LyricsLineInfo> lyricsLineInfosTemp = new TreeMap<Integer, LyricsLineInfo>();
+            Map<String, Object> lyricsTags = new HashMap<String, Object>();
+
+            // 获取歌词内容
+            String lrcContents[] = lrcContent.split("\n");
+            for (int i = 0; i < lrcContents.length; i++) {
+                String lineInfo = lrcContents[i];
+
+                // 解析歌词
+                parserLineInfos(lyricsLineInfosTemp,
+                        lyricsTags, lineInfo);
+            }
+
+            // 重新封装
+            TreeMap<Integer, LyricsLineInfo> lyricsLineInfos = new TreeMap<Integer, LyricsLineInfo>();
+            int index = 0;
+            Iterator<Integer> it = lyricsLineInfosTemp.keySet().iterator();
+            while (it.hasNext()) {
+                lyricsLineInfos
+                        .put(index++, lyricsLineInfosTemp.get(it.next()));
+            }
+            it = null;
+            // 设置歌词的标签类
+            lyricsIfno.setLyricsTags(lyricsTags);
+            //
+            lyricsIfno.setLyricsLineInfoTreeMap(lyricsLineInfos);
+        }
+        return lyricsIfno;
+
     }
 
     /**
