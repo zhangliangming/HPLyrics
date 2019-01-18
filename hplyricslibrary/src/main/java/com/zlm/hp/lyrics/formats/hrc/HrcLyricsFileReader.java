@@ -69,6 +69,11 @@ public class HrcLyricsFileReader extends LyricsFileReader {
     }
 
     @Override
+    public LyricsInfo readLrcText(String dynamicContent, String lrcContent, String extraLrcContent, String lyricsFilePath) throws Exception {
+        return null;
+    }
+
+    @Override
     public LyricsInfo readInputStream(InputStream in) throws Exception {
         LyricsInfo lyricsIfno = new LyricsInfo();
         lyricsIfno.setLyricsFileExt(getSupportFileExt());
