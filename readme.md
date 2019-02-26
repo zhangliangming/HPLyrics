@@ -9,16 +9,17 @@
 
 # 2.x版本使用注意 #
 - 主题：我主要是使用Theme.AppCompat.Light.NoActionBar的主题，我试过其它的主题，会导致surfaceview背景为黑色，并且不能透明的问题。
-- surfaceview存在的问题，没有view相关的旋转，位移等动画，所以我乐乐音乐的旋转界面会出现问题，如果有相关动画需求的，慎用。
+- surfaceview存在的问题，没有view相关的旋转，位移等动画和touch事件，所以我乐乐音乐的旋转界面会出现问题，如果有相关动画需求的，慎用。
 
 # 3.x版本使用注意 #
 - 设置硬件加速：android:hardwareAccelerated="true" 
 - android4.0以上
+- 存在的问题，没有touch事件
 
 # 网易云API歌词调用方式 #
 
 ![](https://i.imgur.com/LIGQRmJ.png)
-注：该歌词只适用于通过api获取歌词，文件保存格式为：lrcwy。其中动感歌词和lrc歌词只能先其中一种，支持翻译歌词
+注：该歌词只适用于通过api获取歌词，文件保存格式为：lrcwy。其中动感歌词和lrc歌词只能选其中一种，支持翻译歌词，
 
 # 日志 #
 
