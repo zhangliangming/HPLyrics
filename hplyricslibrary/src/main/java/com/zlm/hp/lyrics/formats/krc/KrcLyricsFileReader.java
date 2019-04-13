@@ -195,6 +195,10 @@ public class KrcLyricsFileReader extends LyricsFileReader {
                 Matcher lyricsWordsMatcher = lyricsWordsPattern
                         .matcher(lineContent);
 
+                if (lyricsWordsMatcher == null) {
+                    return null;
+                }
+
                 // 歌词分隔
                 String lineLyricsTemp[] = lineContent.split(regex);
                 String[] lyricsWords = getLyricsWords(lineLyricsTemp);

@@ -1,5 +1,7 @@
 package com.zlm.hp.lyrics.model;
 
+import android.text.TextUtils;
+
 import java.util.List;
 
 /**
@@ -20,7 +22,7 @@ public class LyricsLineInfo {
     /**
      * 该行歌词
      */
-    private String mLineLyrics;
+    private String mLineLyrics = "";
 
     /**
      * 歌词数组，用来分隔每个歌词
@@ -50,11 +52,17 @@ public class LyricsLineInfo {
     }
 
     public void setLyricsWords(String[] lyricsWords) {
+        if (lyricsWords == null) return;
+        String[] tempArray = new String[lyricsWords.length];
         for (int i = 0; i < lyricsWords.length; i++) {
-            lyricsWords[i] = lyricsWords[i].replaceAll("\r|\n", "");
+            String temp = lyricsWords[i];
+            if (TextUtils.isEmpty(temp)) {
+                tempArray[i] = "";
+            } else {
+                tempArray[i] = temp.replaceAll("\r|\n", "");
+            }
         }
-
-        this.mLyricsWords = lyricsWords;
+        this.mLyricsWords = tempArray;
     }
 
     public int[] getWordsDisInterval() {
@@ -86,7 +94,9 @@ public class LyricsLineInfo {
     }
 
     public void setLineLyrics(String mLineLyrics) {
-        this.mLineLyrics = mLineLyrics.replaceAll("\r|\n", "");
+        if (!TextUtils.isEmpty(mLineLyrics)) {
+            this.mLineLyrics = mLineLyrics.replaceAll("\r|\n", "");
+        }
     }
 
     /**

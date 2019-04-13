@@ -250,7 +250,7 @@ public class WYLyricsFileReader extends LyricsFileReader {
             if (translateLrcInfosTemp.containsKey(lyricsLineInfo.getStartTime())) {
                 LyricsLineInfo temp = translateLrcInfosTemp.get(lyricsLineInfo.getStartTime());
                 translateLrcLineInfo.setLineLyrics(temp.getLineLyrics());
-            }else{
+            } else {
                 translateLrcLineInfo.setLineLyrics("");
             }
             translateLrcLineInfos.add(i, translateLrcLineInfo);
@@ -351,6 +351,9 @@ public class WYLyricsFileReader extends LyricsFileReader {
                 Pattern lyricsWordsPattern = Pattern.compile(regex);
                 Matcher lyricsWordsMatcher = lyricsWordsPattern
                         .matcher(lineContent);
+                if (lyricsWordsMatcher == null) {
+                    return null;
+                }
 
                 // 歌词分隔
                 String lineLyricsTemp[] = lineContent.split(regex);
