@@ -102,10 +102,10 @@ public class ManyLyricsView extends AbstractLrcView {
      *
      */
     private Scroller mScroller;
-    /**
+     /**
      * Y轴移动的时间
      */
-    private int mDuration = 350;
+    private int mDuration = 500;
 
     ///////////////////////////////////////////////////
     /**
@@ -1295,6 +1295,10 @@ public class ManyLyricsView extends AbstractLrcView {
         mPaintLine.setTextSize(mPlayRectSize);
         mPaintPlay.setTextSize(mPlayRectSize);
         invalidateView();
+    }
+    
+     public void setDuration(int duration) {
+        this.mDuration = duration;
     }
 
     /**
