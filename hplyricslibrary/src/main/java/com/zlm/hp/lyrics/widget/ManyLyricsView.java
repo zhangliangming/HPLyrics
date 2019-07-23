@@ -105,7 +105,7 @@ public class ManyLyricsView extends AbstractLrcView {
      /**
      * Y轴移动的时间
      */
-    private int mDuration = 500;
+    private int mDuration = 1000;
 
     ///////////////////////////////////////////////////
     /**
