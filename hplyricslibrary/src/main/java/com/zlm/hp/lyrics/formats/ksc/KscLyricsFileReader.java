@@ -9,8 +9,11 @@ import com.zlm.hp.lyrics.model.LyricsTag;
 import com.zlm.hp.lyrics.utils.CharUtils;
 import com.zlm.hp.lyrics.utils.StringUtils;
 import com.zlm.hp.lyrics.utils.TimeUtils;
+import com.zlm.hp.lyrics.utils.UnicodeInputStream;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
@@ -51,9 +54,24 @@ public class KscLyricsFileReader extends LyricsFileReader {
      */
     public final static String LEGAL_TAG_PREFIX = "karaoke.tag";
 
-    public KscLyricsFileReader() {
-        // 设置编码
-        setDefaultCharset(Charset.forName("GB2312"));
+    /**
+     * 读取歌词文件
+     *
+     * @param file
+     * @return
+     */
+    @Override
+    public LyricsInfo readFile(File file) throws Exception {
+        if (file != null) {
+            String charsetName = getCharsetName(file);
+            setDefaultCharset(Charset.forName(charsetName));
+            InputStream inputStream = new FileInputStream(file);
+            if (charsetName.toLowerCase().equals("utf-8")) {
+                inputStream = new UnicodeInputStream(inputStream, charsetName);
+            }
+            return readInputStream(inputStream);
+        }
+        return null;
     }
 
     @Override
@@ -133,19 +151,29 @@ public class KscLyricsFileReader extends LyricsFileReader {
         LyricsLineInfo lyricsLineInfo = null;
         if (lineInfo.startsWith(LEGAL_SONGNAME_PREFIX)) {
             String temp[] = lineInfo.split("\'");
-            //
-            lyricsTags.put(LyricsTag.TAG_TITLE, temp[1]);
+            if (temp.length > 1) {
+                lyricsTags.put(LyricsTag.TAG_TITLE, temp[1]);
+            }
         } else if (lineInfo.startsWith(LEGAL_SINGERNAME_PREFIX)) {
             String temp[] = lineInfo.split("\'");
-            lyricsTags.put(LyricsTag.TAG_ARTIST, temp[1]);
+            if (temp.length > 1) {
+                lyricsTags.put(LyricsTag.TAG_ARTIST, temp[1]);
+            }
         } else if (lineInfo.startsWith(LEGAL_OFFSET_PREFIX)) {
             String temp[] = lineInfo.split("\'");
-            lyricsTags.put(LyricsTag.TAG_OFFSET, temp[1]);
+            if (temp.length > 1) {
+                lyricsTags.put(LyricsTag.TAG_OFFSET, temp[1]);
+            }
         } else if (lineInfo.startsWith(LEGAL_TAG_PREFIX)) {
             // 自定义标签
             if (lineInfo.contains(":")) {
-                String temp[] = lineInfo.split("\'")[1].split(":");
-                lyricsTags.put(temp[0], temp[1]);
+                String temp1[] = lineInfo.split("\'");
+                if (temp1.length > 1) {
+                    String temp2[] = temp1[1].split(":");
+                    if (temp2.length > 1) {
+                        lyricsTags.put(temp2[0], temp2[1]);
+                    }
+                }
             }
         } else if (lineInfo.startsWith(LEGAL_LYRICS_LINE_PREFIX)) {
             lyricsLineInfo = new LyricsLineInfo();
