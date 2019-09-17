@@ -7,10 +7,14 @@ import com.zlm.hp.lyrics.model.LyricsInfo;
 import com.zlm.hp.lyrics.model.LyricsLineInfo;
 import com.zlm.hp.lyrics.model.LyricsTag;
 import com.zlm.hp.lyrics.utils.TimeUtils;
+import com.zlm.hp.lyrics.utils.UnicodeInputStream;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -49,6 +53,26 @@ public class LrcLyricsFileReader extends LyricsFileReader {
     private final static String LEGAL_AL_PREFIX = "[al:";
 
     private final static String LEGAL_TOTAL_PREFIX = "[total:";
+
+    /**
+     * 读取歌词文件
+     *
+     * @param file
+     * @return
+     */
+    @Override
+    public LyricsInfo readFile(File file) throws Exception {
+        if (file != null) {
+            String charsetName = getCharsetName(file);
+            setDefaultCharset(Charset.forName(charsetName));
+            InputStream inputStream = new FileInputStream(file);
+            if (charsetName.toLowerCase().equals("utf-8")) {
+                inputStream = new UnicodeInputStream(inputStream, charsetName);
+            }
+            return readInputStream(inputStream);
+        }
+        return null;
+    }
 
     @Override
     public LyricsInfo readInputStream(InputStream in) throws Exception {
