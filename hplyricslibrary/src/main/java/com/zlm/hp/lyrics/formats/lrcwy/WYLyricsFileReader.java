@@ -9,10 +9,14 @@ import com.zlm.hp.lyrics.model.LyricsLineInfo;
 import com.zlm.hp.lyrics.model.LyricsTag;
 import com.zlm.hp.lyrics.model.TranslateLrcLineInfo;
 import com.zlm.hp.lyrics.utils.TimeUtils;
+import com.zlm.hp.lyrics.utils.UnicodeInputStream;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -67,6 +71,26 @@ public class WYLyricsFileReader extends LyricsFileReader {
      * 额外歌词
      */
     private final static String LEGAL_EXTRA_LYRICS_PREFIX = "wy.extra.lrc";
+
+    /**
+     * 读取歌词文件
+     *
+     * @param file
+     * @return
+     */
+    @Override
+    public LyricsInfo readFile(File file) throws Exception {
+        if (file != null) {
+            String charsetName = getCharsetName(file);
+            setDefaultCharset(Charset.forName(charsetName));
+            InputStream inputStream = new FileInputStream(file);
+            if (charsetName.toLowerCase().equals("utf-8")) {
+                inputStream = new UnicodeInputStream(inputStream, charsetName);
+            }
+            return readInputStream(inputStream);
+        }
+        return null;
+    }
 
     @Override
     public LyricsInfo readInputStream(InputStream in) throws Exception {
@@ -250,7 +274,7 @@ public class WYLyricsFileReader extends LyricsFileReader {
             if (translateLrcInfosTemp.containsKey(lyricsLineInfo.getStartTime())) {
                 LyricsLineInfo temp = translateLrcInfosTemp.get(lyricsLineInfo.getStartTime());
                 translateLrcLineInfo.setLineLyrics(temp.getLineLyrics());
-            } else {
+            }else{
                 translateLrcLineInfo.setLineLyrics("");
             }
             translateLrcLineInfos.add(i, translateLrcLineInfo);
@@ -351,9 +375,6 @@ public class WYLyricsFileReader extends LyricsFileReader {
                 Pattern lyricsWordsPattern = Pattern.compile(regex);
                 Matcher lyricsWordsMatcher = lyricsWordsPattern
                         .matcher(lineContent);
-                if (lyricsWordsMatcher == null) {
-                    return null;
-                }
 
                 // 歌词分隔
                 String lineLyricsTemp[] = lineContent.split(regex);
