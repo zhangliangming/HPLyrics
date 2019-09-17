@@ -4,10 +4,12 @@ import android.util.Base64;
 
 import com.zlm.hp.lyrics.model.LyricsInfo;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 
@@ -86,7 +88,7 @@ public abstract class LyricsFileReader {
      * @param dynamicContent  动感歌词内容
      * @param lrcContent      lrc歌词内容
      * @param extraLrcContent 额外歌词内容（翻译歌词、音译歌词）
-     * @param lyricsFilePath 歌词文件保存路径
+     * @param lyricsFilePath  歌词文件保存路径
      * @return
      * @throws Exception
      */
@@ -122,5 +124,44 @@ public abstract class LyricsFileReader {
 
     public Charset getDefaultCharset() {
         return defaultCharset;
+    }
+
+    /**
+     * 判断文件的编码格式
+     *
+     * @param file
+     * @return
+     */
+    public String getCharsetName(File file) {
+        String code = "GBK";
+        BufferedInputStream bin = null;
+        try {
+            bin = new BufferedInputStream(new FileInputStream(file));
+            int p = (bin.read() << 8) + bin.read();
+
+            switch (p) {
+                case 0xefbb:
+                    code = "UTF-8";
+                    break;
+                case 0xfffe:
+                    code = "Unicode";
+                    break;
+                case 0xfeff:
+                    code = "UTF-16BE";
+                    break;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (bin != null) {
+                try {
+                    bin.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return code;
     }
 }
