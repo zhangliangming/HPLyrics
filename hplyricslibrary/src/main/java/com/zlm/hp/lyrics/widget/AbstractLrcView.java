@@ -474,7 +474,7 @@ public abstract class AbstractLrcView extends View {
         //
         mActivityWR = new WeakReference<Context>(context);
         //创建异步HandlerThread
-        mHandlerThread = new HandlerThread("updateLrcData", Process.THREAD_PRIORITY_BACKGROUND);
+        mHandlerThread = new HandlerThread("updateLrcData", Process.THREAD_PRIORITY_DEFAULT);
         //必须先开启线程
         mHandlerThread.start();
         //子线程Handler
@@ -1332,6 +1332,10 @@ public abstract class AbstractLrcView extends View {
 
     public float getLyricsWordHLTime() {
         return mLyricsWordHLTime;
+    }
+
+    public void setLyricsWordHLTime(float mLyricsWordHLTime) {
+        this.mLyricsWordHLTime = mLyricsWordHLTime;
     }
 
     public int getExtraSplitLyricsLineNum() {
