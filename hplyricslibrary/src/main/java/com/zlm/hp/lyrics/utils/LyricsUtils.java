@@ -82,6 +82,64 @@ public class LyricsUtils {
         return textX;
     }
 
+    /**
+     * 获取高亮移动的x位置（注：该方法在歌词不换行时使用）
+     *
+     * @param curLrcTextWidth    当前行宽度
+     * @param lineLyricsHLWidth  当前行高亮歌词宽度
+     * @param viewWidth          视图宽度
+     * @param paddingLeftOrRight 左右间隔距离
+     * @return
+     */
+    public static float getFristLrcMoveTextX(float curLrcTextWidth, float lineLyricsHLWidth, int viewWidth, float paddingLeftOrRight) {
+        float textX = 0;
+        if (curLrcTextWidth > viewWidth) {
+            if (lineLyricsHLWidth >= viewWidth / 2) {
+                if ((curLrcTextWidth - lineLyricsHLWidth) >= viewWidth / 2) {
+                    textX = (viewWidth / 2 - lineLyricsHLWidth);
+                } else {
+                    textX = viewWidth - curLrcTextWidth
+                            - paddingLeftOrRight;
+                }
+            } else {
+                textX = paddingLeftOrRight;
+            }
+        } else {
+            // 居左
+            textX = paddingLeftOrRight;
+        }
+        return textX;
+    }
+
+
+    /**
+     * 获取高亮移动的x位置（注：该方法在歌词不换行时使用）
+     *
+     * @param curLrcTextWidth    当前行宽度
+     * @param lineLyricsHLWidth  当前行高亮歌词宽度
+     * @param viewWidth          视图宽度
+     * @param paddingLeftOrRight 左右间隔距离
+     * @return
+     */
+    public static float getSecondLrcMoveTextX(float curLrcTextWidth, float lineLyricsHLWidth, int viewWidth, float paddingLeftOrRight) {
+        float textX = 0;
+        if (curLrcTextWidth > viewWidth) {
+            if (lineLyricsHLWidth >= viewWidth / 2) {
+                if ((curLrcTextWidth - lineLyricsHLWidth) >= viewWidth / 2) {
+                    textX = (viewWidth / 2 - lineLyricsHLWidth);
+                } else {
+                    textX = viewWidth - curLrcTextWidth
+                            - paddingLeftOrRight;
+                }
+            } else {
+                textX = paddingLeftOrRight;
+            }
+        } else {
+            textX = viewWidth - curLrcTextWidth
+                    - paddingLeftOrRight;
+        }
+        return textX;
+    }
 
     /**
      * 获取分隔后的歌词的真正行号
@@ -148,6 +206,35 @@ public class LyricsUtils {
             }
         }
 
+        return lineLyricsHLWidth;
+    }
+
+    /**
+     * 获取lrc行歌词高亮的宽度
+     *
+     * @param paint
+     * @param lrcLineInfos
+     * @param lyricsLineInfo
+     * @param lyricsLineNum
+     * @param lyricsWordHLTime
+     * @return
+     */
+    public static float getLrcHLWidth(Paint paint, TreeMap<Integer, LyricsLineInfo> lrcLineInfos, LyricsLineInfo lyricsLineInfo, int lyricsLineNum, float lyricsWordHLTime) {
+        float lineLyricsHLWidth = 0;
+        // 当行歌词
+        String curLyrics = lyricsLineInfo.getLineLyrics();
+        float curLrcTextWidth = LyricsUtils.getTextWidth(paint, curLyrics);
+        long startTime = lyricsLineInfo.getStartTime();
+        long endTime = 0;
+        if (lyricsLineNum + 1 < lrcLineInfos.size()) {
+            endTime = lrcLineInfos.get(lyricsLineNum + 1).getStartTime();
+        } else {
+            //最后一行歌词，没办法计算时间长度
+            endTime = startTime;
+        }
+        long sumTime = endTime - startTime;
+        if (sumTime == 0) return 0;
+        lineLyricsHLWidth = lyricsWordHLTime / sumTime * curLrcTextWidth;
         return lineLyricsHLWidth;
     }
 
@@ -1194,6 +1281,26 @@ public class LyricsUtils {
         }
 
         return 0;
+    }
+
+    /**
+     * 获取lrc歌词的时间长度
+     *
+     * @param lyricsLineTreeMap
+     * @param lyricsLineNum
+     * @param oldPlayingTime
+     * @param playOffset
+     * @return
+     */
+    public static long getLrcLenTime(TreeMap<Integer, LyricsLineInfo> lyricsLineTreeMap, int lyricsLineNum, long oldPlayingTime, long playOffset) {
+        if (lyricsLineNum < 0)
+            return 0;
+        //添加歌词增量
+        long curPlayingTime = oldPlayingTime + playOffset;
+        LyricsLineInfo lyrLine = lyricsLineTreeMap.get(lyricsLineNum);
+        if (curPlayingTime < lyrLine.getStartTime()) return 0;
+        long elapseTime = curPlayingTime - lyrLine.getStartTime();
+        return elapseTime;
     }
 
     /**
