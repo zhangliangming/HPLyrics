@@ -91,13 +91,115 @@ public class FloatLyricsView extends AbstractLrcView {
         int extraLrcStatus = getExtraLrcStatus();
         //绘画歌词
         if (extraLrcStatus == AbstractLrcView.EXTRALRCSTATUS_NOSHOWEXTRALRC) {
-            //只显示默认歌词
-            drawDynamicLyrics(canvas);
+            LyricsReader lyricsReader = getLyricsReader();
+            if (lyricsReader.getLyricsType() == LyricsInfo.LRC) {
+                //绘画lrc歌词
+                drawLyrics(canvas);
+            } else {
+                //只显示默认歌词
+                drawDynamicLyrics(canvas);
+            }
         } else {
             //显示翻译歌词 OR 音译歌词
             drawDynamiAndExtraLyrics(canvas);
         }
 
+    }
+
+    /**
+     * 绘画lrc歌词
+     *
+     * @param canvas
+     */
+    private void drawLyrics(Canvas canvas) {
+        //获取数据
+        TreeMap<Integer, LyricsLineInfo> lrcLineInfos = getLrcLineInfos();
+        int lyricsLineNum = getLyricsLineNum();
+        float lyricsWordHLTime = getLyricsWordHLTime();
+        Paint paint = getPaint();
+        Paint paintHL = getPaintHL();
+        Paint paintOutline = getPaintOutline();
+        int[] paintColors = getPaintColors();
+        int[] paintHLColors = getPaintHLColors();
+        float spaceLineHeight = getSpaceLineHeight();
+        float paddingLeftOrRight = getPaddingLeftOrRight();
+
+        LyricsLineInfo lyricsLineInfo = lrcLineInfos.get(lyricsLineNum);
+        // 当行歌词
+        String curLyrics = lyricsLineInfo.getLineLyrics();
+        float curLrcTextWidth = LyricsUtils.getTextWidth(paint, curLyrics);
+        // 当前歌词行的x坐标
+        float textX = 0;
+        // 当前歌词行的y坐标
+        float textY = 0;
+
+        float lineLyricsHLWidth = LyricsUtils.getLrcHLWidth(paint, lrcLineInfos, lyricsLineInfo, lyricsLineNum, lyricsWordHLTime);
+        float topPadding = (getHeight() - spaceLineHeight - 2 * LyricsUtils.getTextHeight(paint)) / 2;
+        if (lyricsLineNum % 2 == 0) {
+            textY = topPadding + LyricsUtils.getTextHeight(paint);
+
+            if (mOrientation == ORIENTATION_LEFT || curLrcTextWidth > getWidth()) {
+                textX = LyricsUtils.getFristLrcMoveTextX(curLrcTextWidth, lineLyricsHLWidth, getWidth(), paddingLeftOrRight);
+            } else {
+                textX = LyricsUtils.getHLMoveTextX(curLrcTextWidth, lineLyricsHLWidth, getWidth(), paddingLeftOrRight);
+            }
+
+
+            if (lyricsLineNum + 1 < lrcLineInfos.size()) {
+                float nextLrcTextY = textY + spaceLineHeight + LyricsUtils.getTextHeight(paint);
+
+                String lrcRightText = lrcLineInfos.get(
+                        lyricsLineNum + 1).getLineLyrics();
+                float lrcRightTextWidth = LyricsUtils.getTextWidth(paint, lrcRightText);
+                float textRightX = 0;
+
+                if (mOrientation == ORIENTATION_LEFT || lrcRightTextWidth > getWidth()) {
+                    textRightX = getWidth() - lrcRightTextWidth - paddingLeftOrRight;
+                } else {
+                    textRightX = (getWidth() - lrcRightTextWidth) / 2;
+                }
+
+
+                LyricsUtils.drawOutline(canvas, paintOutline, lrcRightText, textRightX, nextLrcTextY);
+                LyricsUtils.drawText(canvas, paint, paintColors, lrcRightText, textRightX,
+                        nextLrcTextY);
+            }
+
+        } else {
+
+            float preLrcTextY = topPadding + LyricsUtils.getTextHeight(paint);
+            textY = preLrcTextY + spaceLineHeight + LyricsUtils.getTextHeight(paint);
+
+
+            if (mOrientation == ORIENTATION_LEFT || curLrcTextWidth > getWidth()) {
+                textX = LyricsUtils.getSecondLrcMoveTextX(curLrcTextWidth, lineLyricsHLWidth, getWidth(), paddingLeftOrRight);
+            } else {
+                textX = (getWidth() - curLrcTextWidth) / 2;
+            }
+
+
+
+            if (lyricsLineNum + 1 < lrcLineInfos.size()) {
+                String lrcLeftText = lrcLineInfos.get(
+                        lyricsLineNum + 1).getLineLyrics();
+                float textLeftX = 0;
+                float lrcLeftTextWidth = LyricsUtils.getTextWidth(paint, lrcLeftText);
+                if (mOrientation == ORIENTATION_LEFT || lrcLeftTextWidth > getWidth()) {
+                    textLeftX = paddingLeftOrRight;
+                } else {
+                    textLeftX = (getWidth() - lrcLeftTextWidth) / 2;
+                }
+
+                LyricsUtils.drawOutline(canvas, paintOutline, lrcLeftText, textLeftX,
+                        preLrcTextY);
+                LyricsUtils.drawText(canvas, paint, paintColors, lrcLeftText, textLeftX,
+                        preLrcTextY);
+            }
+        }
+
+        //画歌词
+        LyricsUtils.drawOutline(canvas, paintOutline, curLyrics, textX, textY);
+        LyricsUtils.drawText(canvas, paintHL, paintHLColors, curLyrics, textX, textY);
     }
 
     /**
@@ -137,7 +239,7 @@ public class FloatLyricsView extends AbstractLrcView {
         int splitLyricsRealLineNum = LyricsUtils.getSplitLyricsRealLineNum(lrcLineInfos, lyricsLineNum, splitLyricsLineNum);
         float topPadding = (getHeight() - spaceLineHeight - 2 * LyricsUtils.getTextHeight(paint)) / 2;
         if (splitLyricsRealLineNum % 2 == 0) {
-            if (mOrientation == ORIENTATION_LEFT) {
+            if (mOrientation == ORIENTATION_LEFT || curLrcTextWidth > getWidth()) {
                 textX = paddingLeftOrRight;
             } else {
                 textX = (getWidth() - curLrcTextWidth) / 2;
@@ -152,7 +254,7 @@ public class FloatLyricsView extends AbstractLrcView {
                 float lrcRightTextWidth = LyricsUtils.getTextWidth(paint, lrcRightText);
                 float textRightX = 0;
 
-                if (mOrientation == ORIENTATION_LEFT) {
+                if (mOrientation == ORIENTATION_LEFT || lrcRightTextWidth > getWidth()) {
                     textRightX = getWidth() - lrcRightTextWidth - paddingLeftOrRight;
                 } else {
                     textRightX = (getWidth() - lrcRightTextWidth) / 2;
@@ -170,7 +272,7 @@ public class FloatLyricsView extends AbstractLrcView {
                 float lrcRightTextWidth = LyricsUtils.getTextWidth(paint, lrcRightText);
                 float textRightX = 0;
 
-                if (mOrientation == ORIENTATION_LEFT) {
+                if (mOrientation == ORIENTATION_LEFT || lrcRightTextWidth > getWidth()) {
                     textRightX = getWidth() - lrcRightTextWidth - paddingLeftOrRight;
                 } else {
                     textRightX = (getWidth() - lrcRightTextWidth) / 2;
@@ -183,7 +285,7 @@ public class FloatLyricsView extends AbstractLrcView {
             }
 
         } else {
-            if (mOrientation == ORIENTATION_LEFT) {
+            if (mOrientation == ORIENTATION_LEFT || curLrcTextWidth > getWidth()) {
                 textX = getWidth() - curLrcTextWidth - paddingLeftOrRight;
             } else {
                 textX = (getWidth() - curLrcTextWidth) / 2;
@@ -198,7 +300,7 @@ public class FloatLyricsView extends AbstractLrcView {
                 float lrcLeftTextWidth = LyricsUtils.getTextWidth(paint, lrcLeftText);
 
                 float textLeftX = 0;
-                if (mOrientation == ORIENTATION_LEFT) {
+                if (mOrientation == ORIENTATION_LEFT || lrcLeftTextWidth > getWidth()) {
                     textLeftX = paddingLeftOrRight;
                 } else {
                     textLeftX = (getWidth() - lrcLeftTextWidth) / 2;
@@ -216,7 +318,7 @@ public class FloatLyricsView extends AbstractLrcView {
                 float lrcLeftTextWidth = LyricsUtils.getTextWidth(paint, lrcLeftText);
 
                 float textLeftX = 0;
-                if (mOrientation == ORIENTATION_LEFT) {
+                if (mOrientation == ORIENTATION_LEFT || lrcLeftTextWidth > getWidth()) {
                     textLeftX = paddingLeftOrRight;
                 } else {
                     textLeftX = (getWidth() - lrcLeftTextWidth) / 2;
@@ -306,7 +408,12 @@ public class FloatLyricsView extends AbstractLrcView {
         TreeMap<Integer, LyricsLineInfo> lrcLineInfos = getLrcLineInfos();
         int lyricsLineNum = LyricsUtils.getLineNumber(lyricsReader.getLyricsType(), lrcLineInfos, playProgress, lyricsReader.getPlayOffset());
         setLyricsLineNum(lyricsLineNum);
-        updateSplitData(playProgress);
+        if (lyricsReader.getLyricsType() == LyricsInfo.DYNAMIC) {
+            updateSplitData(playProgress);
+        } else {
+            long lyricsWordHLTime = LyricsUtils.getLrcLenTime(lrcLineInfos, lyricsLineNum, playProgress, lyricsReader.getPlayOffset());
+            setLyricsWordHLTime(lyricsWordHLTime);
+        }
     }
 
 
@@ -366,11 +473,13 @@ public class FloatLyricsView extends AbstractLrcView {
      */
     public void setLyricsReader(LyricsReader lyricsReader) {
         super.setLyricsReader(lyricsReader);
-        if (lyricsReader != null && lyricsReader.getLyricsType() == LyricsInfo.DYNAMIC) {
-            int extraLrcType = getExtraLrcType();
-            //翻译歌词以动感歌词形式显示
-            if (extraLrcType == AbstractLrcView.EXTRALRCTYPE_BOTH || extraLrcType == AbstractLrcView.EXTRALRCTYPE_TRANSLATELRC) {
-                setTranslateDrawType(AbstractLrcView.TRANSLATE_DRAW_TYPE_DYNAMIC);
+        if (lyricsReader != null) {
+            if (lyricsReader.getLyricsType() == LyricsInfo.DYNAMIC) {
+                int extraLrcType = getExtraLrcType();
+                //翻译歌词以动感歌词形式显示
+                if (extraLrcType == AbstractLrcView.EXTRALRCTYPE_BOTH || extraLrcType == AbstractLrcView.EXTRALRCTYPE_TRANSLATELRC) {
+                    setTranslateDrawType(AbstractLrcView.TRANSLATE_DRAW_TYPE_DYNAMIC);
+                }
             }
         } else {
             setLrcStatus(AbstractLrcView.LRCSTATUS_NONSUPPORT);
