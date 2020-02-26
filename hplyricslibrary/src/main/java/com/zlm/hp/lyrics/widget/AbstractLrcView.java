@@ -6,11 +6,10 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.Typeface;
+import android.os.AsyncTask;
 import android.os.Handler;
-import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
-import android.os.Process;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -25,6 +24,7 @@ import com.zlm.libs.register.RegisterHelper;
 import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.TreeMap;
+import java.util.concurrent.Executors;
 
 /**
  * @Description: 歌词抽象视图
@@ -335,8 +335,6 @@ public abstract class AbstractLrcView extends View {
     private List<LyricsLineInfo> mTransliterationLrcLineInfos;
 
     ///////////////////////////////歌词绘画播放器//////////////////////////////////
-
-    private byte[] lock = new byte[0];
     /**
      * 播放器类型
      */
@@ -360,12 +358,8 @@ public abstract class AbstractLrcView extends View {
      */
     private long mRefreshTime = 30;
 
-    /**
-     * 子线程用于执行耗时任务
-     */
-    private Handler mWorkerHandler;
-    //创建异步HandlerThread
-    private HandlerThread mHandlerThread;
+    private AsyncTask mUpdateTask = null;
+
     /**
      * 处理ui任务
      */
@@ -374,19 +368,54 @@ public abstract class AbstractLrcView extends View {
         public void handleMessage(Message msg) {
             Context context = mActivityWR.get();
             if (context != null) {
-                synchronized (lock) {
-                    if (mLrcPlayerStatus == LRCPLAYERSTATUS_PLAY && mLyricsReader != null) {
-                        invalidateView();
-                        long endTime = System.currentTimeMillis();
-                        long updateTime = (endTime - mPlayerStartTime) - mPlayerSpendTime;
-                        mPlayerSpendTime = (endTime - mPlayerStartTime);
-                        long delayMs = mRefreshTime - updateTime;
-                        mWorkerHandler.sendEmptyMessageDelayed(0, Math.max(0, delayMs));
-                    }
+
+                if (mLrcPlayerStatus == LRCPLAYERSTATUS_PLAY && mLyricsReader != null) {
+                    invalidateView();
+                    long endTime = System.currentTimeMillis();
+                    long updateTime = (endTime - mPlayerStartTime) - mPlayerSpendTime;
+                    mPlayerSpendTime = (endTime - mPlayerStartTime);
+                    long delayMs = mRefreshTime - updateTime;
+
+                    executeTask(Math.max(0, delayMs));
                 }
             }
         }
     };
+
+    /**
+     * 运行需要快速执行的任务
+     *
+     * @param delayMs
+     */
+    public void executeTask(final long delayMs) {
+        if (mUpdateTask != null) {
+            mUpdateTask.cancel(true);
+        }
+        mUpdateTask = new AsyncTask<String, Integer, String>() {
+            @Override
+            protected String doInBackground(String... strings) {
+
+                try {
+                    Thread.sleep(delayMs);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                Context context = mActivityWR.get();
+                if (context != null) {
+                    if (mLyricsReader != null) {
+                        updateView(mCurPlayingTime + mPlayerSpendTime);
+                        if (mLrcPlayerStatus == LRCPLAYERSTATUS_PLAY) {
+                            mUIHandler.sendEmptyMessage(0);
+                        } else if (mLrcPlayerStatus == LRCPLAYERSTATUS_SEEKTO) {
+                            invalidateView();
+                        }
+                    }
+                }
+                return null;
+            }
+        }.executeOnExecutor(Executors.newCachedThreadPool(),"");
+    }
 
     private WeakReference<Context> mActivityWR;
 
@@ -473,30 +502,6 @@ public abstract class AbstractLrcView extends View {
 
         //
         mActivityWR = new WeakReference<Context>(context);
-        //创建异步HandlerThread
-        mHandlerThread = new HandlerThread("updateLrcData", Process.THREAD_PRIORITY_DEFAULT);
-        //必须先开启线程
-        mHandlerThread.start();
-        //子线程Handler
-        mWorkerHandler = new Handler(mHandlerThread.getLooper(), new Handler.Callback() {
-            @Override
-            public boolean handleMessage(Message msg) {
-                Context context = mActivityWR.get();
-                if (context != null) {
-                    synchronized (lock) {
-                        if (mLyricsReader != null) {
-                            updateView(mCurPlayingTime + mPlayerSpendTime);
-                            if (mLrcPlayerStatus == LRCPLAYERSTATUS_PLAY) {
-                                mUIHandler.sendEmptyMessage(0);
-                            } else if (mLrcPlayerStatus == LRCPLAYERSTATUS_SEEKTO) {
-                                invalidateView();
-                            }
-                        }
-                    }
-                }
-                return false;
-            }
-        });
     }
 
     @Override
@@ -510,45 +515,45 @@ public abstract class AbstractLrcView extends View {
      * @param canvas
      */
     private void onDrawView(Canvas canvas) {
-        synchronized (lock) {
-            mPaint.setAlpha(255);
-            mPaintHL.setAlpha(255);
-            mExtraLrcPaint.setAlpha(255);
-            mExtraLrcPaintHL.setAlpha(255);
-            if (mLrcStatus == LRCSTATUS_INIT || mLrcStatus == LRCSTATUS_NOLRC_DEFTEXT) {
-                //绘画默认文本
-                String defText = getDefText();
-                float textWidth = LyricsUtils.getTextWidth(mPaint, defText);
-                int textHeight = LyricsUtils.getTextHeight(mPaint);
-                float hlWidth = textWidth / 2;
-                float x = (getWidth() - textWidth) / 2;
-                float y = (getHeight() + textHeight) / 2;
-                LyricsUtils.drawOutline(canvas, mPaintOutline, defText, x, y);
-                LyricsUtils.drawDynamicText(canvas, mPaint, mPaintHL, mPaintColors, mPaintHLColors, defText, hlWidth, x, y);
-            } else if (mLrcStatus == LRCSTATUS_LOADING || mLrcStatus == LRCSTATUS_ERROR || mLrcStatus == LRCSTATUS_NONSUPPORT) {
-                //绘画加载中文本
-                String text = getDefText();
-                if (mLrcStatus == LRCSTATUS_LOADING) {
-                    text = getLoadingText();
-                } else if (mLrcStatus == LRCSTATUS_ERROR) {
-                    text = getLoadErrorText();
-                } else if (mLrcStatus == LRCSTATUS_NONSUPPORT) {
-                    text = getNonsupportText();
-                }
-                float textWidth = LyricsUtils.getTextWidth(mPaint, text);
-                int textHeight = LyricsUtils.getTextHeight(mPaint);
-                float x = (getWidth() - textWidth) / 2;
-                float y = (getHeight() + textHeight) / 2;
-                LyricsUtils.drawOutline(canvas, mPaintOutline, text, x, y);
-                LyricsUtils.drawText(canvas, mPaint, mPaintColors, text, x, y);
-            } else if (mLrcStatus == LRCSTATUS_NOLRC_GOTOSEARCH) {
-                String btnText = getGotoSearchText();
-                //绘画搜索歌词按钮
-                drawGoToSearchBtn(canvas, mGotoSearchRectPaint, mGotoSearchTextPaint, btnText);
-            } else if (mLrcStatus == LRCSTATUS_LRC) {
-                onDrawLrcView(canvas);
+
+        mPaint.setAlpha(255);
+        mPaintHL.setAlpha(255);
+        mExtraLrcPaint.setAlpha(255);
+        mExtraLrcPaintHL.setAlpha(255);
+        if (mLrcStatus == LRCSTATUS_INIT || mLrcStatus == LRCSTATUS_NOLRC_DEFTEXT) {
+            //绘画默认文本
+            String defText = getDefText();
+            float textWidth = LyricsUtils.getTextWidth(mPaint, defText);
+            int textHeight = LyricsUtils.getTextHeight(mPaint);
+            float hlWidth = textWidth / 2;
+            float x = (getWidth() - textWidth) / 2;
+            float y = (getHeight() + textHeight) / 2;
+            LyricsUtils.drawOutline(canvas, mPaintOutline, defText, x, y);
+            LyricsUtils.drawDynamicText(canvas, mPaint, mPaintHL, mPaintColors, mPaintHLColors, defText, hlWidth, x, y);
+        } else if (mLrcStatus == LRCSTATUS_LOADING || mLrcStatus == LRCSTATUS_ERROR || mLrcStatus == LRCSTATUS_NONSUPPORT) {
+            //绘画加载中文本
+            String text = getDefText();
+            if (mLrcStatus == LRCSTATUS_LOADING) {
+                text = getLoadingText();
+            } else if (mLrcStatus == LRCSTATUS_ERROR) {
+                text = getLoadErrorText();
+            } else if (mLrcStatus == LRCSTATUS_NONSUPPORT) {
+                text = getNonsupportText();
             }
+            float textWidth = LyricsUtils.getTextWidth(mPaint, text);
+            int textHeight = LyricsUtils.getTextHeight(mPaint);
+            float x = (getWidth() - textWidth) / 2;
+            float y = (getHeight() + textHeight) / 2;
+            LyricsUtils.drawOutline(canvas, mPaintOutline, text, x, y);
+            LyricsUtils.drawText(canvas, mPaint, mPaintColors, text, x, y);
+        } else if (mLrcStatus == LRCSTATUS_NOLRC_GOTOSEARCH) {
+            String btnText = getGotoSearchText();
+            //绘画搜索歌词按钮
+            drawGoToSearchBtn(canvas, mGotoSearchRectPaint, mGotoSearchTextPaint, btnText);
+        } else if (mLrcStatus == LRCSTATUS_LRC) {
+            onDrawLrcView(canvas);
         }
+
     }
 
     /**
@@ -653,13 +658,11 @@ public abstract class AbstractLrcView extends View {
      * 初始歌词数据
      */
     public void initLrcData() {
-        synchronized (lock) {
-            mLyricsReader = null;
-            mLrcStatus = LRCSTATUS_INIT;
-            resetData();
-            initExtraLrcTypeAndCallBack();
-            invalidateView();
-        }
+        mLyricsReader = null;
+        mLrcStatus = LRCSTATUS_INIT;
+        resetData();
+        initExtraLrcTypeAndCallBack();
+        invalidateView();
     }
 
     /**
@@ -866,14 +869,12 @@ public abstract class AbstractLrcView extends View {
     public void setExtraLrcStatus(int extraLrcStatus, boolean isReloadData) {
         this.mExtraLrcStatus = extraLrcStatus;
         if (isReloadData) {
-            synchronized (lock) {
-                removeCallbacksAndMessages();
-                //更新行和索引等数据
-                updateView(mCurPlayingTime + mPlayerSpendTime);
-                invalidateView();
-                if (mLrcPlayerStatus == LRCPLAYERSTATUS_PLAY) {
-                    mWorkerHandler.sendEmptyMessageDelayed(0, mRefreshTime);
-                }
+            removeCallbacksAndMessages();
+            //更新行和索引等数据
+            updateView(mCurPlayingTime + mPlayerSpendTime);
+            invalidateView();
+            if (mLrcPlayerStatus == LRCPLAYERSTATUS_PLAY) {
+                executeTask(mRefreshTime);
             }
         }
     }
@@ -893,30 +894,27 @@ public abstract class AbstractLrcView extends View {
      * @param playProgress
      */
     public void play(int playProgress) {
-        synchronized (lock) {
-            if (mLrcPlayerStatus == LRCPLAYERSTATUS_PLAY) {
-                removeCallbacksAndMessages();
-            }
-            mLrcPlayerStatus = LRCPLAYERSTATUS_PLAY;
-            this.mCurPlayingTime = playProgress;
-            mPlayerStartTime = System.currentTimeMillis();
-            mPlayerSpendTime = 0;
-            mWorkerHandler.sendEmptyMessageDelayed(0, 0);
+        if (mLrcPlayerStatus == LRCPLAYERSTATUS_PLAY) {
+            removeCallbacksAndMessages();
         }
+        mLrcPlayerStatus = LRCPLAYERSTATUS_PLAY;
+        this.mCurPlayingTime = playProgress;
+        mPlayerStartTime = System.currentTimeMillis();
+        mPlayerSpendTime = 0;
+        executeTask(0);
+
     }
 
     /**
      * 歌词暂停
      */
     public void pause() {
-        synchronized (lock) {
-            if (mLrcPlayerStatus == LRCPLAYERSTATUS_PLAY) {
-                mLrcPlayerStatus = LRCPLAYERSTATUS_INIT;
-                removeCallbacksAndMessages();
-            }
-            mCurPlayingTime += mPlayerSpendTime;
-            mPlayerSpendTime = 0;
+        if (mLrcPlayerStatus == LRCPLAYERSTATUS_PLAY) {
+            mLrcPlayerStatus = LRCPLAYERSTATUS_INIT;
+            removeCallbacksAndMessages();
         }
+        mCurPlayingTime += mPlayerSpendTime;
+        mPlayerSpendTime = 0;
     }
 
     /**
@@ -925,17 +923,15 @@ public abstract class AbstractLrcView extends View {
      * @param playProgress
      */
     public void seekto(int playProgress) {
-        synchronized (lock) {
-            if (mLrcPlayerStatus == LRCPLAYERSTATUS_PLAY) {
-                play(playProgress);
-            } else {
-                mLrcPlayerStatus = LRCPLAYERSTATUS_SEEKTO;
+        if (mLrcPlayerStatus == LRCPLAYERSTATUS_PLAY) {
+            play(playProgress);
+        } else {
+            mLrcPlayerStatus = LRCPLAYERSTATUS_SEEKTO;
 
-                this.mCurPlayingTime = playProgress;
-                mPlayerStartTime = System.currentTimeMillis();
-                mPlayerSpendTime = 0;
-                mWorkerHandler.sendEmptyMessageDelayed(0, 0);
-            }
+            this.mCurPlayingTime = playProgress;
+            mPlayerStartTime = System.currentTimeMillis();
+            mPlayerSpendTime = 0;
+            executeTask(0);
         }
     }
 
@@ -943,12 +939,10 @@ public abstract class AbstractLrcView extends View {
      * 唤醒
      */
     public void resume() {
-        synchronized (lock) {
-            mLrcPlayerStatus = LRCPLAYERSTATUS_PLAY;
-            mPlayerStartTime = System.currentTimeMillis();
-            mPlayerSpendTime = 0;
-            mWorkerHandler.sendEmptyMessageDelayed(0, 0);
-        }
+        mLrcPlayerStatus = LRCPLAYERSTATUS_PLAY;
+        mPlayerStartTime = System.currentTimeMillis();
+        mPlayerSpendTime = 0;
+        executeTask(0);
     }
 
     /**
@@ -966,26 +960,26 @@ public abstract class AbstractLrcView extends View {
      * @param lyricsReader
      */
     public void setLyricsReader(LyricsReader lyricsReader) {
-        synchronized (lock) {
-            this.mLyricsReader = lyricsReader;
-            resetData();
-            if (!hasLrcLineInfos()) {
 
-                if (mSearchLyricsListener != null) {
-                    mLrcStatus = LRCSTATUS_NOLRC_GOTOSEARCH;
-                } else {
-                    mLrcStatus = LRCSTATUS_NOLRC_DEFTEXT;
-                }
+        this.mLyricsReader = lyricsReader;
+        resetData();
+        if (!hasLrcLineInfos()) {
 
+            if (mSearchLyricsListener != null) {
+                mLrcStatus = LRCSTATUS_NOLRC_GOTOSEARCH;
             } else {
-                //是否有歌词数据
-                mLrcStatus = LRCSTATUS_LRC;
-
-                updateView(mCurPlayingTime);
+                mLrcStatus = LRCSTATUS_NOLRC_DEFTEXT;
             }
-            initExtraLrcTypeAndCallBack();
-            invalidateView();
+
+        } else {
+            //是否有歌词数据
+            mLrcStatus = LRCSTATUS_LRC;
+
+            updateView(mCurPlayingTime);
         }
+        initExtraLrcTypeAndCallBack();
+        invalidateView();
+
     }
 
     /**
@@ -1089,21 +1083,21 @@ public abstract class AbstractLrcView extends View {
      * @param isReloadData  是否重新加载数据及刷新界面
      */
     public void setSize(int fontSize, int extraFontSize, boolean isReloadData) {
-        synchronized (lock) {
+
+        if (isReloadData) {
+            setFontSize(fontSize, false);
+            setExtraLrcFontSize(extraFontSize, false);
             if (isReloadData) {
-                setFontSize(fontSize, false);
-                setExtraLrcFontSize(extraFontSize, false);
-                if (isReloadData) {
-                    if (hasLrcLineInfos()) {
-                        updateView(mCurPlayingTime + mPlayerSpendTime);
-                    }
-                    invalidateView();
+                if (hasLrcLineInfos()) {
+                    updateView(mCurPlayingTime + mPlayerSpendTime);
                 }
-            } else {
-                setFontSize(fontSize, false);
-                setExtraLrcFontSize(extraFontSize, false);
+                invalidateView();
             }
+        } else {
+            setFontSize(fontSize, false);
+            setExtraLrcFontSize(extraFontSize, false);
         }
+
     }
 
     /**
@@ -1113,30 +1107,30 @@ public abstract class AbstractLrcView extends View {
      * @param isReloadData 是否重新加载数据及刷新界面
      */
     public void setFontSize(float fontSize, boolean isReloadData) {
-        synchronized (lock) {
 
-            this.mFontSize = fontSize;
 
-            //
-            mPaint.setTextSize(mFontSize);
-            mPaintHL.setTextSize(mFontSize);
-            mPaintOutline.setTextSize(mFontSize);
+        this.mFontSize = fontSize;
 
-            //搜索歌词回调不为空
-            if (mSearchLyricsListener != null) {
-                mGotoSearchRectPaint.setTextSize(mFontSize);
-                mGotoSearchTextPaint.setTextSize(mFontSize);
-                mGotoSearchBtnRect = null;
-            }
+        //
+        mPaint.setTextSize(mFontSize);
+        mPaintHL.setTextSize(mFontSize);
+        mPaintOutline.setTextSize(mFontSize);
 
-            if (isReloadData) {
-                //加载歌词数据
-                if (hasLrcLineInfos()) {
-                    updateView(mCurPlayingTime + mPlayerSpendTime);
-                }
-                invalidateView();
-            }
+        //搜索歌词回调不为空
+        if (mSearchLyricsListener != null) {
+            mGotoSearchRectPaint.setTextSize(mFontSize);
+            mGotoSearchTextPaint.setTextSize(mFontSize);
+            mGotoSearchBtnRect = null;
         }
+
+        if (isReloadData) {
+            //加载歌词数据
+            if (hasLrcLineInfos()) {
+                updateView(mCurPlayingTime + mPlayerSpendTime);
+            }
+            invalidateView();
+        }
+
     }
 
     /**
@@ -1146,22 +1140,22 @@ public abstract class AbstractLrcView extends View {
      * @param isReloadData     是否重新加载数据及刷新界面
      */
     public void setExtraLrcFontSize(float extraLrcFontSize, boolean isReloadData) {
-        synchronized (lock) {
-            this.mExtraLrcFontSize = extraLrcFontSize;
 
-            //
-            mExtraLrcPaint.setTextSize(mExtraLrcFontSize);
-            mExtraLrcPaintHL.setTextSize(mExtraLrcFontSize);
-            mExtraLrcPaintOutline.setTextSize(mExtraLrcFontSize);
+        this.mExtraLrcFontSize = extraLrcFontSize;
+
+        //
+        mExtraLrcPaint.setTextSize(mExtraLrcFontSize);
+        mExtraLrcPaintHL.setTextSize(mExtraLrcFontSize);
+        mExtraLrcPaintOutline.setTextSize(mExtraLrcFontSize);
 
 
-            if (isReloadData) {
-                if (hasLrcLineInfos()) {
-                    updateView(mCurPlayingTime + mPlayerSpendTime);
-                }
-                invalidateView();
+        if (isReloadData) {
+            if (hasLrcLineInfos()) {
+                updateView(mCurPlayingTime + mPlayerSpendTime);
             }
+            invalidateView();
         }
+
     }
 
     /**
@@ -1218,9 +1212,6 @@ public abstract class AbstractLrcView extends View {
      */
     public void release() {
         removeCallbacksAndMessages();
-        //关闭线程
-        if (mHandlerThread != null)
-            mHandlerThread.quit();
     }
 
     /**
@@ -1232,9 +1223,8 @@ public abstract class AbstractLrcView extends View {
             mUIHandler.removeCallbacksAndMessages(null);
         }
 
-        //移除队列任务
-        if (mWorkerHandler != null) {
-            mWorkerHandler.removeCallbacksAndMessages(null);
+        if (mUpdateTask != null) {
+            mUpdateTask.cancel(true);
         }
 
     }
