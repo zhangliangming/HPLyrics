@@ -102,10 +102,15 @@ public class ManyLyricsView extends AbstractLrcView {
      *
      */
     private Scroller mScroller;
-     /**
+    /**
      * Y轴移动的时间
      */
-    private int mDuration = 250;
+    private int mDuration = 750;
+
+    /**
+     * 额外歌词加倍：Y轴移动的时间
+     */
+    private boolean isExtraDoubleDuration = false;
 
     ///////////////////////////////////////////////////
     /**
@@ -347,7 +352,7 @@ public class ManyLyricsView extends AbstractLrcView {
         // 画当前歌词之前的歌词
         float lineTopY = mCentreY;
         for (int i = lyricsLineNum - 1; i >= 0; i--) {
-            if(lineTopY < 0){
+            if (lineTopY < 0) {
                 break;
             }
             LyricsLineInfo upLyricsLineInfo = lrcLineInfos
@@ -546,7 +551,7 @@ public class ManyLyricsView extends AbstractLrcView {
                 List<LyricsLineInfo> translateSplitLyricsLineInfos = translateLrcLineInfos.get(lyricsLineNum).getSplitLyricsLineInfos();
                 lineTopY -= (LyricsUtils.getTextHeight(paint) + spaceLineHeight);
                 lineTopY = drawUpLyrics(canvas, paint, translateSplitLyricsLineInfos, extraLrcSpaceLineHeight, lineTopY);
-                if(lineTopY < 0){
+                if (lineTopY < 0) {
                     return lineTopY;
                 }
                 lineTopY -= (LyricsUtils.getTextHeight(paint) + extraLrcSpaceLineHeight);
@@ -561,7 +566,7 @@ public class ManyLyricsView extends AbstractLrcView {
                 lineTopY -= (LyricsUtils.getTextHeight(paint) + spaceLineHeight);
                 lineTopY = drawUpLyrics(canvas, paint, transliterationSplitLrcLineInfos, extraLrcSpaceLineHeight, lineTopY);
 
-                if(lineTopY < 0){
+                if (lineTopY < 0) {
                     return lineTopY;
                 }
 
@@ -716,7 +721,10 @@ public class ManyLyricsView extends AbstractLrcView {
         if (newLyricsLineNum != lyricsLineNum) {
             if (mTouchEventStatus == TOUCHEVENTSTATUS_INIT && !mIsTouchIntercept) {
                 //初始状态
-                int duration = mDuration * getLineSizeNum(lyricsLineNum);
+                int duration = mDuration;
+                if (isExtraDoubleDuration) {
+                    duration = duration * getLineSizeNum(lyricsLineNum);
+                }
                 int deltaY = getLineAtHeightY(newLyricsLineNum) - mScroller.getFinalY();
                 mScroller.startScroll(0, mScroller.getFinalY(), 0, deltaY, duration);
                 invalidateView();
@@ -1322,9 +1330,13 @@ public class ManyLyricsView extends AbstractLrcView {
         mPaintPlay.setTextSize(mPlayRectSize);
         invalidateView();
     }
-    
-     public void setDuration(int duration) {
+
+    public void setDuration(int duration) {
         this.mDuration = duration;
+    }
+
+    public void setExtraDoubleDuration(boolean extraDoubleDuration) {
+        isExtraDoubleDuration = extraDoubleDuration;
     }
 
     /**
@@ -1338,6 +1350,7 @@ public class ManyLyricsView extends AbstractLrcView {
 
     /**
      * 设置指示器监听事件
+     *
      * @param onIndicatorListener
      */
     public void setOnIndicatorListener(OnIndicatorListener onIndicatorListener) {
