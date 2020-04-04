@@ -105,7 +105,7 @@ public class ManyLyricsView extends AbstractLrcView {
      /**
      * Y轴移动的时间
      */
-    private int mDuration = 1000;
+    private int mDuration = 250;
 
     ///////////////////////////////////////////////////
     /**
@@ -312,17 +312,33 @@ public class ManyLyricsView extends AbstractLrcView {
                 .get(lyricsLineNum);
         List<LyricsLineInfo> splitLyricsLineInfos = lyricsLineInfo.getSplitLyricsLineInfos();
         float lineBottomY = drawDownLyrics(canvas, paint, paintHL, splitLyricsLineInfos, splitLyricsLineNum, splitLyricsWordIndex, spaceLineHeight, lyricsWordHLTime, mCentreY);
-        //画额外歌词
-        lineBottomY = drawDownExtraLyrics(canvas, extraLrcPaint, extraLrcPaintHL, lyricsLineNum, extraSplitLyricsLineNum, extraSplitLyricsWordIndex, extraLrcSpaceLineHeight, lyricsWordHLTime, translateLyricsWordHLTime, lineBottomY);
 
+        //未超出下视图
+        if (lineBottomY + spaceLineHeight < getHeight()) {
+            //画额外歌词
+            lineBottomY = drawDownExtraLyrics(canvas, extraLrcPaint, extraLrcPaintHL, lyricsLineNum, extraSplitLyricsLineNum, extraSplitLyricsWordIndex, extraLrcSpaceLineHeight, lyricsWordHLTime, translateLyricsWordHLTime, lineBottomY);
+        }
 
-        //画当前行正面的歌词
+        //画当前行下面的歌词
         for (int i = lyricsLineNum + 1; i < lrcLineInfos.size(); i++) {
+
+            //超出下视图
+            if (lineBottomY + spaceLineHeight > getHeight()) {
+                break;
+            }
+
             LyricsLineInfo downLyricsLineInfo = lrcLineInfos
                     .get(i);
             //获取分割后的歌词列表
             List<LyricsLineInfo> lyricsLineInfos = downLyricsLineInfo.getSplitLyricsLineInfos();
             lineBottomY = drawDownLyrics(canvas, paint, paintHL, lyricsLineInfos, -1, -2, spaceLineHeight, -1, lineBottomY);
+
+            //超出下视图
+            if (lineBottomY + spaceLineHeight > getHeight()) {
+                break;
+            }
+
+
             //画额外歌词
             lineBottomY = drawDownExtraLyrics(canvas, extraLrcPaint, extraLrcPaintHL, i, -1, -2, extraLrcSpaceLineHeight, -1, -1, lineBottomY);
         }
@@ -331,6 +347,9 @@ public class ManyLyricsView extends AbstractLrcView {
         // 画当前歌词之前的歌词
         float lineTopY = mCentreY;
         for (int i = lyricsLineNum - 1; i >= 0; i--) {
+            if(lineTopY < 0){
+                break;
+            }
             LyricsLineInfo upLyricsLineInfo = lrcLineInfos
                     .get(i);
             //获取分割后的歌词列表
@@ -396,10 +415,10 @@ public class ManyLyricsView extends AbstractLrcView {
 
             lineBottomY = fristLineTextY + i * lineHeight;
 
-            //超出上视图
-            if (lineBottomY < lineHeight) {
-                continue;
-            }
+//            //超出上视图
+//            if (lineBottomY < lineHeight) {
+//                continue;
+//            }
             //超出下视图
             if (lineBottomY + spaceLineHeight > getHeight()) {
                 break;
@@ -527,8 +546,10 @@ public class ManyLyricsView extends AbstractLrcView {
                 List<LyricsLineInfo> translateSplitLyricsLineInfos = translateLrcLineInfos.get(lyricsLineNum).getSplitLyricsLineInfos();
                 lineTopY -= (LyricsUtils.getTextHeight(paint) + spaceLineHeight);
                 lineTopY = drawUpLyrics(canvas, paint, translateSplitLyricsLineInfos, extraLrcSpaceLineHeight, lineTopY);
+                if(lineTopY < 0){
+                    return lineTopY;
+                }
                 lineTopY -= (LyricsUtils.getTextHeight(paint) + extraLrcSpaceLineHeight);
-
                 //
                 lineTopY = drawUpLyrics(canvas, paint, splitLyricsLineInfos, spaceLineHeight, lineTopY);
             }
@@ -539,6 +560,11 @@ public class ManyLyricsView extends AbstractLrcView {
                 List<LyricsLineInfo> transliterationSplitLrcLineInfos = transliterationLrcLineInfos.get(lyricsLineNum).getSplitLyricsLineInfos();
                 lineTopY -= (LyricsUtils.getTextHeight(paint) + spaceLineHeight);
                 lineTopY = drawUpLyrics(canvas, paint, transliterationSplitLrcLineInfos, extraLrcSpaceLineHeight, lineTopY);
+
+                if(lineTopY < 0){
+                    return lineTopY;
+                }
+
                 lineTopY -= (LyricsUtils.getTextHeight(paint) + extraLrcSpaceLineHeight);
 
                 //
@@ -575,12 +601,12 @@ public class ManyLyricsView extends AbstractLrcView {
 
             //超出上视图
             if (lineTopY < lineHeight) {
-                break;
+                return -1;
             }
-            //超出下视图
-            if (lineTopY + spaceLineHeight > getHeight()) {
-                continue;
-            }
+//            //超出下视图
+////            if (lineTopY + spaceLineHeight > getHeight()) {
+////                continue;
+////            }
 
             String text = splitLyricsLineInfos.get(i).getLineLyrics();
             //计算颜色透明度

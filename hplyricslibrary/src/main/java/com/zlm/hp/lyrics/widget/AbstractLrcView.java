@@ -354,9 +354,9 @@ public abstract class AbstractLrcView extends View {
      */
     private long mCurPlayingTime = 0;
     /**
-     * 刷新延时时间
+     * 动感歌词行歌词中字刷新时间
      */
-    private long mRefreshTime = 30;
+    private long mRefreshTime = 100;
 
     private AsyncTask mUpdateTask = null;
 
@@ -1252,6 +1252,10 @@ public abstract class AbstractLrcView extends View {
     ///////////////////////////////////////////////
 
 
+    /**
+     * 动感歌词行歌词中字刷新时间
+     * @param refreshTime
+     */
     public void setRefreshTime(long refreshTime) {
         this.mRefreshTime = refreshTime;
     }
